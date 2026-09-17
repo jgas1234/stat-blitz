@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Stat Blitz</string>
+    <string name="title_activity_main">Stat Blitz</string>
+    <string name="package_name">com.jgas1234.statblitz</string>
+    <string name="custom_url_scheme">com.jgas1234.statblitz</string>
+</resources>
