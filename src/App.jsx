@@ -77,7 +77,8 @@ const CATEGORIES_BASEBALL = {
       { name: "Mickey Mantle", value: 536, teams: ["NYY"] },
       { name: "Jimmie Foxx", value: 534, teams: ["BOS", "CHC", "OAK", "PHI"] },
       { name: "Willie McCovey", value: 521, teams: ["OAK", "SDP", "SFG"] },
-      { name: "Frank Thomas", value: 521, teams: ["ATL", "CHC", "CHW", "CIN", "HOU", "NYM", "OAK", "PHI", "PIT", "TOR"] },
+      { name: "Frank Thomas", value: 521, teams: ["CHW", "OAK", "TOR"] },
+      { name: "Frank Thomas Sr.", value: 286, teams: ["PIT", "CIN", "CHC", "ATL", "NYM", "PHI", "HOU"] },
       { name: "Ted Williams", value: 521, teams: ["BOS"] },
       { name: "Ernie Banks", value: 512, teams: ["CHC"] },
       { name: "Eddie Mathews", value: 512, teams: ["ATL", "DET", "HOU"] },
@@ -1169,7 +1170,8 @@ const CATEGORIES_BASEBALL = {
       { name: "Ted Simmons", value: 2472, teams: ["ATL", "MIL", "STL"] },
       { name: "Joe Medwick", value: 2471, teams: ["ATL", "LAD", "SFG", "STL"] },
       { name: "Bobby Abreu", value: 2470, teams: ["HOU", "LAA", "LAD", "NYM", "NYY", "PHI"] },
-      { name: "Frank Thomas", value: 2468, teams: ["ATL", "CHC", "CHW", "CIN", "HOU", "NYM", "OAK", "PHI", "PIT", "TOR"] },
+      { name: "Frank Thomas", value: 2468, teams: ["CHW", "OAK", "TOR"] },
+      { name: "Frank Thomas Sr.", value: 1671, teams: ["PIT", "CIN", "CHC", "ATL", "NYM", "PHI", "HOU"] },
       { name: "Roger Connor", value: 2467, teams: ["NYI", "PHI", "SFG", "STL", "TRT"] },
       { name: "Harry Hooper", value: 2466, teams: ["BOS", "CHW"] },
       { name: "Jeff Kent", value: 2461, teams: ["CLE", "HOU", "LAD", "NYM", "SFG", "TOR"] },
@@ -2096,7 +2098,8 @@ const CATEGORIES_BASEBALL = {
       { name: "David Ortiz", value: 1768, teams: ["BOS", "MIN"] },
       { name: "Honus Wagner", value: 1733, teams: ["LOU", "PIT"] },
       { name: "Adrian Beltre", value: 1707, teams: ["BOS", "LAD", "SEA", "TEX"] },
-      { name: "Frank Thomas", value: 1704, teams: ["ATL", "CHC", "CHW", "CIN", "HOU", "NYM", "OAK", "PHI", "PIT", "TOR"] },
+      { name: "Frank Thomas", value: 1704, teams: ["CHW", "OAK", "TOR"] },
+      { name: "Frank Thomas Sr.", value: 962, teams: ["PIT", "CIN", "CHC", "ATL", "NYM", "PHI", "HOU"] },
       { name: "Reggie Jackson", value: 1702, teams: ["BAL", "LAA", "NYY", "OAK"] },
       { name: "Jim Thome", value: 1699, teams: ["BAL", "CHW", "CLE", "LAD", "MIN", "PHI"] },
       { name: "Cal Ripken", value: 1695, teams: ["BAL"] },
@@ -17823,7 +17826,7 @@ export default function StatBlitz() {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center py-8 px-3"
+      className="min-h-screen w-full flex justify-center py-8 px-3"
       style={{ background: "radial-gradient(circle at 50% 0%, #16233d 0%, #0a1120 55%, #060a14 100%)" }}
     >
       <style>{`
