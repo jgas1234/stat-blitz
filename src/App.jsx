@@ -17379,6 +17379,7 @@ function formatMs(ms) {
 // restrict audio until the user has interacted with the page, and a
 // missing sound should never break the actual game.
 let sharedAudioCtx = null;
+let isMuted = false;
 function getAudioCtx() {
   if (!sharedAudioCtx) {
     sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -17387,6 +17388,7 @@ function getAudioCtx() {
 }
 
 function playTickSound() {
+  if (isMuted) return;
   try {
     const ctx = getAudioCtx();
     const now = ctx.currentTime;
@@ -17405,6 +17407,7 @@ function playTickSound() {
 }
 
 function playSuccessSound() {
+  if (isMuted) return;
   try {
     const ctx = getAudioCtx();
     const now = ctx.currentTime;
@@ -17450,6 +17453,7 @@ function playSuccessSound() {
 }
 
 function playMissSound() {
+  if (isMuted) return;
   try {
     const ctx = getAudioCtx();
     const now = ctx.currentTime;
@@ -17513,6 +17517,29 @@ export default function StatBlitz() {
   const [challengePanel, setChallengePanel] = useState(null); // null | "create" | "enter"
   const [challengeStatus, setChallengeStatus] = useState("");
   const [challengeBusy, setChallengeBusy] = useState(false);
+
+  const [muted, setMuted] = useState(false);
+
+  // Load the saved mute preference from this device once, on first render.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("statBlitzMuted");
+      if (saved !== null) setMuted(saved === "true");
+    } catch (err) {
+      // localStorage unavailable — preference just won't persist this session
+    }
+  }, []);
+
+  // Keep the module-level mute flag (checked by the standalone sound
+  // functions, which live outside the component) in sync with this state.
+  useEffect(() => {
+    isMuted = muted;
+    try {
+      localStorage.setItem("statBlitzMuted", String(muted));
+    } catch (err) {
+      // localStorage unavailable — preference just won't persist this session
+    }
+  }, [muted]);
 
   const [dailyMode, setDailyMode] = useState(false); // is the daily question panel open
   const [dailyQuestion, setDailyQuestion] = useState(null); // built question text/options for display
@@ -17985,7 +18012,14 @@ export default function StatBlitz() {
         style={{ background: "linear-gradient(180deg, #101a2e 0%, #0b1424 100%)", boxShadow: "0 30px 60px -20px rgba(0,0,0,0.6)" }}
       >
         {/* HEADER */}
-        <div className="px-6 pt-6 pb-4 text-center border-b border-white/10">
+        <div className="relative px-6 pt-6 pb-4 text-center border-b border-white/10">
+          <button
+            onClick={() => setMuted((m) => !m)}
+            title={muted ? "Unmute sounds" : "Mute sounds"}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10"
+          >
+            {muted ? "🔇" : "🔊"}
+          </button>
           <p className="text-[11px] tracking-widest text-amber-400/80 font-semibold mb-1">SPIN A TEAM. FIND ANY PLAYER WHO SUITED UP.</p>
           <h1 className="font-scoreboard text-white text-5xl leading-none">STAT BLITZ</h1>
           <p className="text-slate-400 text-sm mt-2">Build a lineup that hits the target total.</p>
