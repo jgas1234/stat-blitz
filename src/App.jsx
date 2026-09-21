@@ -17371,6 +17371,110 @@ function formatMs(ms) {
   return `${minutes}:${String(seconds).padStart(2, "0")}.${tenths}`;
 }
 
+// All three sounds are synthesized entirely in-browser with the Web
+// Audio API — no audio files to host, license, or bundle. They share one
+// AudioContext (created lazily on first use) rather than each spinning up
+// its own, since the tick sound alone can fire dozens of times per
+// session. Every call is wrapped in try/catch since some browsers
+// restrict audio until the user has interacted with the page, and a
+// missing sound should never break the actual game.
+let sharedAudioCtx = null;
+function getAudioCtx() {
+  if (!sharedAudioCtx) {
+    sharedAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return sharedAudioCtx;
+}
+
+function playTickSound() {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "square";
+    osc.frequency.value = 900;
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.03);
+  } catch (err) {
+    // Audio unavailable — fail silently, never block gameplay.
+  }
+}
+
+function playSuccessSound() {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+
+    // Bright ascending arpeggio — the "you did it" cue.
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = freq;
+      const start = now + i * 0.09;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.25, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.3);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.35);
+    });
+
+    // A short filtered-noise swell layered underneath for a "crowd" texture.
+    const bufferSize = ctx.sampleRate * 0.6;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.3;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const noiseFilter = ctx.createBiquadFilter();
+    noiseFilter.type = "bandpass";
+    noiseFilter.frequency.value = 2000;
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0, now);
+    noiseGain.gain.linearRampToValueAtTime(0.15, now + 0.05);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+    noise.connect(noiseFilter).connect(noiseGain).connect(ctx.destination);
+    noise.start(now);
+    noise.stop(now + 0.6);
+  } catch (err) {
+    // Audio unavailable — fail silently, never block gameplay.
+  }
+}
+
+function playMissSound() {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+
+    // Classic descending "wah wah womp" — the disappointment cue.
+    const notes = [392, 349.23, 293.66]; // G4, F4, D4
+    notes.forEach((freq, i) => {
+      const start = now + i * 0.28;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(freq, start);
+      osc.frequency.linearRampToValueAtTime(freq * 0.85, start + 0.25);
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.2, start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.28);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start + 0.3);
+    });
+  } catch (err) {
+    // Audio unavailable — fail silently, never block gameplay.
+  }
+}
+
 function challengeSummaryText(cat, difficulty, total, speedRun, runEndTime, runStartTime) {
   const diffLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
   if (speedRun && runStartTime && runEndTime) {
@@ -17513,6 +17617,18 @@ export default function StatBlitz() {
     if (roundComplete && summaryRef.current) {
       summaryRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  }, [roundComplete]);
+
+  // Play a reaction sound the moment the lineup finishes — a cheer if
+  // the target was hit, a letdown sound if it fell short.
+  useEffect(() => {
+    if (!roundComplete) return;
+    if (goalReached) {
+      playSuccessSound();
+    } else {
+      playMissSound();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundComplete]);
 
   function toggleSpeedRun() {
@@ -17701,6 +17817,7 @@ export default function StatBlitz() {
     function tick() {
       ticks += 1;
       setDisplayTeam(randomTeam(teams));
+      playTickSound();
       if (ticks >= totalTicks) {
         setDisplayTeam(finalTeam);
         assignTeamToSlot(targetIndex, finalTeam);
