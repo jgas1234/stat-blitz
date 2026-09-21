@@ -17826,7 +17826,7 @@ export default function StatBlitz() {
 
   return (
     <div
-      className="min-h-screen w-full flex justify-center py-8 px-3"
+      className="min-h-dvh w-full flex justify-center py-8 px-3"
       style={{ background: "radial-gradient(circle at 50% 0%, #16233d 0%, #0a1120 55%, #060a14 100%)" }}
     >
       <style>{`
