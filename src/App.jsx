@@ -12835,7 +12835,7 @@ const CATEGORIES_FOOTBALL = {
       { name: "Chris Streveler", value: 231, teams: ["ARI", "NYJ"] },
       { name: "Wetterlund, Chet", value: 230, teams: ["DET"] },
       { name: "Del Bello, Jack", value: 229, teams: ["IND"] },
-      { name: "Warren Moon", value: 228, teams: ["KC"] },
+      { name: "Warren Moon", value: 49325, teams: ["TEN", "MIN", "SEA", "KC"] },
       { name: "Will Grier", value: 228, teams: ["CAR"] },
       { name: "Patterson, Billy", value: 227, teams: ["CHI"] },
       { name: "Tomasic, Andy", value: 227, teams: ["PIT"] },
@@ -13230,6 +13230,7 @@ const CATEGORIES_FOOTBALL = {
     targets20: { easy: 5500, medium: 6500, hard: 7500 },
     players: [
       { name: "Tom Brady", value: 738, teams: ["NE", "TB"] },
+      { name: "Warren Moon", value: 291, teams: ["TEN", "MIN", "SEA", "KC"] },
       { name: "Drew Brees", value: 608, teams: ["LAC", "NO"] },
       { name: "Peyton Manning", value: 553, teams: ["DEN", "IND"] },
       { name: "Aaron Rodgers", value: 548, teams: ["GB", "NYJ", "PIT"] },
