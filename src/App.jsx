@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const TEAMS_BASEBALL = [
   { abbr: "NYY", name: "Yankees", color: "#0C2340" },
@@ -17390,6 +17390,8 @@ export default function StatBlitz() {
   const [slotCount, setSlotCount] = useState(10);
   const [slots, setSlots] = useState(() => emptySlots(10));
   const [activeIndex, setActiveIndex] = useState(0);
+  const slotRefs = useRef([]);
+  const summaryRef = useRef(null);
   const [spinning, setSpinning] = useState(false);
   const [displayTeam, setDisplayTeam] = useState(SPORTS.baseball.teams[0]);
   const [revealed, setRevealed] = useState(false);
@@ -17494,6 +17496,24 @@ export default function StatBlitz() {
       setBestTime((prev) => (prev === null || elapsed < prev ? elapsed : prev));
     }
   }, [roundComplete, speedRun, runStartTime, runEndTime]);
+
+  // Auto-scroll to the newly active slot as the lineup advances, so you
+  // never have to manually scroll down to find what's next.
+  useEffect(() => {
+    if (roundComplete) return;
+    const el = slotRefs.current[activeIndex];
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [activeIndex, roundComplete]);
+
+  // Once the lineup is complete, scroll back up to the running total so
+  // the final score is immediately visible.
+  useEffect(() => {
+    if (roundComplete && summaryRef.current) {
+      summaryRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [roundComplete]);
 
   function toggleSpeedRun() {
     setSpeedRun((s) => !s);
@@ -18094,7 +18114,7 @@ export default function StatBlitz() {
         </div>
 
         {/* SPIN STATUS */}
-        <div className="px-5 mt-5">
+        <div ref={summaryRef} className="px-5 mt-5">
           <p className="text-center text-xs text-slate-400">
             {roundComplete
               ? "Lineup complete"
@@ -18300,6 +18320,7 @@ export default function StatBlitz() {
             return (
               <div
                 key={i}
+                ref={(el) => (slotRefs.current[i] = el)}
                 className={
                   "rounded-xl border bg-white/5 p-2.5 transition-opacity " +
                   ring +
