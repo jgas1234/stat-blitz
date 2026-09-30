@@ -1,5 +1,349 @@
 import React, { useState, useEffect, useRef } from "react";
 
+// Primary fielding position for baseball position players, used only by
+// Career Home Runs / Hits / RBI / Stolen Bases (the four batting-counting
+// categories). Keyed by the exact `name` string used in those categories'
+// player entries. Not yet wired into any game logic — populated from
+// Baseball-Reference's positional WAR leaderboards, starting with catchers.
+const POSITIONS_BASEBALL = [
+  { abbr: "C", name: "Catcher" },
+  { abbr: "1B", name: "First Base" },
+  { abbr: "2B", name: "Second Base" },
+  { abbr: "3B", name: "Third Base" },
+  { abbr: "SS", name: "Shortstop" },
+  { abbr: "OF", name: "Outfield" },
+  { abbr: "DH", name: "Designated Hitter" },
+];
+
+// Lineup Builder mode: one shared team spins above the whole board (not
+// per slot). Each spin gives a team; the player may drop that team's
+// player into ANY still-open slot whose required position matches. The
+// 9 slots below are fixed and always in this order — unlike Position
+// Mode, the player doesn't choose which slot is which.
+const BUILDER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "OF", "OF", "OF", "DH"];
+
+// Re-spins are a limited resource: burn one to reject the team just
+// spun (whether it's fully dead — no valid player for any open slot —
+// or just one you don't like) and try again immediately. Hard mode
+// gets none, so whatever spins up, you live with it; a truly dead spin
+// with zero re-spins left just auto-continues for free, since there's
+// no legal action to take anyway.
+const BUILDER_RESPINS = { easy: 6, medium: 3, hard: 0 };
+
+const PLAYER_POSITIONS = {
+  "Johnny Bench": "C", "Gary Carter": "C", "Ivan Rodriguez": "C", "Carlton Fisk": "C",
+  "Mike Piazza": "C", "Yogi Berra": "C", "Joe Mauer": "C", "Bill Dickey": "C",
+  "Mickey Cochrane": "C", "Gabby Hartnett": "C", "Ted Simmons": "C", "Thurman Munson": "C",
+  "Gene Tenace": "C", "Buster Posey": "C", "Buck Ewing": "C", "Bill Freehan": "C",
+  "Roy Campanella": "C", "Wally Schang": "C", "Jorge Posada": "C", "Roger Bresnahan": "C",
+  "Jason Kendall": "C", "Yadier Molina": "C", "Josh Gibson": "C", "Darrell Porter": "C",
+  "Jim Sundberg": "C", "J.T. Realmuto": "C", "Lance Parrish": "C", "Russell Martin": "C",
+  "Ernie Lombardi": "C", "Victor Martinez": "C", "Salvador Perez": "C", "Willson Contreras": "C",
+  "Ray Schalk": "C", "Smoky Burgess": "C", "Brian McCann": "C", "Javy Lopez": "C",
+  "Manny Sanguillen": "C", "Mickey Tettleton": "C", "Elston Howard": "C", "Tom Haller": "C",
+  "Duke Farrell": "C", "Del Crandall": "C", "Sherm Lollar": "C", "Rick Ferrell": "C",
+  "Ed Bailey": "C", "Walker Cooper": "C", "Tim McCarver": "C", "Terry Steinbach": "C",
+  "Tony Pena": "C", "Mike Napoli": "C", "Bob Boone": "C", "Jack Clements": "C",
+  "Darren Daulton": "C", "Benito Santiago": "C", "Chris Hoiles": "C", "Jason Varitek": "C",
+  "Charles Johnson": "C", "Deacon McGuire": "C", "A. J. Pierzynski": "C", "John Romano": "C",
+  "Ramon Hernandez": "C", "Mike Stanley": "C", "Andy Seminick": "C", "Cal Raleigh": "C",
+  "Yasmani Grandal": "C", "Kurt Suzuki": "C", "George Miller": "C", "Ernie Whitt": "C",
+  "Matt Wieters": "C", "Jody Davis": "C", "Brad Ausmus": "C", "Chris Iannetta": "C",
+  "Wilson Ramos": "C", "Mike Lieberthal": "C", "Gary Sanchez": "C", "Gus Triandos": "C",
+  "Mike Macfarlane": "C", "Al Lopez": "C", "Todd Hundley": "C",
+  "Bengie Molina": "C", "Mike Zunino": "C", "Matt Nokes": "C", "Jack O'Connor": "C",
+  "Earl Williams": "C", "Miguel Olivo": "C", "Evan Gattis": "C", "Wilbert Robinson": "C",
+  "Rod Barajas": "C", "Luke Sewell": "C", "John Buck": "C",
+  "Lou Gehrig": "1B", "Albert Pujols": "1B", "Jimmie Foxx": "1B", "Cap Anson": "1B",
+  "Roger Connor": "1B", "Jeff Bagwell": "1B", "Dan Brouthers": "1B", "Frank Thomas": "1B",
+  "Johnny Mize": "1B", "Jim Thome": "1B", "Miguel Cabrera": "1B", "Rafael Palmeiro": "1B",
+  "Joey Votto": "1B", "Paul Goldschmidt": "1B", "Willie McCovey": "1B", "Todd Helton": "1B",
+  "Eddie Murray": "1B", "Freddie Freeman": "1B", "Mark McGwire": "1B", "George Sisler": "1B",
+  "Hank Greenberg": "1B", "Keith Hernandez": "1B", "Bill Terry": "1B", "Harmon Killebrew": "1B",
+  "John Olerud": "1B", "Joe Torre": "1B", "Jason Giambi": "1B", "Will Clark": "1B",
+  "Jake Beckley": "1B", "Tony Perez": "1B", "David Ortiz": "1B", "Fred McGriff": "1B",
+  "Mark Teixeira": "1B", "Norm Cash": "1B", "Orlando Cepeda": "1B", "Dolph Camilli": "1B",
+  "Frank Chance": "1B", "Matt Olson": "1B", "Carlos Delgado": "1B", "Ed Konetchy": "1B",
+  "Adrian Gonzalez": "1B", "Don Mattingly": "1B", "Gil Hodges": "1B", "Mark Grace": "1B",
+  "Jack Fournier": "1B", "Joe Judge": "1B", "Anthony Rizzo": "1B", "Fred Tenney": "1B",
+  "Bill White": "1B", "Boog Powell": "1B", "Steve Garvey": "1B", "George Scott": "1B",
+  "Harry Davis": "1B", "Lu Blue": "1B", "Kent Hrbek": "1B", "Cecil Cooper": "1B",
+  "Jake Daubert": "1B", "Jim Bottomley": "1B", "Carlos Santana": "1B", "Kevin Youkilis": "1B",
+  "Phil Cavarretta": "1B", "Mule Suttles": "1B", "Edwin Encarnacion": "1B", "Derrek Lee": "1B",
+  "Dan McGann": "1B", "Stuffy McInnis": "1B", "Mickey Vernon": "1B", "George Burns": "1B",
+  "Ted Kluszewski": "1B", "Wally Joyner": "1B", "Ron Fairly": "1B", "Rudy York": "1B",
+  "Earl Torgeson": "1B", "Jud Wilson": "1B", "Andres Galarraga": "1B", "Frank McCormick": "1B",
+  "Hal Trosky": "1B", "Joe Adcock": "1B", "Jose Abreu": "1B", "Pete Alonso": "1B",
+  "Wally Pipp": "1B", "Mike Hargrove": "1B", "Mo Vaughn": "1B", "Joe Kuhel": "1B",
+  "Vladimir Guerrero Jr.": "1B", "Brandon Belt": "1B", "Henry Larkin": "1B", "Bob Watson": "1B",
+  "Justin Morneau": "1B", "Tino Martinez": "1B", "Carlos Pena": "1B", "Paul Konerko": "1B",
+  "Travis Hafner": "1B", "Lee May": "1B", "Ryan Klesko": "1B", "John Mayberry": "1B",
+  "Roy Sievers": "1B", "Prince Fielder": "1B", "Chris Chambliss": "1B", "Ripper Collins": "1B",
+  "Bill Skowron": "1B", "Jason Thompson": "1B", "Andre Thornton": "1B", "John Reilly": "1B",
+  "Mike Sweeney": "1B", "Tommy Tucker": "1B", "Jack Doyle": "1B", "Hal Chase": "1B",
+  "Aubrey Huff": "1B", "Gus Suhr": "1B", "Zeke Bonura": "1B", "Alvin Davis": "1B",
+  "Earl Sheely": "1B", "Don Mincher": "1B", "Norm Siebern": "1B", "George McQuinn": "1B",
+  "Donn Clendenon": "1B", "Glenn Davis": "1B", "Dick Hoblitzell": "1B", "Pete O'Brien": "1B",
+  "Fred Merkle": "1B", "Richie Sexson": "1B", "Eric Hosmer": "1B", "Dan Driessen": "1B",
+  "Gregg Jefferies": "1B", "Bruce Bochte": "1B", "Jake Stahl": "1B", "Christian Walker": "1B",
+  "Cecil Fielder": "1B", "Jim Gentile": "1B", "Ryan Howard": "1B", "Lyle Overbay": "1B",
+  "Jeff King": "1B", "Sean Casey": "1B", "Leon Durham": "1B", "Vic Power": "1B",
+  "Bill Buckner": "1B", "Nate Colbert": "1B", "Cliff Johnson": "1B", "Chris Davis": "1B",
+  "Eddie Robinson": "1B", "Adam LaRoche": "1B", "Kendrys Morales": "1B", "Tony Clark": "1B",
+  "Kevin Millar": "1B", "Adam Lind": "1B", "John Jaha": "1B", "Mike Epstein": "1B",
+  "C. J. Cron": "1B", "Charlie Grimm": "1B", "Billy Butler": "1B", "David Segui": "1B",
+  "Eric Karros": "1B", "J. T. Snow": "1B", "Rhys Hoskins": "1B", "Kitty Bransfield": "1B",
+  "Russell Branyan": "1B", "Mitch Moreland": "1B", "Josh Bell": "1B", "Bill Everitt": "1B",
+  "Mark Trumbo": "1B", "Dale Long": "1B", "Joe Pepitone": "1B", "Deron Johnson": "1B",
+  "Charlie Comiskey": "1B", "Wilmer Flores": "1B", "Lucas Duda": "1B", "Dick Stuart": "1B",
+  "Eddie Collins": "2B", "Nap Lajoie": "2B", "Craig Biggio": "2B", "Rod Carew": "2B",
+  "Rogers Hornsby": "2B", "Frankie Frisch": "2B", "Charlie Gehringer": "2B", "Roberto Alomar": "2B",
+  "Nellie Fox": "2B", "Robinson Cano": "2B", "Julio Franco": "2B", "Jose Altuve": "2B",
+  "Joe Morgan": "2B", "Jeff Kent": "2B", "Red Schoendienst": "2B", "Ryne Sandberg": "2B",
+  "Lou Whitaker": "2B", "Billy Herman": "2B", "Bid McPhee": "2B", "Willie Randolph": "2B",
+  "Placido Polanco": "2B", "Buddy Myer": "2B", "Ray Durham": "2B", "Bobby Doerr": "2B",
+  "Mark Grudzielanek": "2B", "Brandon Phillips": "2B", "Tony Phillips": "2B", "Jim Gilliam": "2B",
+  "Bill Mazeroski": "2B", "Tony Taylor": "2B", "Frank White": "2B", "Ian Kinsler": "2B",
+  "Del Pratt": "2B", "Steve Sax": "2B", "Bobby Lowe": "2B", "Marty McManus": "2B",
+  "Luis Castillo": "2B", "Larry Doyle": "2B", "Chase Utley": "2B", "Pete Runnels": "2B",
+  "Tony Lazzeri": "2B", "Chuck Knoblauch": "2B", "Bobby Grich": "2B", "Dustin Pedroia": "2B",
+  "Joe Quinn": "2B", "Bret Boone": "2B", "DJ LeMahieu": "2B", "Howie Kendrick": "2B",
+  "Tony Cuccinello": "2B", "Cupid Childs": "2B", "Marcus Semien": "2B", "Mark Loretta": "2B",
+  "Jim Gantner": "2B", "Hardy Richardson": "2B", "Billy Goodman": "2B", "Fred Pfeffer": "2B",
+  "Davey Lopes": "2B", "Cookie Rojas": "2B", "Johnny Evers": "2B", "Bill Hallman": "2B",
+  "Claude Ritchey": "2B", "Jorge Orta": "2B", "Felix Millan": "2B", "Mark McLemore": "2B",
+  "Phil Garner": "2B", "Hughie Critz": "2B", "Sparky Adams": "2B", "Tom Daly": "2B",
+  "Carlos Baerga": "2B", "Juan Samuel": "2B", "Daniel Murphy": "2B", "Dave Cash": "2B",
+  "Jackie Robinson": "2B", "Ben Zobrist": "2B", "Danny Murphy": "2B", "Manny Trillo": "2B",
+  "Jose Offerman": "2B", "Delino DeShields": "2B", "Joe Gordon": "2B", "Dick McAuliffe": "2B",
+  "Brian Roberts": "2B", "Dots Miller": "2B", "Jose Vidro": "2B", "Lou Bierbauer": "2B",
+  "Jimmy Williams": "2B", "George Grantham": "2B", "Johnny Ray": "2B", "Aaron Hill": "2B",
+  "Tito Fuentes": "2B", "Adam Kennedy": "2B", "George Cutshaw": "2B", "Johnny Temple": "2B",
+  "Lonny Frey": "2B", "Miller Huggins": "2B", "Glenn Beckert": "2B", "Julian Javier": "2B",
+  "Tom Herr": "2B", "Ketel Marte": "2B", "Damion Easley": "2B", "Bill Doran": "2B",
+  "Tony Womack": "2B", "Bucky Harris": "2B", "Davey Johnson": "2B", "Mariano Duncan": "2B",
+  "Harold Reynolds": "2B", "Ozzie Albies": "2B", "Jerry Remy": "2B", "Neil Walker": "2B",
+  "Bip Roberts": "2B", "Don Buford": "2B", "Sandy Alomar": "2B", "Dan Uggla": "2B",
+  "Kelly Johnson": "2B", "Danny Richardson": "2B", "Dee Strange-Gordon": "2B", "Damaso Garcia": "2B",
+  "Gleyber Torres": "2B", "Gene DeMontreville": "2B", "Jonathan Schoop": "2B", "Rickie Weeks": "2B",
+  "Jorge Polanco": "2B", "Frank Isbell": "2B", "Brian Dozier": "2B", "Lee Magee": "2B",
+  "Bill Sweeney": "2B", "Germany Schaefer": "2B", "Pop Smith": "2B", "Rougned Odor": "2B",
+  "Julio Cruz": "2B", "William Robinson": "2B", "Brandon Lowe": "2B", "Bump Wills": "2B",
+  "Hub Collins": "2B", "Dick Egan": "2B", "Quilvio Veras": "2B", "Billy Gilbert": "2B",
+  "Jack Crooks": "2B", "Emilio Bonifacio": "2B", "Dave Nelson": "2B", "Alan Wiggins": "2B",
+  "Rodney Scott": "2B", "Pat Kelly": "2B",
+  "Mike Schmidt": "3B", "Eddie Mathews": "3B", "Wade Boggs": "3B", "Adrian Beltre": "3B",
+  "George Brett": "3B", "Chipper Jones": "3B", "Ron Santo": "3B", "Brooks Robinson": "3B",
+  "Paul Molitor": "3B", "Scott Rolen": "3B", "Edgar Martinez": "3B", "Graig Nettles": "3B",
+  "Home Run Baker": "3B", "Ken Boyer": "3B", "Buddy Bell": "3B", "Manny Machado": "3B",
+  "Sal Bando": "3B", "Nolan Arenado": "3B", "Jose Ramirez": "3B", "Dick Allen": "3B",
+  "Evan Longoria": "3B", "Darrell Evans": "3B", "Robin Ventura": "3B", "Stan Hack": "3B",
+  "Jimmy Collins": "3B", "Ron Cey": "3B", "Alex Bregman": "3B", "John McGraw": "3B",
+  "David Wright": "3B", "Josh Donaldson": "3B", "Toby Harrah": "3B", "Bob Elliott": "3B",
+  "Heinie Groh": "3B", "Matt Chapman": "3B", "Matt Williams": "3B", "Tommy Leach": "3B",
+  "Larry Gardner": "3B", "Harlond Clift": "3B", "Lave Cross": "3B", "Doug DeCinces": "3B",
+  "Deacon White": "3B", "Ryan Zimmerman": "3B", "Bill Bradley": "3B", "Troy Glaus": "3B",
+  "Justin Turner": "3B", "Eric Chavez": "3B", "Tim Wallach": "3B", "Carney Lansford": "3B",
+  "Art Devlin": "3B", "Kyle Seager": "3B", "Gary Gaetti": "3B", "Anthony Rendon": "3B",
+  "Bill Madlock": "3B", "Denny Lyons": "3B", "George Kell": "3B", "Pie Traynor": "3B",
+  "Al Rosen": "3B", "Jeff Cirillo": "3B", "Don Money": "3B", "Ken McMullen": "3B",
+  "Eddie Yost": "3B", "Ken Caminiti": "3B", "Travis Fryman": "3B", "Heinie Zimmerman": "3B",
+  "Aramis Ramirez": "3B", "Willie Kamm": "3B", "Ken Keltner": "3B", "Bill Joyce": "3B",
+  "Rafael Devers": "3B", "Max Muncy": "3B", "Billy Nash": "3B", "Bobby Bonilla": "3B",
+  "Edgardo Alfonzo": "3B", "Ezra Sutton": "3B", "Matt Carpenter": "3B", "Kris Bryant": "3B",
+  "Hank Thompson": "3B", "Richie Hebner": "3B", "Jimmy Dykes": "3B", "Arlie Latham": "3B",
+  "Buddy Lewis": "3B", "Harry Steinfeldt": "3B", "Freddie Lindstrom": "3B", "Melvin Mora": "3B",
+  "Kevin Seitzer": "3B", "Martin Prado": "3B", "Terry Pendleton": "3B", "Bob Bailey": "3B",
+  "Clete Boyer": "3B", "Chase Headley": "3B", "Eugenio Suarez": "3B", "Jim Ray Hart": "3B",
+  "Ray Boone": "3B", "Billy Werber": "3B", "Ossie Bluege": "3B", "Todd Frazier": "3B",
+  "Mike Lowell": "3B", "Austin Riley": "3B", "Casey Blake": "3B", "Eddie Foster": "3B",
+  "Pinky Higgins": "3B", "Howard Johnson": "3B", "Willie Jones": "3B", "Chone Figgins": "3B",
+  "Milt Stock": "3B", "Doug Rader": "3B", "Juan Uribe": "3B", "Hans Lobert": "3B",
+  "George Pinkney": "3B", "Bob Horner": "3B", "Vinny Castilla": "3B", "Joe Randa": "3B",
+  "Wid Conroy": "3B", "Pablo Sandoval": "3B", "Jimmy Austin": "3B", "Brandon Inge": "3B",
+  "Mike Mowrey": "3B", "Sammy Strang": "3B", "Bill Melton": "3B", "Phil Nevin": "3B",
+  "Todd Zeile": "3B", "Ryan McMahon": "3B", "Jimmy Johnston": "3B", "Frank Malzone": "3B",
+  "Steve Buechele": "3B", "Billy Shindle": "3B", "Harry Lord": "3B", "Pinky Whitney": "3B",
+  "Scott Brosius": "3B", "Aurelio Rodriguez": "3B", "Larry Parrish": "3B", "Joe Crede": "3B",
+  "Tony Batista": "3B", "Mike Moustakas": "3B", "George Moriarty": "3B", "Dean Palmer": "3B",
+  "Hank Blalock": "3B", "Bobby Byrne": "3B", "Hector Lopez": "3B", "Eduardo Escobar": "3B",
+  "Roy Hartzell": "3B", "Enos Cabell": "3B", "Mike Pagliarulo": "3B", "Charlie Hayes": "3B",
+  "Joe Dugan": "3B", "Howie Shanks": "3B", "Patsy Tebeau": "3B", "Charlie Irwin": "3B",
+  "Eric Hinske": "3B", "Miguel Sano": "3B", "Fritz Maisel": "3B", "Mark Reynolds": "3B",
+  "Pedro Feliz": "3B", "Pedro Alvarez": "3B", "Ed Sprague": "3B", "Rollie Zeider": "3B",
+  "Jerry Royster": "3B", "Ty Wigginton": "3B", "Jim Donnelly": "3B", "Chippy McGarr": "3B",
+  "Honus Wagner": "SS", "Alex Rodriguez": "SS", "Arky Vaughan": "SS", "George Davis": "SS",
+  "Robin Yount": "SS", "Luke Appling": "SS", "Ernie Banks": "SS", "Ozzie Smith": "SS",
+  "Alan Trammell": "SS", "Bill Dahlen": "SS", "Barry Larkin": "SS", "Derek Jeter": "SS",
+  "Bobby Wallace": "SS", "Lou Boudreau": "SS", "Pee Wee Reese": "SS", "Joe Cronin": "SS",
+  "Jack Glasscock": "SS", "Francisco Lindor": "SS", "Willie Wells": "SS", "Joe Sewell": "SS",
+  "Bert Campaneris": "SS", "Jim Fregosi": "SS", "Luis Aparicio": "SS", "Dave Bancroft": "SS",
+  "Nomar Garciaparra": "SS", "Carlos Correa": "SS", "Troy Tulowitzki": "SS", "Joe Tinker": "SS",
+  "Miguel Tejada": "SS", "Corey Seager": "SS", "Art Fletcher": "SS", "Hughie Jennings": "SS",
+  "Vern Stephens": "SS", "Jimmy Rollins": "SS", "Travis Jackson": "SS", "Xander Bogaerts": "SS",
+  "Al Dark": "SS", "Phil Rizzuto": "SS", "Tony Fernandez": "SS", "Roger Peckinpaugh": "SS",
+  "Rabbit Maranville": "SS", "Trea Turner": "SS", "Donie Bush": "SS", "Hanley Ramirez": "SS",
+  "Mark Belanger": "SS", "Omar Vizquel": "SS", "Rico Petrocelli": "SS", "Dick Bartell": "SS",
+  "Rafael Furcal": "SS", "Dave Concepcion": "SS", "Maury Wills": "SS", "Jay Bell": "SS",
+  "Freddy Parent": "SS", "Ed McKean": "SS", "Johnny Pesky": "SS", "Jose Reyes": "SS",
+  "Dick Groat": "SS", "Terry Turner": "SS", "Trevor Story": "SS", "Herman Long": "SS",
+  "Elvis Andrus": "SS", "Eddie Joost": "SS", "Cecil Travis": "SS", "John Ward": "SS",
+  "Dansby Swanson": "SS", "Kid Elberfeld": "SS", "Edgar Renteria": "SS", "Marty Marion": "SS",
+  "Brandon Crawford": "SS", "Jose Valentin": "SS", "Jhonny Peralta": "SS", "Ray Chapman": "SS",
+  "Javier Baez": "SS", "Chris Speier": "SS", "Bill Russell": "SS", "J. J. Hardy": "SS",
+  "Asdrubal Cabrera": "SS", "Roy Smalley": "SS", "Jean Segura": "SS", "Garry Templeton": "SS",
+  "Buck Herzog": "SS", "Willy Adames": "SS", "Leo Cardenas": "SS", "Billy Jurges": "SS",
+  "Yunel Escobar": "SS", "Glenn Wright": "SS", "Mike Bordick": "SS", "Harvey Kuenn": "SS",
+  "Greg Gagne": "SS", "Michael Young": "SS", "Dickie Thon": "SS", "Roy McMillan": "SS",
+  "Freddie Patek": "SS", "Larry Bowa": "SS", "Woodie Held": "SS", "Frankie Crosetti": "SS",
+  "Buck Weaver": "SS", "Orlando Cabrera": "SS", "Tom Burns": "SS", "Ozzie Guillen": "SS",
+  "Granny Hamner": "SS", "Germany Smith": "SS", "Frank Fennelly": "SS", "Sam Wise": "SS",
+  "Royce Clayton": "SS", "Didi Gregorius": "SS", "Tommy Corcoran": "SS", "Rich Aurilia": "SS",
+  "Ian Desmond": "SS", "Starlin Castro": "SS", "Everett Scott": "SS", "Monte Cross": "SS",
+  "Red Kress": "SS", "Hubie Brooks": "SS", "Paul Radford": "SS", "Mickey Doolin": "SS",
+  "Cristian Guzman": "SS", "Julio Lugo": "SS", "Jose Hernandez": "SS", "Paul DeJong": "SS",
+  "Jonathan Villar": "SS", "Ivan de Jesus": "SS", "Alcides Escobar": "SS", "Shawon Dunston": "SS",
+  "Alex Gonzalez": "SS", "Don Kessinger": "SS", "Bones Ely": "SS",
+  "Jose Vizcaino": "SS", "Tim Foli": "SS", "Shorty Fuller": "SS",
+  "Ivy Olson": "SS", "Alfredo Griffin": "SS", "Frank Taveras": "SS",
+  "Willie Mays": "OF", "Ty Cobb": "OF", "Tris Speaker": "OF", "Mickey Mantle": "OF",
+  "Mike Trout": "OF", "Ken Griffey Jr.": "OF", "Joe DiMaggio": "OF", "Duke Snider": "OF",
+  "Carlos Beltran": "OF", "Kenny Lofton": "OF", "Andruw Jones": "OF", "Richie Ashburn": "OF",
+  "Andre Dawson": "OF", "Billy Hamilton": "OF", "Jim Edmonds": "OF", "Willie Davis": "OF",
+  "Jim Wynn": "OF", "Larry Doby": "OF", "Cesar Cedeno": "OF", "Vada Pinson": "OF",
+  "Chet Lemon": "OF", "Earl Averill": "OF", "Turkey Stearnes": "OF", "Max Carey": "OF",
+  "Johnny Damon": "OF", "Kirby Puckett": "OF", "Fred Lynn": "OF", "Dale Murphy": "OF",
+  "Bernie Williams": "OF", "Andrew McCutchen": "OF", "Brett Butler": "OF", "Devon White": "OF",
+  "Oscar Charleston": "OF", "Curtis Granderson": "OF", "Ellis Burks": "OF", "Torii Hunter": "OF",
+  "Earle Combs": "OF", "Willie Wilson": "OF", "Mike Cameron": "OF", "Wally Berger": "OF",
+  "Edd Roush": "OF", "Steve Finley": "OF", "Lenny Dykstra": "OF", "Amos Otis": "OF",
+  "Hack Wilson": "OF", "Curt Flood": "OF", "Andy Van Slyke": "OF", "Roy Thomas": "OF",
+  "Hugh Duffy": "OF", "Paul Blair": "OF", "Jimmy Ryan": "OF", "Ben Chapman": "OF",
+  "Pete Browning": "OF", "Al Oliver": "OF", "Fielder Jones": "OF", "Paul Hines": "OF",
+  "Lorenzo Cain": "OF", "Ray Lankford": "OF", "Clyde Milan": "OF", "Mike Griffin": "OF",
+  "Cody Bellinger": "OF", "George Gore": "OF", "Garry Maddox": "OF", "Eric Davis": "OF",
+  "Andy Pafko": "OF", "Brady Anderson": "OF", "George Van Haltren": "OF", "Dwayne Murphy": "OF",
+  "Willie McGee": "OF", "Chili Davis": "OF", "Cy Williams": "OF", "Bobby Murcer": "OF",
+  "Byron Buxton": "OF", "Dom DiMaggio": "OF", "Bobby Thomson": "OF", "Darin Erstad": "OF",
+  "Mickey Rivers": "OF", "Shane Victorino": "OF", "Cy Seymour": "OF", "Jacoby Ellsbury": "OF",
+  "Chick Stahl": "OF", "Lance Johnson": "OF", "Adam Jones": "OF", "Ginger Beaumont": "OF",
+  "Billy Hoy": "OF", "Sam West": "OF", "Marquis Grissom": "OF", "Benny Kauff": "OF",
+  "Baby Doll Jacobson": "OF", "Rick Monday": "OF", "Mike Donlin": "OF", "Grady Sizemore": "OF",
+  "Jim Piersall": "OF", "Josh Hamilton": "OF", "Vernon Wells": "OF", "Dave Henderson": "OF",
+  "Cesar Tovar": "OF", "Lloyd Waner": "OF", "Tony Gonzalez": "OF", "Bill North": "OF",
+  "George Hendrick": "OF", "Lloyd Moseby": "OF", "Denard Span": "OF", "Cool Papa Bell": "OF",
+  "Coco Crisp": "OF", "Randy Winn": "OF", "Amos Strunk": "OF", "Tommie Agee": "OF",
+  "Brandon Nimmo": "OF", "Marlon Byrd": "OF", "Johnny Mostil": "OF", "Dode Paskert": "OF",
+  "Bill Lange": "OF", "Burt Shotton": "OF", "Stan Javier": "OF", "Carlos Gomez": "OF",
+  "Al Bumbry": "OF", "Matty Alou": "OF", "Michael Bourn": "OF", "Bill Bruton": "OF",
+  "Matt Kemp": "OF", "Mark Kotsay": "OF", "AJ Pollock": "OF", "Jake Stenzel": "OF",
+  "Ruppert Jones": "OF", "Johnny Bates": "OF", "Jerry Mumphrey": "OF", "David DeJesus": "OF",
+  "Carl Everett": "OF", "Gorman Thomas": "OF", "Mookie Wilson": "OF", "Gary Pettis": "OF",
+  "Mack Jones": "OF", "Charlie Blackmon": "OF", "Curt Welch": "OF", "Aaron Rowand": "OF",
+  "Colby Rasmus": "OF", "Roberto Kelly": "OF", "Jose Cardenal": "OF", "Ron LeFlore": "OF",
+  "Bill Virdon": "OF", "Dave Martinez": "OF", "Bug Holliday": "OF", "Milt Thompson": "OF",
+  "Angel Pagan": "OF", "Dexter Fowler": "OF", "Steve Brodie": "OF", "B. J. Upton": "OF",
+  "Juan Pierre": "OF", "Sam Chapman": "OF", "Chris Young": "OF", "Solly Hofman": "OF",
+  "Emmet Heidrick": "OF", "Gus Bell": "OF", "Darryl Hamilton": "OF", "Joc Pederson": "OF",
+  "Ned Hanlon": "OF", "Charlie Hemphill": "OF", "Tom Brown": "OF", "Lee Mazzilli": "OF",
+  "Otis Nixon": "OF", "Brian McRae": "OF", "Duff Cooley": "OF", "Gary Matthews": "OF",
+  "Fred Snodgrass": "OF", "Jarrod Dyson": "OF", "Randal Grichuk": "OF", "Rube Oldring": "OF",
+  "Jack Smith": "OF", "Cameron Maybin": "OF", "Jim McTamany": "OF", "Bobby Tolan": "OF",
+  "Chad Curtis": "OF", "Doc Cramer": "OF", "Jim Hickman": "OF", "Don Demeter": "OF",
+  "Rick Manning": "OF", "Rajai Davis": "OF", "Doug Glanville": "OF", "Corey Patterson": "OF",
+  "Harry Bay": "OF", "Omar Moreno": "OF", "Oddibe McDowell": "OF", "Darren Lewis": "OF",
+  "Dave Roberts": "OF", "Rudy Law": "OF", "Tom Goodwin": "OF", "Danny Hoffman": "OF",
+  "Juan Encarnacion": "OF", "Ollie Pickering": "OF", "Ben Revere": "OF", "Dave Philley": "OF",
+  "Preston Wilson": "OF", "Brian Hunter": "OF", "Scott Podsednik": "OF", "Bob Dernier": "OF",
+  "Deion Sanders": "OF", "Tony Gwynn": "OF", "Dave Fultz": "OF", "Willy Taveras": "OF",
+  "Rebel Oakes": "OF", "Armando Marsans": "OF", "Jimmy McAleer": "OF", "Ed Andrews": "OF",
+  "Babe Ruth": "OF", "Hank Aaron": "OF", "Stan Musial": "OF", "Mel Ott": "OF",
+  "Frank Robinson": "OF", "Roberto Clemente": "OF", "Al Kaline": "OF", "Sam Crawford": "OF",
+  "Reggie Jackson": "OF", "Paul Waner": "OF", "Larry Walker": "OF", "Harry Heilmann": "OF",
+  "Dwight Evans": "OF", "Reggie Smith": "OF", "Dave Winfield": "OF", "Shoeless Joe Jackson": "OF",
+  "Gary Sheffield": "OF", "Bobby Abreu": "OF", "Vladimir Guerrero": "OF", "Ichiro Suzuki": "OF",
+  "Sammy Sosa": "OF", "Bobby Bonds": "OF", "Enos Slaughter": "OF", "Willie Keeler": "OF",
+  "Harry Hooper": "OF", "Elmer Flick": "OF", "Jack Clark": "OF", "Sam Rice": "OF",
+  "Brian Giles": "OF", "Kiki Cuyler": "OF", "Rusty Staub": "OF", "J. D. Drew": "OF",
+  "Rocky Colavito": "OF", "Sam Thompson": "OF", "King Kelly": "OF", "Chuck Klein": "OF",
+  "Tony Oliva": "OF", "Dixie Walker": "OF", "Jose Canseco": "OF", "Darryl Strawberry": "OF",
+  "Felipe Alou": "OF", "Mike Tiernan": "OF", "Ken Singleton": "OF", "Bill Nicholson": "OF",
+  "Tim Salmon": "OF", "David Justice": "OF", "Babe Herman": "OF", "Dave Parker": "OF",
+  "Reggie Sanders": "OF", "Jesse Barfield": "OF", "Giancarlo Stanton": "OF", "Paul O'Neill": "OF",
+  "Magglio Ordonez": "OF", "Juan Gonzalez": "OF", "Harold Baines": "OF", "Johnny Callison": "OF",
+  "Kirk Gibson": "OF", "Roger Maris": "OF", "Tommy Henrich": "OF", "Jose Bautista": "OF",
+  "Jason Heyward": "OF", "Carl Furillo": "OF", "Shawn Green": "OF", "Tommy Holmes": "OF",
+  "Bob Allison": "OF", "Shin-Soo Choo": "OF", "Gavvy Cravath": "OF", "Nick Markakis": "OF",
+  "Wally Moses": "OF", "Brian Jordan": "OF", "Nelson Cruz": "OF", "Mookie Betts": "OF",
+  "Ross Youngs": "OF", "Hunter Pence": "OF", "Von Hayes": "OF", "Raul Mondesi": "OF",
+  "Jayson Werth": "OF", "Bing Miller": "OF", "Terry Puhl": "OF", "Sixto Lezcano": "OF",
+  "Jackie Jensen": "OF", "Bob Meusel": "OF", "Alex Rios": "OF", "Vic Wertz": "OF",
+  "Bryce Harper": "OF", "Hank Bauer": "OF", "Oyster Burns": "OF", "Buck Freeman": "OF",
+  "Frank Schulte": "OF", "Danny Tartabull": "OF", "Josh Reddick": "OF", "Jay Buhner": "OF",
+  "Oscar Gamble": "OF", "Bake McBride": "OF", "Jim Northrup": "OF", "Nick Swisher": "OF",
+  "Tom Brunansky": "OF", "Curt Walker": "OF", "Danny Green": "OF", "Trot Nixon": "OF",
+  "Andre Ethier": "OF", "Carl Reynolds": "OF", "Jermaine Dye": "OF", "Jack Tobin": "OF",
+  "Al Smith": "OF", "Willard Marshall": "OF", "J.D. Martinez": "OF", "Jeromy Burnitz": "OF",
+  "Joe Carter": "OF", "Claudell Washington": "OF", "Richard Hidalgo": "OF", "Mike Mitchell": "OF",
+  "Jay Bruce": "OF", "Patsy Donovan": "OF", "Chicken Wolf": "OF", "George Springer": "OF",
+  "Wally Post": "OF", "Jeff Burroughs": "OF", "Michael Cuddyer": "OF", "Yasiel Puig": "OF",
+  "Ruben Sierra": "OF", "Braggo Roth": "OF", "Tommy McCarthy": "OF", "Red Murray": "OF",
+  "Tony Armas": "OF", "Al Cowens": "OF", "Bruce Campbell": "OF", "Jim Fogarty": "OF",
+  "Matt Lawton": "OF", "Corey Hart": "OF", "Matt Stairs": "OF", "Kole Calhoun": "OF",
+  "Rob Deer": "OF", "Cody Ross": "OF", "Elmer Smith": "OF", "Pete Fox": "OF",
+  "Derek Bell": "OF", "Aaron Judge": "OF", "Tony Conigliaro": "OF", "Max Flack": "OF",
+  "Ryan Ludwick": "OF", "Shano Collins": "OF", "Cliff Heathcote": "OF", "Mike Marshall": "OF",
+  "Willie Kirkland": "OF", "George Browne": "OF", "Max Kepler": "OF", "Jeff Francoeur": "OF",
+  "Danny Moeller": "OF", "Ken Harrelson": "OF", "Jose Guillen": "OF", "Dante Bichette": "OF",
+  "Jay Gibbons": "OF", "Brandon Moss": "OF", "Avisail Garcia": "OF", "Hugh Nicol": "OF",
+  "Keith Moreland": "OF", "Billy Sunday": "OF", "Charlie Dexter": "OF", "Hunter Renfroe": "OF",
+  "Roger Cedeno": "OF", "Cory Snyder": "OF", "Jorge Soler": "OF", "Tommy Dowd": "OF",
+  "Barry Bonds": "OF", "Ted Williams": "OF", "Rickey Henderson": "OF", "Carl Yastrzemski": "OF",
+  "Pete Rose": "OF", "Ed Delahanty": "OF", "Al Simmons": "OF", "Tim Raines": "OF",
+  "Manny Ramirez": "OF", "Goose Goslin": "OF", "Fred Clarke": "OF", "Billy Williams": "OF",
+  "Jesse Burkett": "OF", "Sherry Magee": "OF", "Willie Stargell": "OF", "Zack Wheat": "OF",
+  "Joe Medwick": "OF", "Minnie Minoso": "OF", "Lance Berkman": "OF", "Ralph Kiner": "OF",
+  "Bob Johnson": "OF", "Bobby Veach": "OF", "Joe Kelley": "OF", "Ryan Braun": "OF",
+  "Luis Gonzalez": "OF", "Jim Rice": "OF", "Heinie Manush": "OF", "Roy White": "OF",
+  "Jimmy Sheckard": "OF", "Charlie Keller": "OF", "George Foster": "OF", "Brian Downing": "OF",
+  "Augie Galan": "OF", "Ken Williams": "OF", "Christian Yelich": "OF", "Matt Holliday": "OF",
+  "Lou Brock": "OF", "Brett Gardner": "OF", "Jim O'Rourke": "OF", "Harry Stovey": "OF",
+  "Albert Belle": "OF", "Carl Crawford": "OF", "Sid Gordon": "OF", "Starling Marte": "OF",
+  "Lonnie Smith": "OF", "Moises Alou": "OF", "Jeff Heath": "OF", "Frank Howard": "OF",
+  "Pedro Guerrero": "OF", "Alex Gordon": "OF", "Kip Selbach": "OF", "Dusty Baker": "OF",
+  "Michael Brantley": "OF", "Yordan Alvarez": "OF", "Justin Upton": "OF", "Ron Gant": "OF",
+  "Rico Carty": "OF", "Chick Hafey": "OF", "Greg Vaughn": "OF", "Gene Woodling": "OF",
+  "Del Ennis": "OF", "Riggs Stephenson": "OF", "Topsy Hartsel": "OF", "B. J. Surhoff": "OF",
+  "Kevin McReynolds": "OF", "Alfonso Soriano": "OF", "Kevin Mitchell": "OF", "Marcell Ozuna": "OF",
+  "Tip O'Neill": "OF", "Hal McRae": "OF", "Carlos Lee": "OF", "Mike Greenwell": "OF",
+  "John Stone": "OF", "Cliff Floyd": "OF", "Wally Moon": "OF", "Rondell White": "OF",
+  "Don Baylor": "OF", "Ben Oglivie": "OF", "Larry Hisle": "OF", "Tillie Walker": "OF",
+  "John Anderson": "OF", "Jason Bay": "OF", "Joe Rudi": "OF", "Bryan Reynolds": "OF",
+  "Greg Luzinski": "OF", "Garret Anderson": "OF", "Tommy Harper": "OF", "Carlos Gonzalez": "OF",
+  "Shannon Stewart": "OF", "Hank Sauer": "OF", "Richie Zisk": "OF", "Willie Horton": "OF",
+  "Ian Happ": "OF", "Sam Mertes": "OF", "Charlie Jamieson": "OF", "Randy Arozarena": "OF",
+  "Bobby Higginson": "OF", "Tom Tresh": "OF", "Bibb Falk": "OF", "Geoff Jenkins": "OF",
+  "Yoenis Cespedes": "OF", "Kyle Schwarber": "OF", "Melky Cabrera": "OF", "Hideki Matsui": "OF",
+  "Duffy Lewis": "OF", "Irish Meusel": "OF", "George Bell": "OF", "Raul Ibanez": "OF",
+  "Tommy Davis": "OF", "Bob Bescher": "OF", "Whitey Lockman": "OF", "Charlie Maxwell": "OF",
+  "Steve Kemp": "OF", "Frank Thomas Sr.": "OF", "Gene Richards": "OF", "Jeff Conine": "OF",
+  "Tommy Pham": "OF", "Gary Ward": "OF", "Lee Lacy": "OF", "Joe Vosmik": "OF",
+  "Josh Willingham": "OF", "Jo-Jo Moore": "OF", "Adam Dunn": "OF", "George Wood": "OF",
+  "Pat Burrell": "OF", "Patsy Dougherty": "OF", "Michael Conforto": "OF", "Dave Kingman": "OF",
+  "Davy Jones": "OF", "Jimmy Slagle": "OF", "Dave Collins": "OF", "Gary Redus": "OF",
+  "Dan Gladden": "OF", "Ralph Garr": "OF", "Gee Walker": "OF", "Walt Wilmot": "OF",
+  "Lou Piniella": "OF", "Darby O'Brien": "OF", "Corey Dickerson": "OF", "Vince Coleman": "OF",
+  "Leon Wagner": "OF", "Carson Bigbee": "OF", "Jacque Jones": "OF", "Eddie Rosario": "OF",
+  "Dmitri Young": "OF", "John Milner": "OF", "Luke Scott": "OF", "Jeffrey Leonard": "OF",
+  "Adam Duvall": "OF", "Emmett Seery": "OF", "Candy Maldonado": "OF", "Carlos Quentin": "OF",
+  "Pete Incaviglia": "OF", "Khris Davis": "OF", "Ducky Holmes": "OF", "Luis Polonia": "OF",
+  "Juan Rivera": "OF", "Wes Covington": "OF", "Glenallen Hill": "OF", "Mel Hall": "OF",
+  "Gus Zernial": "OF", "Cliff Carroll": "OF", "Bill Robinson": "OF", "Bo Jackson": "OF",
+  "Eddie Burke": "OF", "Troy O'Leary": "OF", "Jim Lemon": "OF", "Al Martin": "OF",
+  "Billy Hatcher": "OF", "George Tebeau": "OF", "Blondie Purcell": "OF", "Jason Kubel": "OF",
+  "Jonny Gomes": "OF", "Ron Kittle": "OF", "Henry Rodriguez": "OF", "Miguel Dilone": "OF",
+};
+
 const TEAMS_BASEBALL = [
   { abbr: "NYY", name: "Yankees", color: "#0C2340" },
   { abbr: "BOS", name: "Red Sox", color: "#BD3039" },
@@ -54,7 +398,34 @@ const CATEGORIES_BASEBALL = {
   "Career Home Runs": {
     unit: "HR",
     targets: { easy: 3000, medium: 4500, hard: 6500 },
-    targets20: { easy: 13000, medium: 16000, hard: 19500 },
+    targets20: { easy: 8500, medium: 10000, hard: 12000 },
+    // Position Mode locks the whole round to one position, and HR ceilings
+    // vary hugely by position (catchers top out far below first basemen or
+    // outfielders), so these are keyed per position rather than one flat
+    // number. Positions without an entry here just fall back to the
+    // generic targets above until their numbers are added. Never applies
+    // to Lineup Builder, which mixes positions across the lineup.
+    targetsPosition: {
+      C: { easy: 2250, medium: 2750, hard: 3000 }, // top-10 catchers cap at 3,390 HR combined
+      "1B": { easy: 3500, medium: 4300, hard: 4700 }, // top-10 first basemen cap at 5,322 HR combined
+      "2B": { easy: 2000, medium: 2500, hard: 2700 }, // top-10 second basemen cap at 3,064 HR combined
+      "3B": { easy: 2900, medium: 3500, hard: 3800 }, // top-10 third basemen cap at 4,315 HR combined
+      SS: { easy: 2300, medium: 2800, hard: 3100 }, // top-10 shortstops cap at 3,496 HR combined
+      OF: { easy: 4200, medium: 5200, hard: 5600 }, // top-10 outfielders cap at 6,370 HR combined
+    },
+    // Lineup Builder is always exactly 9 slots (C/1B/2B/3B/SS/OF/OF/OF/DH),
+    // and the true maximum for a legal lineup — best available player at
+    // each position — is 5,629 HR combined. Checked before the generic
+    // targets whenever builderMode is active.
+    targetsBuilder: { easy: 3900, medium: 4700, hard: 5100 },
+    targetsPosition20: {
+      C: { easy: 4250, medium: 4750, hard: 5250 }, // top-20 catchers cap at 5,689 HR combined
+      "1B": { easy: 6900, medium: 7700, hard: 8500 }, // top-20 first basemen cap at 9,219 HR combined
+      "2B": { easy: 3900, medium: 4400, hard: 4800 }, // top-20 second basemen cap at 5,221 HR combined
+      "3B": { easy: 5600, medium: 6300, hard: 7000 }, // top-20 third basemen cap at 7,547 HR combined
+      SS: { easy: 4100, medium: 4600, hard: 5100 }, // top-20 shortstops cap at 5,502 HR combined
+      OF: { easy: 8300, medium: 9300, hard: 10200 }, // top-20 outfielders cap at 11,087 HR combined
+    },
     players: [
       { name: "Barry Bonds", value: 762, teams: ["PIT", "SFG"] },
       { name: "Hank Aaron", value: 755, teams: ["ATL", "MIL"] },
@@ -176,7 +547,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Joe Adcock", value: 336, teams: ["ATL", "CIN", "CLE", "LAA"] },
       { name: "Darryl Strawberry", value: 335, teams: ["LAD", "NYM", "NYY", "SFG"] },
       { name: "Robinson Cano", value: 335, teams: ["NYM", "NYY", "SEA"] },
-      { name: "Carlos Santana", value: 335, teams: ["CLE", "KC", "PHI"] },
+      { name: "Carlos Santana", value: 335, teams: ["CLE", "KC", "SEA", "PHI", "MIN", "PIT", "MIL", "ARI", "CHC"] },
       { name: "Andrew McCutchen", value: 333, teams: ["NYY", "PHI", "PIT", "SFG"] },
       { name: "Bobby Bonds", value: 332, teams: ["CHC", "CHW", "CLE", "LAA", "NYY", "SFG", "STL", "TEX"] },
       { name: "Moises Alou", value: 332, teams: ["CHC", "HOU", "MIA", "MON/WAS", "NYM", "PIT", "SFG"] },
@@ -811,6 +1182,12 @@ const CATEGORIES_BASEBALL = {
   "Career Hits": {
     unit: "hits",
     targets: { easy: 20000, medium: 27500, hard: 32500 },
+    // Lineup Builder is always exactly 9 slots (C/1B/2B/3B/SS/OF/OF/OF/DH);
+    // the true maximum for a legal lineup — best available player at each
+    // position — is 31,955 hits combined. The generic "hard" target above
+    // (32,500) actually exceeds that, so without this override Hard mode
+    // would be impossible in this mode specifically.
+    targetsBuilder: { easy: 22400, medium: 26500, hard: 28800 },
     players: [
       { name: "Pete Rose", value: 4256, teams: ["CIN", "MON/WAS", "PHI"] },
       { name: "Ty Cobb", value: 4189, teams: ["DET", "OAK"] },
@@ -1177,7 +1554,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Claudell Washington", value: 1884, teams: ["ATL", "CHW", "LAA", "NYM", "NYY", "OAK", "TEX"] },
       { name: "Vinny Castilla", value: 1884, teams: ["ATL", "COL", "HOU", "MON/WAS", "SDP", "TB"] },
       { name: "Tommy Tucker", value: 1882, teams: ["ATL", "BLO", "CLV", "LAD", "MON/WAS", "STL"] },
-      { name: "Carlos Santana", value: 1882, teams: ["CLE", "KC", "PHI"] },
+      { name: "Carlos Santana", value: 1882, teams: ["CLE", "KC", "SEA", "PHI", "MIN", "PIT", "MIL", "ARI", "CHC"] },
       { name: "Matt Williams", value: 1878, teams: ["ARI", "CLE", "MIL", "SFG", "TEX", "TOR"] },
       { name: "Mike Trout", value: 1878, teams: ["LAA"] },
       { name: "Jose Canseco", value: 1877, teams: ["BOS", "CHW", "NYY", "OAK", "TB", "TEX", "TOR"] },
@@ -1568,6 +1945,10 @@ const CATEGORIES_BASEBALL = {
   "Career RBI": {
     unit: "RBI",
     targets: { easy: 9000, medium: 13500, hard: 17500 },
+    // True 9-slot Lineup Builder max is 17,053 RBI — the generic "hard"
+    // target above (17,500) exceeds it, so this override keeps Hard mode
+    // actually possible in this mode specifically.
+    targetsBuilder: { easy: 11900, medium: 14200, hard: 15300 },
     players: [
       { name: "Hank Aaron", value: 2297, teams: ["ATL", "MIL"] },
       { name: "Albert Pujols", value: 2218, teams: ["LAA", "LAD", "STL"] },
@@ -1773,7 +2154,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Tony Gwynn", value: 1138, teams: ["SDP"] },
       { name: "Tommy Corcoran", value: 1137, teams: ["CIN", "LAD", "PBB", "PHQ", "SFG"] },
       { name: "Bryce Harper", value: 1137, teams: ["MON/WAS", "PHI"] },
-      { name: "Carlos Santana", value: 1136, teams: ["CLE", "KC", "PHI"] },
+      { name: "Carlos Santana", value: 1136, teams: ["CLE", "KC", "SEA", "PHI", "MIN", "PIT", "MIL", "ARI", "CHC"] },
       { name: "Roberto Alomar", value: 1134, teams: ["ARI", "BAL", "CHW", "CLE", "NYM", "SDP", "TOR"] },
       { name: "Joe Morgan", value: 1133, teams: ["ATL", "CIN", "CLE", "HOU", "OAK", "PHI", "SFG", "STL"] },
       { name: "Greg Luzinski", value: 1128, teams: ["CHW", "PHI"] },
@@ -2326,6 +2707,10 @@ const CATEGORIES_BASEBALL = {
     unit: "SB",
     targets: { easy: 3000, medium: 5000, hard: 7500 },
     targets20: { hard: 13000 },
+    // True 9-slot Lineup Builder max is 6,844 SB — the generic "hard"
+    // target above (7,500) exceeds it, so this override keeps Hard mode
+    // actually possible in this mode specifically.
+    targetsBuilder: { easy: 4800, medium: 5700, hard: 6200 },
     players: [
       { name: "Rickey Henderson", value: 1406, teams: ["BOS", "LAA", "LAD", "NYM", "NYY", "OAK", "SDP", "SEA", "TOR"] },
       { name: "Lou Brock", value: 938, teams: ["CHC", "STL"] },
@@ -8509,6 +8894,10 @@ function teamByAbbr(abbr, teams) {
   return teams.find((t) => t.abbr === abbr);
 }
 
+function positionByAbbr(abbr, positions) {
+  return positions.find((p) => p.abbr === abbr);
+}
+
 function teamNames(abbrs, teams) {
   return abbrs.map((a) => (teamByAbbr(a, teams) ? teamByAbbr(a, teams).name : a)).join(", ");
 }
@@ -8516,6 +8905,29 @@ function teamNames(abbrs, teams) {
 function emptySlots(count) {
   return Array.from({ length: count }, () => ({
     team: null,
+    position: null,
+    name: "",
+    manualStat: "",
+    result: null,
+  }));
+}
+
+function builderEmptySlots() {
+  return BUILDER_POSITIONS.map((pos) => ({
+    team: null,
+    position: pos,
+    name: "",
+    manualStat: "",
+    result: null,
+  }));
+}
+
+// Position Mode's slots once a position has been chosen: every slot
+// requires that same position, however many slots the round has.
+function positionSpinSlots(pos, count) {
+  return Array.from({ length: count }, () => ({
+    team: null,
+    position: pos,
     name: "",
     manualStat: "",
     result: null,
@@ -8528,7 +8940,31 @@ function randomTeam(teams) {
 
 // Custom per-lineup-size overrides (e.g. cat.targets20) take priority;
 // otherwise the 10-spot target scales proportionally to lineup size.
-function getTarget(cat, difficulty, slotCount) {
+// Lineup Builder is always a fixed 9-slot real lineup, so it checks
+// cat.targetsBuilder first, ahead of everything else. Position Mode locks
+// every slot to one position for the whole round, and HR (etc.) ceilings
+// vary a lot by position, so when a position is chosen it looks up
+// cat.targetsPosition(20)[chosenPosition] next — before falling back to
+// the generic targets for any position that doesn't have its own numbers
+// defined yet.
+function getTarget(cat, difficulty, slotCount, positionMode, chosenPosition, builderMode) {
+  if (builderMode && cat.targetsBuilder && cat.targetsBuilder[difficulty] != null) {
+    return cat.targetsBuilder[difficulty];
+  }
+  if (positionMode && chosenPosition) {
+    const posBase10 = cat.targetsPosition && cat.targetsPosition[chosenPosition];
+    const posBase20 = cat.targetsPosition20 && cat.targetsPosition20[chosenPosition];
+    const exact = slotCount === 10 ? posBase10 : slotCount === 20 ? posBase20 : null;
+    if (exact && exact[difficulty] != null) {
+      return exact[difficulty];
+    }
+    if (posBase10 && posBase10[difficulty] != null) {
+      // No exact-size table for this slot count and position — scale the
+      // 10-spot position baseline instead of jumping to the much higher
+      // generic targets.
+      return Math.round(posBase10[difficulty] * (slotCount / 10));
+    }
+  }
   const sizedOverrides = cat[`targets${slotCount}`];
   if (sizedOverrides && sizedOverrides[difficulty] != null) {
     return sizedOverrides[difficulty];
@@ -8656,14 +9092,6 @@ function pickTodaysCombo(daily) {
 }
 
 
-function formatMs(ms) {
-  const totalTenths = Math.floor(ms / 100);
-  const minutes = Math.floor(totalTenths / 600);
-  const seconds = Math.floor((totalTenths % 600) / 10);
-  const tenths = totalTenths % 10;
-  return `${minutes}:${String(seconds).padStart(2, "0")}.${tenths}`;
-}
-
 // All three sounds are synthesized entirely in-browser with the Web
 // Audio API — no audio files to host, license, or bundle. They share one
 // AudioContext (created lazily on first use) rather than each spinning up
@@ -8772,11 +9200,8 @@ function playMissSound() {
   }
 }
 
-function challengeSummaryText(cat, difficulty, total, speedRun, runEndTime, runStartTime) {
+function challengeSummaryText(cat, difficulty, total) {
   const diffLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
-  if (speedRun && runStartTime && runEndTime) {
-    return `finished a ${diffLabel} ${cat.unit} run in ${formatMs(runEndTime - runStartTime)}`;
-  }
   return `hit ${total.toLocaleString()} ${cat.unit} on ${diffLabel}`;
 }
 
@@ -8789,6 +9214,9 @@ function StatBlitz() {
   const [category, setCategory] = useState(Object.keys(SPORTS.baseball.categories)[0]);
   const [difficulty, setDifficulty] = useState("medium");
   const [slotCount, setSlotCount] = useState(10);
+  // Remembers whatever slot count was active before Lineup Builder forced
+  // it to 9, so leaving the mode restores it instead of getting stuck at 9.
+  const [preBuilderSlotCount, setPreBuilderSlotCount] = useState(10);
   const [slots, setSlots] = useState(() => emptySlots(10));
   const [activeIndex, setActiveIndex] = useState(0);
   const slotRefs = useRef([]);
@@ -8798,13 +9226,22 @@ function StatBlitz() {
   const [revealed, setRevealed] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [hardMode, setHardMode] = useState(false);
-  const [speedRun, setSpeedRun] = useState(false);
-  const [runStartTime, setRunStartTime] = useState(null);
-  const [runEndTime, setRunEndTime] = useState(null);
-  const [bestTime, setBestTime] = useState(null);
-  const [, forceTick] = useState(0);
 
-  const [challengeTarget, setChallengeTarget] = useState(null); // { code, sport, category, difficulty, hardMode, speedRun, slotCount, total, unit, timeMs }
+  const [positionMode, setPositionMode] = useState(false);
+  // The single position chosen for the whole round — null until picked,
+  // and locked in for the rest of the round once it is (no changing
+  // mid-round). Position Mode then runs on the exact same shared-spin
+  // engine as Lineup Builder: one team spins above the board, and the
+  // player drops that team's players into any still-open slot — except
+  // every slot here requires this one position instead of a fixed 9.
+  const [chosenPosition, setChosenPosition] = useState(null);
+  const [builderMode, setBuilderMode] = useState(false);
+  const [builderTeam, setBuilderTeam] = useState(null); // team currently spun, shared across all slots
+  const [builderRespinsLeft, setBuilderRespinsLeft] = useState(0);
+  const [builderDead, setBuilderDead] = useState(false); // true when builderTeam can fill none of the open slots
+  const [builderSpinning, setBuilderSpinning] = useState(false);
+
+  const [challengeTarget, setChallengeTarget] = useState(null); // { code, sport, category, difficulty, hardMode, slotCount, total, unit }
   const [myChallengeCode, setMyChallengeCode] = useState(null);
   const [challengeInput, setChallengeInput] = useState("");
   const [challengePanel, setChallengePanel] = useState(null); // null | "create" | "enter"
@@ -8863,10 +9300,37 @@ function StatBlitz() {
   const teams = SPORTS[sport].teams;
   const CATEGORY_KEYS = Object.keys(SPORTS[sport].categories);
   const cat = SPORTS[sport].categories[category];
-  const target = getTarget(cat, difficulty, slotCount);
+  const target = getTarget(cat, difficulty, slotCount, positionMode, chosenPosition, builderMode);
+
+  // Position filtering only exists for baseball's four position-player
+  // batting categories — pitching categories are already position-specific
+  // by definition, and basketball/football have no position data yet.
+  const POSITION_CATEGORIES_BASEBALL = ["Career Home Runs", "Career Hits", "Career RBI", "Career Stolen Bases"];
+  const positionModeAvailable = sport === "baseball" && POSITION_CATEGORIES_BASEBALL.includes(category);
+  // Lineup Builder needs the same position data as Position Mode.
+  const builderModeAvailable = positionModeAvailable;
+  // Position Mode only starts spinning once a position has been chosen —
+  // before that, it's just showing the picker. Both it and Lineup Builder
+  // run on the same shared-spin engine once "active".
+  const positionSpinActive = positionMode && !!chosenPosition;
+  const sharedSpinActive = builderMode || positionSpinActive;
+
+  // If the sport/category changes out from under an active Position Mode
+  // (e.g. switching to basketball), fall back to team mode automatically.
+  useEffect(() => {
+    if (!positionModeAvailable && positionMode) setPositionMode(false);
+  }, [positionModeAvailable, positionMode]);
+
+  useEffect(() => {
+    if (!builderModeAvailable && builderMode) setBuilderMode(false);
+  }, [builderModeAvailable, builderMode]);
+
+  // The two modes are mutually exclusive — turning one on turns the other off.
+  useEffect(() => {
+    if (positionMode && builderMode) setBuilderMode(false);
+  }, [positionMode]);
 
   const activeSlot = activeIndex < slotCount ? slots[activeIndex] : null;
-  const roundComplete = activeIndex >= slotCount;
 
   function isScored(status) {
     return status === "found" || status === "confirmed";
@@ -8876,25 +9340,36 @@ function StatBlitz() {
     return status === "found" || status === "confirmed" || status === "missed";
   }
 
+  // Neither shared-spin mode has a single "active" slot — any open slot
+  // is fair game for whatever team is currently spun — so completion
+  // means every slot is resolved, not that activeIndex ran off the end.
+  const sharedRoundComplete = sharedSpinActive && slots.every((s) => isResolved(s.result?.status));
+  const roundComplete = sharedSpinActive ? sharedRoundComplete : activeIndex >= slotCount;
+
   const canSpin =
+    !sharedSpinActive &&
     !spinning &&
     !roundComplete &&
     !(activeSlot && activeSlot.result && isResolved(activeSlot.result.status));
 
   // Auto-advance to the next slot a beat after a slot resolves (found,
-  // self-reported, or missed).
+  // self-reported, or missed). Both shared-spin modes advance differently
+  // (see the shared-spin auto-continue effect below), so this is skipped.
   useEffect(() => {
+    if (sharedSpinActive) return;
     if (activeSlot && activeSlot.result && isResolved(activeSlot.result.status)) {
       const timer = setTimeout(() => {
         setActiveIndex((idx) => Math.min(idx + 1, slotCount));
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [slots, activeIndex, slotCount]);
+  }, [slots, activeIndex, slotCount, sharedSpinActive]);
 
   // Only slot #1 needs a manual tap. From slot #2 onward, once the
-  // board advances into a fresh slot, spin it automatically.
+  // board advances into a fresh slot, spin it automatically. Not used
+  // in Builder or Position Mode, both of which handle their own flow.
   useEffect(() => {
+    if (builderMode || positionMode) return;
     if (activeIndex > 0 && activeIndex < slotCount) {
       const slot = slots[activeIndex];
       if (slot && !slot.team) {
@@ -8904,22 +9379,24 @@ function StatBlitz() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex]);
 
-  // Speed run: tick the display every 100ms while a run is live.
+  // Whichever open slot was just filled with the current shared team,
+  // clear the team and spin fresh for the next placement — unless the
+  // lineup is already complete. Shared by both Lineup Builder and
+  // Position Mode (once a position is chosen), since they run on the
+  // same engine.
   useEffect(() => {
-    if (!speedRun || !runStartTime || runEndTime) return;
-    const interval = setInterval(() => forceTick((t) => t + 1), 100);
-    return () => clearInterval(interval);
-  }, [speedRun, runStartTime, runEndTime]);
-
-  // Speed run: stop the clock the moment all 10 slots are filled.
-  useEffect(() => {
-    if (speedRun && roundComplete && runStartTime && !runEndTime) {
-      const end = Date.now();
-      setRunEndTime(end);
-      const elapsed = end - runStartTime;
-      setBestTime((prev) => (prev === null || elapsed < prev ? elapsed : prev));
+    if (!sharedSpinActive || !builderTeam || sharedRoundComplete) return;
+    const justUsed = slots.some((s) => s.team === builderTeam.abbr && isScored(s.result?.status));
+    if (justUsed) {
+      const timer = setTimeout(() => {
+        setBuilderTeam(null);
+        setBuilderDead(false);
+        builderSpin();
+      }, 800);
+      return () => clearTimeout(timer);
     }
-  }, [roundComplete, speedRun, runStartTime, runEndTime]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slots, builderTeam, sharedSpinActive, sharedRoundComplete]);
 
   // Auto-scroll to the newly active slot as the lineup advances, so you
   // never have to manually scroll down to find what's next.
@@ -8951,10 +9428,49 @@ function StatBlitz() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roundComplete]);
 
-  function toggleSpeedRun() {
-    setSpeedRun((s) => !s);
-    setRunStartTime(null);
-    setRunEndTime(null);
+  function togglePositionMode() {
+    setPositionMode((p) => !p);
+    setBuilderMode(false);
+    setChosenPosition(null); // fresh round always starts with the picker
+    setBuilderTeam(null);
+    setBuilderDead(false);
+    setSlots(emptySlots(slotCount));
+    setActiveIndex(0);
+  }
+
+  // Locks in the position for the whole round and starts the shared-spin
+  // engine, same as Lineup Builder. There's no changing it afterward
+  // short of leaving Position Mode and turning it back on.
+  function choosePosition(pos) {
+    setChosenPosition(pos);
+    setSlots(positionSpinSlots(pos, slotCount));
+    setActiveIndex(0);
+    setBuilderTeam(null);
+    setBuilderDead(false);
+    setBuilderRespinsLeft(BUILDER_RESPINS[difficulty]);
+  }
+
+  function toggleBuilderMode() {
+    setBuilderMode((b) => {
+      const turningOn = !b;
+      if (turningOn) {
+        setPositionMode(false);
+        setPreBuilderSlotCount(slotCount); // remember it so turning off can restore it
+        setSlotCount(BUILDER_POSITIONS.length);
+        setSlots(builderEmptySlots());
+        setActiveIndex(0);
+        setBuilderTeam(null);
+        setBuilderDead(false);
+        setBuilderRespinsLeft(BUILDER_RESPINS[difficulty]);
+      } else {
+        setSlotCount(preBuilderSlotCount);
+        setSlots(emptySlots(preBuilderSlotCount));
+        setActiveIndex(0);
+        setBuilderTeam(null);
+        setBuilderDead(false);
+      }
+      return turningOn;
+    });
   }
 
   function generateChallengeCode() {
@@ -8973,11 +9489,9 @@ function StatBlitz() {
       category,
       difficulty,
       hardMode,
-      speedRun,
       slotCount,
       total: runningTotal,
       unit: cat.unit,
-      timeMs: speedRun && runStartTime && runEndTime ? runEndTime - runStartTime : null,
     };
     try {
       await window.storage.set(`challenge:${code}`, JSON.stringify(payload), true);
@@ -8991,7 +9505,7 @@ function StatBlitz() {
 
   async function copyChallengeMessage() {
     if (!myChallengeCode) return;
-    const scoreText = challengeSummaryText(cat, difficulty, runningTotal, speedRun, runEndTime, runStartTime);
+    const scoreText = challengeSummaryText(cat, difficulty, runningTotal);
     const message = `I ${scoreText} in a ${slotCount}-slot ${SPORTS[sport].label} challenge on Stat Blitz. Beat me — enter code ${myChallengeCode} in the app!`;
     try {
       await navigator.clipboard.writeText(message);
@@ -9018,14 +9532,10 @@ function StatBlitz() {
       setCategory(data.category);
       setDifficulty(data.difficulty);
       setHardMode(!!data.hardMode);
-      setSpeedRun(!!data.speedRun);
       setSlotCount(n);
       setSlots(emptySlots(n));
       setActiveIndex(0);
       setRevealed(false);
-      setRunStartTime(null);
-      setRunEndTime(null);
-      setBestTime(null);
     } catch (err) {
       setChallengeStatus("Couldn't find that code — double-check it.");
     }
@@ -9081,16 +9591,31 @@ function StatBlitz() {
     }
   }
 
+  // Rebuilds the board for whichever mode is currently active, given a
+  // (possibly new) slot count — the one thing all four change-handlers
+  // below need in common.
+  function rebuildSlotsFor(builderOn, chosenPos, count) {
+    if (builderOn) return builderEmptySlots();
+    if (chosenPos) return positionSpinSlots(chosenPos, count);
+    return emptySlots(count);
+  }
+
   function changeSport(key) {
     setSport(key);
     const firstCategory = Object.keys(SPORTS[key].categories)[0];
     setCategory(firstCategory);
+    // Baseball's four position categories are the only ones either
+    // shared-spin mode supports; switching sport always lands outside
+    // that set, so drop back to a normal board rather than leaving a
+    // stale fixed layout around.
+    setBuilderMode(false);
+    setPositionMode(false);
+    setChosenPosition(null);
+    setBuilderTeam(null);
+    setBuilderDead(false);
     setSlots(emptySlots(slotCount));
     setActiveIndex(0);
     setRevealed(false);
-    setRunStartTime(null);
-    setRunEndTime(null);
-    setBestTime(null);
     setChallengeTarget(null);
     setMyChallengeCode(null);
     setChallengeStatus("");
@@ -9099,35 +9624,45 @@ function StatBlitz() {
 
   function changeCategory(key) {
     setCategory(key);
-    setSlots(emptySlots(slotCount));
+    if (sharedSpinActive) {
+      setBuilderTeam(null);
+      setBuilderDead(false);
+    }
+    setSlots(rebuildSlotsFor(builderMode, chosenPosition, slotCount));
     setActiveIndex(0);
     setRevealed(false);
-    setRunStartTime(null);
-    setRunEndTime(null);
-    setBestTime(null);
   }
 
   function changeDifficulty(d) {
     setDifficulty(d);
-    setRunStartTime(null);
-    setRunEndTime(null);
-    setBestTime(null);
+    if (sharedSpinActive) {
+      setBuilderRespinsLeft(BUILDER_RESPINS[d]);
+      setBuilderTeam(null);
+      setBuilderDead(false);
+      setSlots(rebuildSlotsFor(builderMode, chosenPosition, slotCount));
+      setActiveIndex(0);
+    }
   }
 
+  // Lineup Builder is locked to a fixed 9-slot real lineup, so manually
+  // changing the slot count there means the player wants a normal board
+  // instead. Position Mode has no such fixed shape, so it just rebuilds
+  // at the new count (still all one position, if one's already chosen).
   function changeSlotCount(n) {
     setSlotCount(n);
-    setSlots(emptySlots(n));
+    setBuilderMode(false);
+    if (positionSpinActive) {
+      setBuilderTeam(null);
+      setBuilderDead(false);
+      setSlots(positionSpinSlots(chosenPosition, n));
+    } else {
+      setSlots(emptySlots(n));
+    }
     setActiveIndex(0);
-    setRunStartTime(null);
-    setRunEndTime(null);
-    setBestTime(null);
   }
 
   function spin() {
     if (!canSpin) return;
-    if (speedRun && !runStartTime) {
-      setRunStartTime(Date.now());
-    }
     setSpinning(true);
     let ticks = 0;
     const totalTicks = 9 + Math.floor(Math.random() * 4);
@@ -9150,10 +9685,70 @@ function StatBlitz() {
     setTimeout(tick, 20);
   }
 
+  // True if `teamAbbr` has at least one player, in the current category's
+  // pool, tagged at one of the still-open positions. DH is the one
+  // exception — it's not a fielding position, so an open DH slot can be
+  // filled by anyone on the team regardless of their tagged position.
+  function builderHasValidPick(teamAbbr, openPositions) {
+    return cat.players.some(
+      (p) =>
+        p.teams.includes(teamAbbr) &&
+        (openPositions.includes("DH") || openPositions.includes(PLAYER_POSITIONS[p.name]))
+    );
+  }
+
+  function builderOpenPositions() {
+    return slots.filter((s) => !isResolved(s.result?.status)).map((s) => s.position);
+  }
+
+  function builderSpin() {
+    if (builderSpinning || sharedRoundComplete) return;
+    setBuilderSpinning(true);
+    let ticks = 0;
+    const totalTicks = 9 + Math.floor(Math.random() * 4);
+    const finalTeam = randomTeam(teams);
+    const openPositions = builderOpenPositions();
+
+    function tick() {
+      ticks += 1;
+      setDisplayTeam(randomTeam(teams));
+      playTickSound();
+      if (ticks >= totalTicks) {
+        setDisplayTeam(finalTeam);
+        setBuilderTeam(finalTeam);
+        setBuilderDead(!builderHasValidPick(finalTeam.abbr, openPositions));
+        setBuilderSpinning(false);
+        return;
+      }
+      const delay = 20 + (ticks / totalTicks) * 70;
+      setTimeout(tick, delay);
+    }
+    setTimeout(tick, 20);
+  }
+
+  // Burn a re-spin to reject the current team — whether it's dead or
+  // just one the player doesn't want — and roll a fresh one immediately.
+  function builderRespin() {
+    if (builderRespinsLeft <= 0 || builderSpinning) return;
+    setBuilderRespinsLeft((n) => n - 1);
+    setBuilderTeam(null);
+    setBuilderDead(false);
+    builderSpin();
+  }
+
+  // Only reachable when the spin is dead and no re-spins remain — there
+  // is no legal placement, so this just moves on to a new spin for free.
+  function builderSkip() {
+    if (builderSpinning || !builderDead || builderRespinsLeft > 0) return;
+    setBuilderTeam(null);
+    setBuilderDead(false);
+    builderSpin();
+  }
+
   function assignTeamToSlot(i, team) {
     setSlots((prev) => {
       const next = [...prev];
-      next[i] = { team: team.abbr, name: "", manualStat: "", result: null };
+      next[i] = { team: team.abbr, position: null, name: "", manualStat: "", result: null };
       return next;
     });
   }
@@ -9172,10 +9767,27 @@ function StatBlitz() {
     setShowSuggestions(false);
     setSlots((prev) => {
       const slot = prev[i];
-      if (!slot.team) return prev;
+      if (!slot.team && !slot.position) return prev;
 
       let result;
-      if (!player.teams.includes(slot.team)) {
+      if (slot.position) {
+        const actualPosition = PLAYER_POSITIONS[player.name] || null;
+        if (actualPosition !== slot.position) {
+          result = { status: "wrongposition", actual: player.value, actualPosition };
+        } else {
+          const dupIndex = prev.findIndex(
+            (s, idx) =>
+              idx !== i &&
+              s.result &&
+              isScored(s.result.status) &&
+              normalize(s.name) === normalize(player.name)
+          );
+          result =
+            dupIndex !== -1
+              ? { status: "duplicate" }
+              : { status: "found", actual: player.value };
+        }
+      } else if (!player.teams.includes(slot.team)) {
         result = { status: "wrongteam", actual: player.value, actualTeams: player.teams };
       } else {
         const dupIndex = prev.findIndex(
@@ -9197,12 +9809,49 @@ function StatBlitz() {
     });
   }
 
+  // Builder mode's equivalent of selectPlayer: the slot's position is
+  // fixed, but the team comes from the shared spin rather than the slot
+  // itself, so both have to check out against the player picked.
+  function selectBuilderPlayer(i, player) {
+    setShowSuggestions(false);
+    setSlots((prev) => {
+      const slot = prev[i];
+      if (!builderTeam || (slot.result && isResolved(slot.result.status))) return prev;
+
+      let result;
+      if (!player.teams.includes(builderTeam.abbr)) {
+        result = { status: "wrongteam", actual: player.value, actualTeams: player.teams };
+      } else {
+        const actualPosition = PLAYER_POSITIONS[player.name] || null;
+        if (slot.position !== "DH" && actualPosition !== slot.position) {
+          result = { status: "wrongposition", actual: player.value, actualPosition };
+        } else {
+          const dupIndex = prev.findIndex(
+            (s, idx) =>
+              idx !== i &&
+              s.result &&
+              isScored(s.result.status) &&
+              normalize(s.name) === normalize(player.name)
+          );
+          result =
+            dupIndex !== -1
+              ? { status: "duplicate" }
+              : { status: "found", actual: player.value };
+        }
+      }
+
+      const next = [...prev];
+      next[i] = { ...slot, team: builderTeam.abbr, name: player.name, result };
+      return next;
+    });
+  }
+
   // If the player types a name but never taps a suggestion, treat it as
   // unverified once they leave the field — self-report is still available.
   function markUnverifiedIfNeeded(i) {
     setSlots((prev) => {
       const slot = prev[i];
-      if (!slot.team || !slot.name.trim() || slot.result) return prev;
+      if ((!slot.team && !slot.position) || !slot.name.trim() || slot.result) return prev;
       const next = [...prev];
       next[i] = { ...slot, result: { status: "unverified" } };
       return next;
@@ -9246,7 +9895,7 @@ function StatBlitz() {
   function missSlot(i) {
     setSlots((prev) => {
       const slot = prev[i];
-      if (!slot.team) return prev;
+      if (!slot.team && !slot.position) return prev;
       const next = [...prev];
       next[i] = { ...slot, result: { status: "missed", actual: 0 } };
       return next;
@@ -9254,11 +9903,14 @@ function StatBlitz() {
   }
 
   function resetBoard() {
-    setSlots(emptySlots(slotCount));
+    setSlots(rebuildSlotsFor(builderMode, chosenPosition, slotCount));
     setActiveIndex(0);
     setRevealed(false);
-    setRunStartTime(null);
-    setRunEndTime(null);
+    if (sharedSpinActive) {
+      setBuilderTeam(null);
+      setBuilderDead(false);
+      setBuilderRespinsLeft(BUILDER_RESPINS[difficulty]);
+    }
   }
 
   const runningTotal = slots.reduce((sum, s) => {
@@ -9323,9 +9975,7 @@ function StatBlitz() {
           <div className="mx-5 mt-4 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 flex items-center justify-between gap-2">
             <p className="text-xs text-amber-300">
               🎯 Challenge <span className="font-semibold">{challengeTarget.code}</span>: beat{" "}
-              {challengeTarget.speedRun && challengeTarget.timeMs
-                ? `their time of ${formatMs(challengeTarget.timeMs)}`
-                : `${challengeTarget.total.toLocaleString()} ${challengeTarget.unit}`}
+              {challengeTarget.total.toLocaleString()} {challengeTarget.unit}
             </p>
             <button onClick={clearChallenge} className="shrink-0 text-xs text-slate-400 hover:text-white">
               Clear
@@ -9452,7 +10102,7 @@ function StatBlitz() {
               >
                 {d}
                 <span className="block text-[10px] font-normal opacity-80">
-                  {getTarget(cat, d, slotCount).toLocaleString()} {cat.unit}
+                  {getTarget(cat, d, slotCount, positionMode, chosenPosition, builderMode).toLocaleString()} {cat.unit}
                 </span>
               </button>
             ))}
@@ -9510,58 +10160,184 @@ function StatBlitz() {
           </button>
         </div>
 
-        {/* SPEED RUN */}
-        <div className="px-5 mt-2">
-          <button
-            onClick={toggleSpeedRun}
-            className="w-full flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2.5"
-          >
-            <span className="text-left">
-              <span className="block text-xs font-semibold text-slate-200">Speed Run</span>
-              <span className="block text-[10px] text-slate-500">Race the clock through the whole lineup</span>
-            </span>
-            <span
-              className={
-                "relative shrink-0 w-10 h-5.5 rounded-full transition-colors " +
-                (speedRun ? "bg-emerald-400" : "bg-white/15")
-              }
-              style={{ height: "22px" }}
+        {/* POSITION MODE — baseball's four position-player batting categories only */}
+        {positionModeAvailable && (
+          <div className="px-5 mt-2">
+            <button
+              onClick={togglePositionMode}
+              className="w-full flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2.5"
             >
+              <span className="text-left">
+                <span className="block text-xs font-semibold text-slate-200">Position Mode</span>
+                <span className="block text-[10px] text-slate-500">
+                  Pick one position, then spin teams to fill every slot at it
+                </span>
+              </span>
               <span
-                className="absolute top-0.5 w-4.5 h-4.5 rounded-full bg-white transition-transform"
-                style={{
-                  width: "18px",
-                  height: "18px",
-                  left: "2px",
-                  transform: speedRun ? "translateX(18px)" : "translateX(0)",
-                }}
-              />
-            </span>
-          </button>
+                className={
+                  "relative shrink-0 w-10 h-5.5 rounded-full transition-colors " +
+                  (positionMode ? "bg-amber-400" : "bg-white/15")
+                }
+                style={{ height: "22px" }}
+              >
+                <span
+                  className="absolute top-0.5 w-4.5 h-4.5 rounded-full bg-white transition-transform"
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    left: "2px",
+                    transform: positionMode ? "translateX(18px)" : "translateX(0)",
+                  }}
+                />
+              </span>
+            </button>
 
-          {speedRun && (
-            <div className="mt-2 flex items-center justify-center gap-4 rounded-lg border border-white/10 bg-black/20 py-2">
-              <div className="text-center">
-                <p className="text-[10px] text-slate-500 uppercase tracking-wide">Time</p>
-                <p className="font-scoreboard text-2xl text-white leading-none">
-                  {runStartTime ? formatMs((runEndTime || Date.now()) - runStartTime) : "0:00.0"}
+            {/* One-time position picker — locks in for the whole round */}
+            {positionMode && !chosenPosition && (
+              <div className="mt-2 rounded-lg border border-white/10 bg-black/20 p-3">
+                <p className="text-[11px] text-slate-400 mb-2">
+                  Choose a position — every slot this round needs it, so pick carefully
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {POSITIONS_BASEBALL.filter((p) => p.abbr !== "DH").map((p) => (
+                    <button
+                      key={p.abbr}
+                      onClick={() => choosePosition(p.abbr)}
+                      className="px-3 py-1.5 rounded-md text-xs font-bold text-white bg-slate-700 hover:bg-amber-400 hover:text-slate-900"
+                    >
+                      {p.abbr}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {positionSpinActive && (
+              <p className="mt-2 text-[11px] text-slate-500 text-center">
+                Position locked for this round:{" "}
+                <span className="font-semibold text-amber-400">
+                  {positionByAbbr(chosenPosition, POSITIONS_BASEBALL)?.name}
+                </span>
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* LINEUP BUILDER MODE — one shared team spin, any open position */}
+        {builderModeAvailable && (
+          <div className="px-5 mt-2">
+            <button
+              onClick={toggleBuilderMode}
+              className="w-full flex items-center justify-between rounded-lg border border-white/10 bg-white/5 px-3 py-2.5"
+            >
+              <span className="text-left">
+                <span className="block text-xs font-semibold text-slate-200">Lineup Builder</span>
+                <span className="block text-[10px] text-slate-500">
+                  One team spins for the whole board — drop them into any open spot they fit
+                </span>
+              </span>
+              <span
+                className={
+                  "relative shrink-0 w-10 h-5.5 rounded-full transition-colors " +
+                  (builderMode ? "bg-amber-400" : "bg-white/15")
+                }
+                style={{ height: "22px" }}
+              >
+                <span
+                  className="absolute top-0.5 w-4.5 h-4.5 rounded-full bg-white transition-transform"
+                  style={{
+                    width: "18px",
+                    height: "18px",
+                    left: "2px",
+                    transform: builderMode ? "translateX(18px)" : "translateX(0)",
+                  }}
+                />
+              </span>
+            </button>
+          </div>
+        )}
+
+        {/* SHARED TEAM SPIN — sits above the whole board, used by both
+            Lineup Builder and Position Mode (once a position is chosen) */}
+        {sharedSpinActive && (
+          <div className="px-5 mt-3">
+            <div className="rounded-xl border border-white/10 bg-black/20 p-3 flex items-center gap-3">
+              <button
+                onClick={builderTeam ? undefined : builderSpin}
+                disabled={!!builderTeam || builderSpinning || sharedRoundComplete}
+                title={builderTeam ? "Fill a slot to spin again" : "Tap to spin"}
+                className={
+                  "shrink-0 w-20 h-10 rounded-lg flex items-center justify-center text-sm font-bold text-white disabled:opacity-90 " +
+                  (!builderTeam && !builderSpinning && !sharedRoundComplete ? "glow-ring" : "")
+                }
+                style={{
+                  background: builderSpinning
+                    ? displayTeam.color
+                    : builderTeam
+                    ? builderTeam.color
+                    : "rgba(255,255,255,0.08)",
+                  transition: "background 0.05s linear",
+                }}
+              >
+                {builderSpinning
+                  ? displayTeam.abbr
+                  : builderTeam
+                  ? builderTeam.abbr
+                  : sharedRoundComplete
+                  ? "DONE"
+                  : "SPIN"}
+              </button>
+              <div className="flex-1 min-w-0">
+                {sharedRoundComplete ? (
+                  <p className="text-xs text-emerald-400 font-semibold">Lineup complete!</p>
+                ) : builderDead ? (
+                  <p className="text-xs text-rose-400">
+                    No one on this roster fits your open spots
+                  </p>
+                ) : builderTeam ? (
+                  <p className="text-xs text-slate-300">
+                    {teamByAbbr(builderTeam.abbr, teams)?.name} — pick anyone who fits an open slot below
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-400">Tap SPIN to get your next team</p>
+                )}
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  {builderRespinsLeft} re-spin{builderRespinsLeft === 1 ? "" : "s"} left
                 </p>
               </div>
-              {bestTime !== null && (
-                <div className="text-center">
-                  <p className="text-[10px] text-slate-500 uppercase tracking-wide">Best</p>
-                  <p className="font-scoreboard text-2xl text-emerald-400 leading-none">{formatMs(bestTime)}</p>
-                </div>
+              {builderDead && !sharedRoundComplete && (
+                <button
+                  onClick={builderRespinsLeft > 0 ? builderRespin : builderSkip}
+                  disabled={builderSpinning}
+                  className="shrink-0 px-3 py-2 rounded-lg text-xs font-semibold bg-amber-400 text-slate-900 hover:bg-amber-300 disabled:opacity-50"
+                >
+                  {builderRespinsLeft > 0 ? "Re-spin" : "Skip"}
+                </button>
+              )}
+              {!builderDead && builderTeam && builderRespinsLeft > 0 && !sharedRoundComplete && (
+                <button
+                  onClick={builderRespin}
+                  disabled={builderSpinning}
+                  className="shrink-0 px-3 py-2 rounded-lg text-xs font-semibold border border-white/15 text-slate-300 hover:bg-white/10 disabled:opacity-50"
+                >
+                  Re-spin
+                </button>
               )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* SPIN STATUS */}
         <div ref={summaryRef} className="px-5 mt-5">
           <p className="text-center text-xs text-slate-400">
             {roundComplete
               ? "Lineup complete"
+              : sharedSpinActive
+              ? builderTeam
+                ? "Type a player into any open slot that team fits"
+                : "Spin above to get your next team"
+              : positionMode
+              ? "Choose a position above to start"
               : `Tap the glowing badge on slot #${activeIndex + 1} of ${slotCount} to spin`}
           </p>
         </div>
@@ -9683,7 +10459,8 @@ function StatBlitz() {
                       onChange={(e) => setChallengeInput(e.target.value.toUpperCase())}
                       placeholder="ABCDE"
                       maxLength={5}
-                      className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white text-center tracking-widest placeholder-slate-500 outline-none focus:border-amber-400"
+                      className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-center tracking-widest placeholder-slate-500 outline-none focus:border-amber-400"
+                      style={{ fontSize: "16px" }}
                     />
                     <button
                       onClick={loadChallenge}
@@ -9743,6 +10520,18 @@ function StatBlitz() {
                 ) : (
                   <span className="text-rose-400">Played for: {teamNames(r.actualTeams, teams)} — not this team</span>
                 );
+              } else if (r.status === "wrongposition") {
+                ring = "border-rose-500/50";
+                badge = "bg-rose-500 text-white";
+                feedback = hardMode ? (
+                  <span className="text-rose-400">Not this position</span>
+                ) : (
+                  <span className="text-rose-400">
+                    {r.actualPosition
+                      ? `Played: ${positionByAbbr(r.actualPosition, POSITIONS_BASEBALL)?.name || r.actualPosition} — not this position`
+                      : "Position unknown for this player — not confirmed"}
+                  </span>
+                );
               } else if (r.status === "duplicate") {
                 ring = "border-rose-500/50";
                 badge = "bg-rose-500 text-white";
@@ -9758,9 +10547,15 @@ function StatBlitz() {
             }
 
             const team = slot.team ? teamByAbbr(slot.team, teams) : null;
-            const isActive = i === activeIndex;
-            const isUpcoming = i > activeIndex;
+            const position = slot.position ? positionByAbbr(slot.position, POSITIONS_BASEBALL) : null;
             const locked = r && isResolved(r.status);
+            // Neither shared-spin mode has a single "current" slot — every
+            // unresolved slot is open for the currently-spun team, so it's
+            // "active" and "filled" (ready to type into) the moment a team
+            // exists.
+            const isActive = sharedSpinActive ? !locked : i === activeIndex;
+            const isUpcoming = sharedSpinActive ? false : i > activeIndex;
+            const filled = sharedSpinActive ? !!builderTeam : team || position;
 
             return (
               <div
@@ -9778,28 +10573,52 @@ function StatBlitz() {
                     {r && r.status === "missed" ? "✕" : i + 1}
                   </div>
 
-                  <button
-                    onClick={() => spin()}
-                    disabled={!isActive || !canSpin}
-                    title={isActive && !locked ? "Tap to spin" : "Reshuffle this slot's team"}
-                    className={
-                      "shrink-0 w-12 h-7 rounded-md flex items-center justify-center text-[11px] font-bold text-white disabled:opacity-60 " +
-                      (isActive && !locked && !spinning ? "glow-ring" : "")
-                    }
-                    style={{
-                      background: isActive && spinning ? displayTeam.color : team ? team.color : "rgba(255,255,255,0.08)",
-                      transition: "background 0.05s linear",
-                    }}
-                  >
-                    {isActive && spinning ? displayTeam.abbr : team ? team.abbr : isActive ? "SPIN" : "—"}
-                  </button>
+                  {sharedSpinActive ? (
+                    // Position is fixed for the whole round in both shared-
+                    // spin modes — nothing to pick here, just a label. It
+                    // picks up the filling team's color once locked in,
+                    // same as plain team mode.
+                    <div
+                      title={`${position?.name || slot.position} — locked for this whole round`}
+                      className="shrink-0 w-12 h-7 rounded-md flex items-center justify-center text-[11px] font-bold text-white"
+                      style={{ background: team ? team.color : "rgba(255,255,255,0.08)" }}
+                    >
+                      {slot.position}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => spin()}
+                      disabled={!isActive || !canSpin}
+                      title={isActive && !locked ? "Tap to spin" : "Reshuffle this slot's team"}
+                      className={
+                        "shrink-0 w-12 h-7 rounded-md flex items-center justify-center text-[11px] font-bold text-white disabled:opacity-60 " +
+                        (isActive && !locked && !spinning ? "glow-ring" : "")
+                      }
+                      style={{
+                        background: isActive && spinning ? displayTeam.color : team ? team.color : "rgba(255,255,255,0.08)",
+                        transition: "background 0.05s linear",
+                      }}
+                    >
+                      {isActive && spinning ? displayTeam.abbr : team ? team.abbr : isActive ? "SPIN" : "—"}
+                    </button>
+                  )}
 
                   <div className="relative flex-1 min-w-0">
                     <input
                       type="text"
-                      placeholder={isUpcoming ? "Up next" : team ? "Player name" : "Spin first"}
+                      placeholder={
+                        isUpcoming
+                          ? "Up next"
+                          : filled
+                          ? "Player name"
+                          : sharedSpinActive
+                          ? "Waiting on a spin"
+                          : positionMode
+                          ? "Pick a position first"
+                          : "Spin first"
+                      }
                       value={slot.name}
-                      disabled={!team || !isActive}
+                      disabled={!filled || !isActive}
                       onChange={(e) => {
                         updateSlot(i, e.target.value);
                         setShowSuggestions(true);
@@ -9817,7 +10636,8 @@ function StatBlitz() {
                           markUnverifiedIfNeeded(i);
                         }
                       }}
-                      className="w-full bg-transparent text-sm text-white placeholder-slate-500 outline-none border-b border-white/10 focus:border-amber-400 py-1 disabled:opacity-40"
+                      className="w-full bg-transparent text-white placeholder-slate-500 outline-none border-b border-white/10 focus:border-amber-400 py-1 disabled:opacity-40"
+                      style={{ fontSize: "16px" }}
                     />
                     {isActive &&
                       !locked &&
@@ -9836,7 +10656,8 @@ function StatBlitz() {
                                 key={p.name}
                                 onMouseDown={(e) => {
                                   e.preventDefault();
-                                  selectPlayer(i, p);
+                                  if (sharedSpinActive) selectBuilderPlayer(i, p);
+                                  else selectPlayer(i, p);
                                 }}
                                 className="w-full flex items-center justify-between gap-2 px-3 py-1.5 text-left text-sm text-white hover:bg-white/10"
                               >
@@ -9866,7 +10687,7 @@ function StatBlitz() {
                 </div>
                 {feedback && <p className="mt-1.5 ml-9 text-xs">{feedback}</p>}
 
-                {isActive && team && !locked && (
+                {isActive && filled && !locked && (
                   <div className="mt-1.5 ml-9 flex justify-end">
                     <button
                       onClick={() => missSlot(i)}
@@ -9886,7 +10707,8 @@ function StatBlitz() {
                       value={slot.manualStat}
                       onChange={(e) => updateManualStat(i, e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && confirmManual(i)}
-                      className="w-16 bg-transparent text-sm text-white placeholder-slate-500 outline-none border-b border-amber-400/50 py-0.5"
+                      className="w-16 bg-transparent text-white placeholder-slate-500 outline-none border-b border-amber-400/50 py-0.5"
+                      style={{ fontSize: "16px" }}
                     />
                     <button
                       onClick={() => confirmManual(i)}
@@ -9910,18 +10732,9 @@ function StatBlitz() {
             <p className="text-sm font-semibold text-emerald-400">
               Lineup complete — {goalReached ? "you hit the target!" : "reset to try beating it."}
             </p>
-            {speedRun && runEndTime && runStartTime && (
-              <p className="mt-1 text-xs text-emerald-300">
-                Finished in {formatMs(runEndTime - runStartTime)}
-                {bestTime === runEndTime - runStartTime ? " — new best!" : ""}
-              </p>
-            )}
             {challengeTarget &&
               (() => {
-                const won =
-                  challengeTarget.speedRun && challengeTarget.timeMs
-                    ? speedRun && runStartTime && runEndTime && runEndTime - runStartTime < challengeTarget.timeMs
-                    : runningTotal > challengeTarget.total;
+                const won = runningTotal > challengeTarget.total;
                 return (
                   <p className={"mt-1 text-xs font-semibold " + (won ? "text-emerald-300" : "text-rose-400")}>
                     {won
