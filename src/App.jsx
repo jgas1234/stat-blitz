@@ -342,6 +342,7 @@ const PLAYER_POSITIONS = {
   "Eddie Burke": "OF", "Troy O'Leary": "OF", "Jim Lemon": "OF", "Al Martin": "OF",
   "Billy Hatcher": "OF", "George Tebeau": "OF", "Blondie Purcell": "OF", "Jason Kubel": "OF",
   "Jonny Gomes": "OF", "Ron Kittle": "OF", "Henry Rodriguez": "OF", "Miguel Dilone": "OF",
+  "Cal Ripken": "SS", "Eric Young": "2B", "Jose Cruz Jr.": "OF", "Jose Cruz Sr.": "OF", "Ken Griffey Sr.": "OF", "Matt Joyce": "OF",
 };
 
 const TEAMS_BASEBALL = [
@@ -4239,7 +4240,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Trevor Hoffman", value: 601, teams: ["MIA", "MIL", "SDP"] },
       { name: "Kenley Jansen", value: 498, teams: ["LAD"] },
       { name: "Lee Smith", value: 478, teams: ["BAL", "BOS", "CHC", "CIN", "LAA", "MON/WAS", "NYY", "STL"] },
-      { name: "Craig Kimbrel", value: 441, teams: ["ATL", "BOS", "CHC", "CHW", "SDP"] },
+      { name: "Craig Kimbrel", value: 441, teams: ["ATL", "SDP", "BOS", "CHC", "CHW", "PHI", "LAD", "BAL", "TB", "NYM", "HOU", "KC"] },
       { name: "Francisco Rodriguez", value: 437, teams: ["BAL", "DET", "LAA", "MIL", "NYM"] },
       { name: "John Franco", value: 424, teams: ["CIN", "HOU", "NYM"] },
       { name: "Billy Wagner", value: 422, teams: ["ATL", "BOS", "HOU", "NYM", "PHI"] },
@@ -9240,6 +9241,9 @@ function StatBlitz() {
   const [builderRespinsLeft, setBuilderRespinsLeft] = useState(0);
   const [builderDead, setBuilderDead] = useState(false); // true when builderTeam can fill none of the open slots
   const [builderSpinning, setBuilderSpinning] = useState(false);
+  // Which slot (if any) is showing its "really skip?" confirmation. Skipping
+  // permanently scores a spot at 0, so it takes two taps to avoid accidents.
+  const [confirmSkipIndex, setConfirmSkipIndex] = useState(null);
 
   const [challengeTarget, setChallengeTarget] = useState(null); // { code, sport, category, difficulty, hardMode, slotCount, total, unit }
   const [myChallengeCode, setMyChallengeCode] = useState(null);
@@ -9397,6 +9401,12 @@ function StatBlitz() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slots, builderTeam, sharedSpinActive, sharedRoundComplete]);
+
+  // A pending "really skip?" prompt shouldn't survive a new spin or the board
+  // moving on to a different slot.
+  useEffect(() => {
+    setConfirmSkipIndex(null);
+  }, [builderTeam, activeIndex]);
 
   // Auto-scroll to the newly active slot as the lineup advances, so you
   // never have to manually scroll down to find what's next.
@@ -9903,6 +9913,7 @@ function StatBlitz() {
   }
 
   function resetBoard() {
+    setConfirmSkipIndex(null);
     setSlots(rebuildSlotsFor(builderMode, chosenPosition, slotCount));
     setActiveIndex(0);
     setRevealed(false);
@@ -10688,13 +10699,34 @@ function StatBlitz() {
                 {feedback && <p className="mt-1.5 ml-9 text-xs">{feedback}</p>}
 
                 {isActive && filled && !locked && (
-                  <div className="mt-1.5 ml-9 flex justify-end">
-                    <button
-                      onClick={() => missSlot(i)}
-                      className="text-[11px] text-slate-500 hover:text-rose-400 underline decoration-dotted underline-offset-2"
-                    >
-                      Can't think of one? Skip (0 {cat.unit})
-                    </button>
+                  <div className="mt-4 ml-9 flex justify-end">
+                    {confirmSkipIndex === i ? (
+                      <div className="flex items-center gap-3 text-[11px]">
+                        <span className="text-slate-400">Skip this spot for 0 {cat.unit}?</span>
+                        <button
+                          onClick={() => {
+                            setConfirmSkipIndex(null);
+                            missSlot(i);
+                          }}
+                          className="px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-300 font-semibold"
+                        >
+                          Yes, skip
+                        </button>
+                        <button
+                          onClick={() => setConfirmSkipIndex(null)}
+                          className="px-2.5 py-1 rounded-md bg-white/10 text-slate-300"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmSkipIndex(i)}
+                        className="text-[11px] text-slate-500 hover:text-rose-400 underline decoration-dotted underline-offset-2 py-1"
+                      >
+                        Can't think of one? Skip (0 {cat.unit})
+                      </button>
+                    )}
                   </div>
                 )}
 
