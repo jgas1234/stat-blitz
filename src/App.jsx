@@ -30,6 +30,12 @@ const BUILDER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "OF", "OF", "OF", "DH"];
 // no legal action to take anyway.
 const BUILDER_RESPINS = { easy: 6, medium: 3, hard: 0 };
 
+// Challenge codes need a shared server-side store so a friend on another
+// device can look the code up. The only store the app has (window.storage)
+// exists inside Claude's environment, not in a real browser or iOS/Android
+// app, so creating a code fails there. Hidden until a real backend exists.
+const CHALLENGES_ENABLED = false;
+
 const PLAYER_POSITIONS = {
   "Johnny Bench": "C", "Gary Carter": "C", "Ivan Rodriguez": "C", "Carlton Fisk": "C",
   "Mike Piazza": "C", "Yogi Berra": "C", "Joe Mauer": "C", "Bill Dickey": "C",
@@ -10390,18 +10396,20 @@ function StatBlitz() {
             >
               Reset
             </button>
-            <button
-              onClick={() => {
-                setChallengeStatus("");
-                setChallengePanel((p) => (p ? null : "menu"));
-              }}
-              className="px-3 py-1.5 rounded-full text-xs font-medium bg-amber-400/10 text-amber-400 border border-amber-400/30 hover:bg-amber-400/20"
-            >
-              🎯 Challenge
-            </button>
+            {CHALLENGES_ENABLED && (
+              <button
+                onClick={() => {
+                  setChallengeStatus("");
+                  setChallengePanel((p) => (p ? null : "menu"));
+                }}
+                className="px-3 py-1.5 rounded-full text-xs font-medium bg-amber-400/10 text-amber-400 border border-amber-400/30 hover:bg-amber-400/20"
+              >
+                🎯 Challenge
+              </button>
+            )}
           </div>
 
-          {challengePanel && (
+          {CHALLENGES_ENABLED && challengePanel && (
             <div className="mt-2 rounded-lg border border-white/10 bg-black/20 p-3 space-y-3">
               {challengePanel === "menu" && (
                 <div className="flex gap-2">
