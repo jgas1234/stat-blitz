@@ -1,0 +1,123 @@
+name: Build and Upload iOS to TestFlight
+
+on:
+  workflow_dispatch:
+
+env:
+  TEAM_ID: 6GAUJ45CX3
+  BUNDLE_ID: com.jgas1234.statblitz
+  # Key ID and Issuer ID are identifiers, not secrets. The private .p8 key
+  # itself lives in the repo secret APP_STORE_CONNECT_KEY_BASE64.
+  ASC_KEY_ID: TSKS9PQS69
+  ASC_ISSUER_ID: 99c11350-b412-4362-b002-22f5c727da8d
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Select the newest Xcode 26
+        run: |
+          XCODE_APP=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$XCODE_APP" ]; then
+            sudo xcode-select -s "$XCODE_APP/Contents/Developer"
+          fi
+          xcodebuild -version
+
+      - name: Install web dependencies and build the app
+        run: |
+          npm install
+          npm run build
+
+      - name: Install current Capacitor and regenerate the iOS project
+        run: |
+          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/ios@latest
+          npx cap init "Stat Blitz" "$BUNDLE_ID" --web-dir=docs
+          rm -rf ios
+          npx cap add ios
+          ls ios/App
+
+      - name: Apply the Stat Blitz app icon (if ios-assets/AppIcon-1024.png exists)
+        run: |
+          ICONSET=ios/App/App/Assets.xcassets/AppIcon.appiconset
+          if [ -f ios-assets/AppIcon-1024.png ]; then
+            for f in "$ICONSET"/*.png; do
+              cp ios-assets/AppIcon-1024.png "$f"
+            done
+            echo "Custom icon applied"
+          else
+            echo "No ios-assets/AppIcon-1024.png found - using the default Capacitor icon"
+          fi
+
+      - name: Configure Info.plist and show the privacy manifest
+        run: |
+          PLIST=ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$PLIST" \
+            || /usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption false" "$PLIST"
+          echo "---- Info.plist ----"
+          cat "$PLIST"
+          echo "---- Privacy manifest ----"
+          cat ios/App/App/PrivacyInfo.xcprivacy || echo "No app-level PrivacyInfo.xcprivacy found"
+
+      - name: Write the App Store Connect API key
+        env:
+          KEY_B64: ${{ secrets.APP_STORE_CONNECT_KEY_BASE64 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          echo "$KEY_B64" | base64 --decode > "$RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8"
+          ls -l "$RUNNER_TEMP/keys"
+
+      - name: Archive the app
+        run: |
+          if [ -d ios/App/App.xcworkspace ]; then
+            TARGET=(-workspace ios/App/App.xcworkspace)
+          else
+            TARGET=(-project ios/App/App.xcodeproj)
+          fi
+          xcodebuild archive \
+            "${TARGET[@]}" \
+            -scheme App \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="$TEAM_ID" \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            MARKETING_VERSION=1.0 \
+            TARGETED_DEVICE_FAMILY=1
+
+      - name: Sign and upload to App Store Connect (TestFlight)
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" << PLIST_EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store-connect</string>
+              <key>teamID</key>
+              <string>$TEAM_ID</string>
+              <key>signingStyle</key>
+              <string>automatic</string>
+              <key>destination</key>
+              <string>upload</string>
+              <key>manageAppVersionAndBuildNumber</key>
+              <false/>
+          </dict>
+          </plist>
+          PLIST_EOF
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/App.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/keys/AuthKey_$ASC_KEY_ID.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
