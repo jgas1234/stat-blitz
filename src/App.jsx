@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 
 // Primary fielding position for baseball position players, used only by
 // Career Home Runs / Hits / RBI / Stolen Bases (the four batting-counting
@@ -28,13 +28,32 @@ const BUILDER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "OF", "OF", "OF", "DH"];
 // gets none, so whatever spins up, you live with it; a truly dead spin
 // with zero re-spins left just auto-continues for free, since there's
 // no legal action to take anyway.
-const BUILDER_RESPINS = { easy: 6, medium: 3, hard: 0 };
+const BUILDER_RESPINS = { easy: 6, medium: 3, hard: 0, max: 3 };
 
 // Challenge codes need a shared server-side store so a friend on another
 // device can look the code up. The only store the app has (window.storage)
 // exists inside Claude's environment, not in a real browser or iOS/Android
 // app, so creating a code fails there. Hidden until a real backend exists.
 const CHALLENGES_ENABLED = false;
+
+// The Daily Question picks "the player with the most career X among those who
+// played for TEAM" straight from the team lists, so any wrong team tag in the
+// top players makes it mark correct answers wrong. Hidden until the basketball
+// and football team lists get the same audit baseball did.
+const DAILY_QUESTION_ENABLED = false;
+
+// "Max" difficulty plus the end-of-round "best possible lineup" comparison.
+// Team Mode and Position Mode only. Set to false to hide both.
+const BEST_POSSIBLE_ENABLED = true;
+
+// Daily spin: a once-a-day puzzle with the same random teams for everyone, opened
+// from a small button beside "Pick a sport". Set to false to hide it.
+const DAILY_SPIN_ENABLED = true;
+
+// The sports the daily spin takes turns with. A puzzle is only as fair as the team
+// lists behind it (a player missing a team makes a spot unanswerable), so if one
+// sport's lists turn out unreliable, take it out of this list until it's audited.
+const DAILY_SPIN_SPORTS = ["baseball", "basketball", "football"];
 
 const PLAYER_POSITIONS = {
   "Johnny Bench": "C", "Gary Carter": "C", "Ivan Rodriguez": "C", "Carlton Fisk": "C",
@@ -137,7 +156,7 @@ const PLAYER_POSITIONS = {
   "Julio Cruz": "2B", "William Robinson": "2B", "Brandon Lowe": "2B", "Bump Wills": "2B",
   "Hub Collins": "2B", "Dick Egan": "2B", "Quilvio Veras": "2B", "Billy Gilbert": "2B",
   "Jack Crooks": "2B", "Emilio Bonifacio": "2B", "Dave Nelson": "2B", "Alan Wiggins": "2B",
-  "Rodney Scott": "2B", "Pat Kelly": "2B",
+  "Rodney Scott": "2B",
   "Mike Schmidt": "3B", "Eddie Mathews": "3B", "Wade Boggs": "3B", "Adrian Beltre": "3B",
   "George Brett": "3B", "Chipper Jones": "3B", "Ron Santo": "3B", "Brooks Robinson": "3B",
   "Paul Molitor": "3B", "Scott Rolen": "3B", "Edgar Martinez": "3B", "Graig Nettles": "3B",
@@ -348,7 +367,7 @@ const PLAYER_POSITIONS = {
   "Eddie Burke": "OF", "Troy O'Leary": "OF", "Jim Lemon": "OF", "Al Martin": "OF",
   "Billy Hatcher": "OF", "George Tebeau": "OF", "Blondie Purcell": "OF", "Jason Kubel": "OF",
   "Jonny Gomes": "OF", "Ron Kittle": "OF", "Henry Rodriguez": "OF", "Miguel Dilone": "OF",
-  "Cal Ripken": "SS", "Eric Young": "2B", "Jose Cruz Jr.": "OF", "Jose Cruz Sr.": "OF", "Ken Griffey Sr.": "OF", "Matt Joyce": "OF",
+  "Cal Ripken": "SS", "Eric Young": "2B", "Jose Cruz Jr.": "OF", "Jose Cruz Sr.": "OF", "Ken Griffey Sr.": "OF", "Matt Joyce": "OF", "Pat Kelly": "OF",
 };
 
 const TEAMS_BASEBALL = [
@@ -1484,7 +1503,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Reggie Smith", value: 2020, teams: ["BOS", "LAD", "SFG", "STL"] },
       { name: "Amos Otis", value: 2020, teams: ["KC", "NYM", "PIT"] },
       { name: "Earl Averill", value: 2019, teams: ["CLE", "DET", "BOS"] },
-      { name: "George Burns", value: 2018, teams: ["BOS", "CIN", "CLE", "DET", "NYY", "OAK", "PHI", "SFG"] },
+      { name: "George Burns", value: 2018, teams: ["BOS", "CLE", "DET", "NYY", "OAK"] },
       { name: "Bill Mazeroski", value: 2016, teams: ["PIT"] },
       { name: "Johnny Mize", value: 2011, teams: ["NYY", "SFG", "STL"] },
       { name: "Gary Matthews", value: 2011, teams: ["ATL", "BAL", "CHC", "LAA", "NYM", "PHI", "PIT", "SDP", "SEA", "SFG", "TEX"] },
@@ -1659,7 +1678,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Freddie Lindstrom", value: 1747, teams: ["CHC", "LAD", "PIT", "SFG"] },
       { name: "Howie Kendrick", value: 1747, teams: ["LAA", "LAD", "MON/WAS", "PHI"] },
       { name: "J.D. Martinez", value: 1741, teams: ["HOU", "DET", "ARI", "BOS"] },
-      { name: "Eric Young", value: 1731, teams: ["ATL", "CHC", "COL", "LAA", "LAD", "MIL", "NYM", "NYY", "SDP", "SFG", "TEX"] },
+      { name: "Eric Young", value: 1731, teams: ["CHC", "COL", "LAD", "MIL", "SDP", "SFG", "TEX"] },
       { name: "Rocky Colavito", value: 1730, teams: ["CHW", "CLE", "DET", "LAD", "NYY", "OAK"] },
       { name: "Tony Cuccinello", value: 1729, teams: ["ATL", "CHW", "CIN", "LAD", "SFG"] },
       { name: "Steve Brodie", value: 1728, teams: ["ATL", "BLO", "NYY", "PIT", "SFG", "STL"] },
@@ -1823,7 +1842,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Ken Williams", value: 1552, teams: ["BAL", "BOS", "CIN"] },
       { name: "Jose Offerman", value: 1551, teams: ["BOS", "KC", "LAD", "MIN", "NYM", "PHI", "SEA"] },
       { name: "Wally Berger", value: 1550, teams: ["ATL", "CIN", "PHI", "SFG"] },
-      { name: "Delino DeShields", value: 1548, teams: ["BAL", "CHC", "CIN", "CLE", "LAD", "MON/WAS", "STL", "TEX"] },
+      { name: "Delino DeShields", value: 1548, teams: ["BAL", "CHC", "LAD", "MON/WAS", "STL"] },
       { name: "Al Lopez", value: 1547, teams: ["ATL", "CLE", "LAD", "PIT"] },
       { name: "Cesar Tovar", value: 1546, teams: ["MIN", "NYY", "OAK", "PHI", "TEX"] },
       { name: "Chick Stahl", value: 1546, teams: ["ATL", "BOS"] },
@@ -2310,7 +2329,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Barry Larkin", value: 960, teams: ["CIN"] },
       { name: "Jose Abreu", value: 960, teams: ["CHW", "HOU"] },
       { name: "Vernon Wells", value: 958, teams: ["LAA", "NYY", "TOR"] },
-      { name: "George Burns", value: 954, teams: ["BOS", "CIN", "CLE", "DET", "NYY", "OAK", "PHI", "SFG"] },
+      { name: "George Burns", value: 954, teams: ["BOS", "CLE", "DET", "NYY", "OAK"] },
       { name: "Frank McCormick", value: 954, teams: ["ATL", "CIN", "PHI"] },
       { name: "Jesse Burkett", value: 952, teams: ["BAL", "BOS", "CLV", "SFG", "STL"] },
       { name: "Mike Lowell", value: 952, teams: ["BOS", "MIA", "NYY"] },
@@ -2766,9 +2785,9 @@ const CATEGORIES_BASEBALL = {
       { name: "Mike Griffin", value: 473, teams: ["BAL", "PHI", "BRD"] },
       { name: "Jimmy Rollins", value: 470, teams: ["CHW", "LAD", "PHI"] },
       { name: "Tommy McCarthy", value: 468, teams: ["ATL", "BRD", "LAD", "PHI", "STL"] },
-      { name: "Eric Young", value: 465, teams: ["ATL", "CHC", "COL", "LAA", "LAD", "MIL", "NYM", "NYY", "SDP", "SFG", "TEX"] },
+      { name: "Eric Young", value: 465, teams: ["CHC", "COL", "LAD", "MIL", "SDP", "SFG", "TEX"] },
       { name: "Jimmy Sheckard", value: 465, teams: ["BLO", "CHC", "CIN", "LAD", "NYY", "STL"] },
-      { name: "Delino DeShields", value: 463, teams: ["BAL", "CHC", "CIN", "CLE", "LAD", "MON/WAS", "STL", "TEX"] },
+      { name: "Delino DeShields", value: 463, teams: ["BAL", "CHC", "LAD", "MON/WAS", "STL"] },
       { name: "Bobby Bonds", value: 461, teams: ["CHC", "CHW", "CLE", "LAA", "NYY", "SFG", "STL", "TEX"] },
       { name: "Ed Delahanty", value: 456, teams: ["CLI", "MIN", "PHI"] },
       { name: "Ron LeFlore", value: 455, teams: ["CHW", "DET", "MON/WAS"] },
@@ -2964,7 +2983,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Jake Daubert", value: 251, teams: ["CIN", "LAD"] },
       { name: "George Moriarty", value: 251, teams: ["CHC", "CHW", "DET", "NYY"] },
       { name: "Harold Reynolds", value: 250, teams: ["BAL", "LAA", "SEA"] },
-      { name: "Pat Kelly", value: 250, teams: ["BAL", "CHW", "CLE", "KC", "MIN", "NYY", "STL", "TOR"] },
+      { name: "Pat Kelly", value: 250, teams: ["BAL", "CHW", "CLE", "KC", "MIN"] },
       { name: "Garry Maddox", value: 248, teams: ["PHI", "SFG"] },
       { name: "Topsy Hartsel", value: 247, teams: ["CHC", "CIN", "LOU", "OAK"] },
       { name: "Darren Lewis", value: 247, teams: ["BOS", "CHC", "CHW", "CIN", "LAD", "OAK", "SFG"] },
@@ -4664,7 +4683,7 @@ const CATEGORIES_BASKETBALL = {
       { name: "Alex English", value: 25613, teams: ["DAL", "DEN", "IND", "MIL"] },
       { name: "Reggie Miller", value: 25279, teams: ["IND"] },
       { name: "Jerry West", value: 25192, teams: ["LAL"] },
-      { name: "Patrick Ewing", value: 24815, teams: ["NOP", "NYK", "OKC", "ORL"] },
+      { name: "Patrick Ewing", value: 24815, teams: ["NYK", "OKC", "ORL"] },
       { name: "Ray Allen", value: 24505, teams: ["BOS", "MIA", "MIL", "OKC"] },
       { name: "Allen Iverson", value: 24368, teams: ["DEN", "DET", "MEM", "PHI"] },
       { name: "Charles Barkley", value: 23757, teams: ["HOU", "PHI", "PHX"] },
@@ -5170,7 +5189,7 @@ const CATEGORIES_BASKETBALL = {
       { name: "LeBron James", value: 12095, teams: ["CLE", "LAL", "MIA"] },
       { name: "Dennis Rodman", value: 11954, teams: ["CHI", "DAL", "DET", "LAL", "SAS"] },
       { name: "Kevin Willis", value: 11901, teams: ["ATL", "DAL", "DEN", "GSW", "HOU", "MIA", "SAS", "TOR"] },
-      { name: "Patrick Ewing", value: 11607, teams: ["NOP", "NYK", "OKC", "ORL"] },
+      { name: "Patrick Ewing", value: 11607, teams: ["NYK", "OKC", "ORL"] },
       { name: "Andre Drummond", value: 11513, teams: ["BKN", "CHI", "CLE", "DET", "LAL", "PHI"] },
       { name: "Dirk Nowitzki", value: 11489, teams: ["DAL"] },
       { name: "Elgin Baylor", value: 11463, teams: ["LAL"] },
@@ -6076,7 +6095,7 @@ const CATEGORIES_BASKETBALL = {
       { name: "Herm Gilliam", value: 2225, teams: ["ATL", "LAC", "OKC", "POR", "SAC"] },
       { name: "LaMelo Ball", value: 2224, teams: ["CHA"] },
       { name: "Christian Laettner", value: 2224, teams: ["ATL", "DAL", "DET", "MIA", "MIN", "WAS"] },
-      { name: "Patrick Ewing", value: 2217, teams: ["NOP", "NYK", "OKC", "ORL"] },
+      { name: "Patrick Ewing", value: 2217, teams: ["NYK", "OKC", "ORL"] },
       { name: "George Gervin", value: 2214, teams: ["CHI", "SAS"] },
       { name: "Sam Jones", value: 2209, teams: ["BOS"] },
       { name: "Shawn Marion", value: 2198, teams: ["CLE", "DAL", "MIA", "PHX", "TOR"] },
@@ -6286,7 +6305,7 @@ const CATEGORIES_BASKETBALL = {
       { name: "Terrell Brandon", value: 1142, teams: ["CLE", "MIL", "MIN"] },
       { name: "Sedale Threatt", value: 1138, teams: ["CHI", "HOU", "LAL", "OKC", "PHI"] },
       { name: "Tracy McGrady", value: 1136, teams: ["ATL", "DET", "HOU", "NYK", "ORL", "TOR"] },
-      { name: "Patrick Ewing", value: 1136, teams: ["NOP", "NYK", "OKC", "ORL"] },
+      { name: "Patrick Ewing", value: 1136, teams: ["NYK", "OKC", "ORL"] },
       { name: "Darrell Armstrong", value: 1133, teams: ["BKN", "DAL", "IND", "NOP", "ORL"] },
       { name: "Danny Ainge", value: 1133, teams: ["BOS", "PHX", "POR", "SAC"] },
       { name: "Anfernee Hardaway", value: 1125, teams: ["MIA", "NYK", "ORL", "PHX"] },
@@ -6675,7 +6694,7 @@ const CATEGORIES_BASKETBALL = {
       { name: "Mark Eaton", value: 3064, teams: ["UTA"] },
       { name: "Tim Duncan", value: 3020, teams: ["SAS"] },
       { name: "David Robinson", value: 2954, teams: ["SAS"] },
-      { name: "Patrick Ewing", value: 2894, teams: ["NOP", "NYK", "OKC", "ORL"] },
+      { name: "Patrick Ewing", value: 2894, teams: ["NYK", "OKC", "ORL"] },
       { name: "Shaquille O'Neal", value: 2732, teams: ["BOS", "CLE", "LAL", "MIA", "ORL", "PHX"] },
       { name: "Tree Rollins", value: 2542, teams: ["ATL", "CLE", "DET", "HOU", "ORL"] },
       { name: "Robert Parish", value: 2361, teams: ["BOS", "CHA", "CHI", "GSW"] },
@@ -7238,7 +7257,7 @@ const CATEGORIES_FOOTBALL = {
       { name: "Drew Bledsoe", value: 44611, teams: ["BUF", "DAL", "NE"] },
       { name: "Dan Fouts", value: 43040, teams: ["LAC"] },
       { name: "Derek Carr", value: 41245, teams: ["LV", "NO"] },
-      { name: "Kerry Collins", value: 40922, teams: ["IND", "LV", "NYG", "TEN"] },
+      { name: "Kerry Collins", value: 40922, teams: ["CAR", "IND", "LV", "NO", "NYG", "TEN"] },
       { name: "Joe Montana", value: 40551, teams: ["SF", "KC"] },
       { name: "Johnny Unitas", value: 40239, teams: ["IND", "LAC"] },
       { name: "Jared Goff", value: 40155, teams: ["DET", "LAR"] },
@@ -7522,7 +7541,7 @@ const CATEGORIES_FOOTBALL = {
       { name: "Terry Bradshaw", value: 212, teams: ["PIT"] },
       { name: "Jim Hart", value: 209, teams: ["ARI", "WAS"] },
       { name: "Kurt Warner", value: 208, teams: ["ARI", "LAR", "NYG"] },
-      { name: "Kerry Collins", value: 208, teams: ["IND", "LV", "NYG", "TEN"] },
+      { name: "Kerry Collins", value: 208, teams: ["CAR", "IND", "LV", "NO", "NYG", "TEN"] },
       { name: "Randall Cunningham", value: 207, teams: ["PHI", "MIN", "DAL", "BAL"] },
       { name: "Jim Everett", value: 203, teams: ["LAC", "LAR", "NO"] },
       { name: "Roman Gabriel", value: 201, teams: ["LAR", "PHI"] },
@@ -8897,6 +8916,83 @@ function findPlayer(list, guess) {
   );
 }
 
+// The best lineup possible for the teams the player actually spun: every slot
+// with a team gets a different eligible player, and the sum is as high as it
+// can be. A player's value doesn't depend on which slot he fills, so going
+// through players from highest to lowest and keeping each one that can still
+// be fit in (re-arranging earlier picks if needed) gives the true maximum —
+// not just "the top name per team", which would double-count a star who played
+// for several of the spun teams.
+function computeBestPossible(slots, players, requiredPosition, positionLookup) {
+  const slotIdx = [];
+  slots.forEach((s, i) => {
+    if (s.team) slotIdx.push(i);
+  });
+  if (slotIdx.length === 0) return { total: 0, lineup: [] };
+
+  const unique = new Map();
+  for (const p of players) {
+    const key = normalize(p.name);
+    const prev = unique.get(key);
+    if (!prev || p.value > prev.value) unique.set(key, p);
+  }
+  const cands = [...unique.values()]
+    .filter((p) => !requiredPosition || positionLookup[p.name] === requiredPosition)
+    .sort((a, b) => b.value - a.value);
+
+  const adj = cands.map((p) =>
+    slotIdx.reduce((acc, si, k) => {
+      if (p.teams.includes(slots[si].team)) acc.push(k);
+      return acc;
+    }, [])
+  );
+  const matchSlot = new Array(slotIdx.length).fill(-1);
+
+  function place(c, visited) {
+    for (const k of adj[c]) {
+      if (visited[k]) continue;
+      visited[k] = true;
+      if (matchSlot[k] === -1 || place(matchSlot[k], visited)) {
+        matchSlot[k] = c;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  let placed = 0;
+  for (let c = 0; c < cands.length && placed < slotIdx.length; c++) {
+    if (adj[c].length === 0) continue;
+    if (place(c, new Array(slotIdx.length).fill(false))) placed++;
+  }
+
+  const matched = [];
+  let total = 0;
+  matchSlot.forEach((c, k) => {
+    if (c !== -1) {
+      matched.push({ slotIndex: slotIdx[k], player: cands[c] });
+      total += cands[c].value;
+    }
+  });
+
+  // Slots that landed on the same team are interchangeable (anyone eligible for
+  // one is eligible for all), so list that team's best player in its earliest
+  // slot, then the next best, and so on. The total doesn't change.
+  const groups = new Map();
+  matched.forEach((e) => {
+    const t = slots[e.slotIndex].team;
+    if (!groups.has(t)) groups.set(t, []);
+    groups.get(t).push(e);
+  });
+  const lineup = [];
+  groups.forEach((group) => {
+    const slotOrder = group.map((e) => e.slotIndex).sort((a, b) => a - b);
+    const ranked = group.map((e) => e.player).sort((a, b) => b.value - a.value);
+    slotOrder.forEach((slotIndex, i) => lineup.push({ slotIndex, player: ranked[i] }));
+  });
+  return { total, lineup };
+}
+
 function teamByAbbr(abbr, teams) {
   return teams.find((t) => t.abbr === abbr);
 }
@@ -8955,6 +9051,7 @@ function randomTeam(teams) {
 // the generic targets for any position that doesn't have its own numbers
 // defined yet.
 function getTarget(cat, difficulty, slotCount, positionMode, chosenPosition, builderMode) {
+  if (difficulty === "max") return null; // Max has no fixed target
   if (builderMode && cat.targetsBuilder && cat.targetsBuilder[difficulty] != null) {
     return cat.targetsBuilder[difficulty];
   }
@@ -9216,6 +9313,587 @@ function challengeSummaryText(cat, difficulty, total) {
    COMPONENT
 --------------------------------------------------------- */
 
+/* ---------------------------------------------------------
+   DAILY SPIN
+   One puzzle a day, the same for everybody: a random 5 to 20 teams, picked
+   from the date. Name a player who played for each team; your score is the
+   percent of the best possible lineup for those teams. One try a day. Your
+   progress, streak and history stay on the phone — no server involved.
+--------------------------------------------------------- */
+
+const DAILY_SPIN_START = "2026-10-12"; // puzzle #1
+const DAILY_SPIN_STORE = "statBlitzDailySpin";
+const DAILY_SPIN_STATS = "statBlitzDailySpinStats";
+const DAILY_SPIN_SEEN = "statBlitzDailySpinSeen";
+const DAILY_SPIN_URL = "https://jgas1234.github.io/stat-blitz/";
+const DAILY_SPIN_EMPTY_STATS = { streak: 0, best: 0, played: 0, last: null, history: {} };
+
+function dailyDateString(d = new Date()) {
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
+// Whole days since 1970 for a YYYY-MM-DD string, independent of time zone.
+function dailyDayNumber(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return Math.floor(Date.UTC(y, m - 1, d) / 86400000);
+}
+
+function dailyYesterday(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return dailyDateString(new Date(y, m - 1, d - 1));
+}
+
+function dailyHash(str) {
+  let h = 2166136261 >>> 0;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619) >>> 0;
+  }
+  return h >>> 0;
+}
+
+// Small seeded random number generator, so a date always gives the same puzzle.
+function dailyRng(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function buildDailyPuzzle(dateStr) {
+  const n = dailyDayNumber(dateStr);
+  const rng = dailyRng(dailyHash("statblitz-daily-" + dateStr));
+  const rotation = DAILY_SPIN_SPORTS.filter((key) => SPORTS[key]);
+  const k = rotation.length;
+  const sportKey = rotation[((n % k) + k) % k]; // sports take turns
+  const sport = SPORTS[sportKey];
+  const categoryNames = Object.keys(sport.categories);
+  const categoryName = categoryNames[Math.floor(rng() * categoryNames.length)];
+  const cat = sport.categories[categoryName];
+  const count = 5 + Math.floor(rng() * 16); // 5 to 20 spots
+  // Only teams with a few players in this list, so no spot is a dead end.
+  const roomy = sport.teams.filter((t) => cat.players.filter((p) => p.teams.includes(t.abbr)).length >= 4);
+  const pool = (roomy.length >= count ? roomy : sport.teams).map((t) => t.abbr);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return {
+    date: dateStr,
+    number: Math.max(1, n - dailyDayNumber(DAILY_SPIN_START) + 1),
+    sportKey,
+    categoryName,
+    count,
+    teams: pool.slice(0, count),
+  };
+}
+
+function dailyEvaluateGuess(puzzle, slotIndex, player, picks) {
+  const already = picks.some((p) => p && p.status === "found" && normalize(p.name) === normalize(player.name));
+  if (already) return { ok: false, reason: "dup" };
+  if (!player.teams.includes(puzzle.teams[slotIndex])) return { ok: false, reason: "wrongteam" };
+  return { ok: true };
+}
+
+function dailyScore(puzzle, picks) {
+  const cat = SPORTS[puzzle.sportKey].categories[puzzle.categoryName];
+  const slots = puzzle.teams.map((abbr) => ({ team: abbr }));
+  const best = computeBestPossible(slots, cat.players, null, PLAYER_POSITIONS);
+  const total = picks.reduce((sum, p) => sum + (p && p.status === "found" ? p.value : 0), 0);
+  const pct = best.total > 0 ? Math.min(100, Math.round((total / best.total) * 100)) : 0;
+  const bestBySlot = {};
+  best.lineup.forEach((e) => {
+    bestBySlot[e.slotIndex] = e.player;
+  });
+  const squares = picks.map((p, i) => {
+    if (!p || p.status !== "found") return "⬛";
+    const b = bestBySlot[i];
+    const ratio = b ? p.value / b.value : 1;
+    return ratio >= 0.85 ? "🟩" : ratio >= 0.6 ? "🟨" : "🟥";
+  });
+  return { best, total, pct, squares, bestBySlot };
+}
+
+function dailyShareText(puzzle, result, streak) {
+  const rows = [];
+  for (let i = 0; i < result.squares.length; i += 10) rows.push(result.squares.slice(i, i + 10).join(""));
+  return [
+    `Stat Blitz daily spin #${puzzle.number}`,
+    `${SPORTS[puzzle.sportKey].label} · ${puzzle.categoryName}`,
+    `${result.pct}% of the best possible · ${puzzle.count} spots`,
+    rows.join("\n"),
+    streak > 1 ? `${streak}-day streak` : "",
+    DAILY_SPIN_URL,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function dailyRecordFinish(stats, dateStr, pct) {
+  if (stats.history && stats.history[dateStr] != null) return stats; // already counted
+  const streak = stats.last === dailyYesterday(dateStr) ? (stats.streak || 0) + 1 : 1;
+  return {
+    streak,
+    best: Math.max(stats.best || 0, streak),
+    played: (stats.played || 0) + 1,
+    last: dateStr,
+    history: { ...(stats.history || {}), [dateStr]: pct },
+  };
+}
+
+// Your streaks, worked out from the saved history: every run of consecutive days
+// you finished, longest first. A run is "current" if it reaches today or yesterday.
+function dailyStreakRuns(history, today) {
+  const runs = [];
+  Object.keys(history || {})
+    .sort()
+    .forEach((d) => {
+      const last = runs[runs.length - 1];
+      if (last && dailyYesterday(d) === last.end) {
+        last.end = d;
+        last.length += 1;
+      } else {
+        runs.push({ start: d, end: d, length: 1 });
+      }
+    });
+  runs.forEach((r) => {
+    r.current = r.end === today || r.end === dailyYesterday(today);
+  });
+  return runs.sort((a, b) => b.length - a.length || (a.end < b.end ? 1 : -1));
+}
+
+function dailyShortDate(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function dailyRead(key, fallback) {
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (err) {
+    return fallback; // storage unavailable — progress just won't persist
+  }
+}
+
+function dailyWrite(key, value) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (err) {
+    // storage unavailable — progress just won't persist
+  }
+}
+
+async function dailyShare(text, setNote) {
+  try {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      await navigator.share({ text });
+      return;
+    }
+  } catch (err) {
+    if (err && err.name === "AbortError") return; // they closed the share sheet
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    setNote("Copied. Paste it anywhere.");
+  } catch (err) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      setNote("Copied. Paste it anywhere.");
+    } catch (err2) {
+      setNote("Couldn't copy. Press and hold the result to copy it.");
+    }
+  }
+}
+
+function DailySpin({ onClose }) {
+  const today = dailyDateString();
+  const puzzle = useMemo(() => buildDailyPuzzle(today), [today]);
+  const sport = SPORTS[puzzle.sportKey];
+  const cat = sport.categories[puzzle.categoryName];
+
+  const [picks, setPicks] = useState(() => {
+    const saved = dailyRead(DAILY_SPIN_STORE, null);
+    if (saved && saved.date === puzzle.date && Array.isArray(saved.picks) && saved.picks.length === puzzle.count) {
+      return saved.picks;
+    }
+    return Array(puzzle.count).fill(null);
+  });
+  const [stats, setStats] = useState(() => dailyRead(DAILY_SPIN_STATS, DAILY_SPIN_EMPTY_STATS));
+  const [sel, setSel] = useState(() => picks.findIndex((p) => !p));
+  const [query, setQuery] = useState("");
+  const [msg, setMsg] = useState("");
+  // Set after a wrong-team answer so the player can tell us the team list is missing someone.
+  const [report, setReport] = useState(null);
+  const [confirmSkip, setConfirmSkip] = useState(false);
+  const [showBest, setShowBest] = useState(false);
+  const [shareNote, setShareNote] = useState("");
+  // The explanation starts open the first time you visit, then tucks away.
+  const [showHow, setShowHow] = useState(() => !dailyRead(DAILY_SPIN_SEEN, false));
+  useEffect(() => {
+    dailyWrite(DAILY_SPIN_SEEN, true);
+  }, []);
+
+  const done = picks.every(Boolean);
+  const result = useMemo(() => (done ? dailyScore(puzzle, picks) : null), [done, puzzle, picks]);
+  const runs = useMemo(() => dailyStreakRuns(stats.history, today), [stats.history, today]);
+  const scores = Object.values(stats.history || {});
+  const avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  const liveStreak = stats.last === today || stats.last === dailyYesterday(today) ? stats.streak : 0;
+
+  useEffect(() => {
+    dailyWrite(DAILY_SPIN_STORE, { date: puzzle.date, picks });
+  }, [picks, puzzle.date]);
+
+  useEffect(() => {
+    if (!done || !result) return;
+    if (stats.history && stats.history[puzzle.date] != null) return;
+    const next = dailyRecordFinish(stats, puzzle.date, result.pct);
+    dailyWrite(DAILY_SPIN_STATS, next);
+    setStats(next);
+  }, [done, result, stats, puzzle.date]);
+
+  const suggestions = useMemo(() => {
+    const q = normalize(query);
+    if (q.length < 2) return [];
+    return cat.players.filter((p) => normalize(p.name).includes(q)).slice(0, 8);
+  }, [query, cat]);
+
+  const teamName = (abbr) => {
+    const t = teamByAbbr(abbr, sport.teams);
+    return t ? t.name : abbr;
+  };
+
+  function fill(index, pick) {
+    const nextPicks = picks.map((p, i) => (i === index ? pick : p));
+    setPicks(nextPicks);
+    setQuery("");
+    setMsg("");
+    setReport(null);
+    setConfirmSkip(false);
+    setSel(nextPicks.findIndex((p) => !p));
+  }
+
+  function choose(player) {
+    if (sel < 0) return;
+    const res = dailyEvaluateGuess(puzzle, sel, player, picks);
+    if (!res.ok) {
+      setMsg(
+        res.reason === "dup"
+          ? `${player.name} is already in your lineup.`
+          : `${player.name} didn't play for the ${teamName(puzzle.teams[sel])}. Try another.`
+      );
+      setReport(res.reason === "wrongteam" ? { player: player.name, team: teamName(puzzle.teams[sel]) } : null);
+      return;
+    }
+    fill(sel, { name: player.name, value: player.value, status: "found" });
+  }
+
+  function skip() {
+    if (sel < 0) return;
+    fill(sel, { name: "", value: 0, status: "skipped" });
+  }
+
+  function pickRow(i) {
+    if (picks[i]) return;
+    setSel(i);
+    setQuery("");
+    setMsg("");
+    setReport(null);
+    setConfirmSkip(false);
+  }
+
+  const now = new Date();
+  const msLeft = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
+  const nextIn = `${Math.floor(msLeft / 3600000)}h ${Math.floor((msLeft % 3600000) / 60000)}m`;
+  const shareText = result ? dailyShareText(puzzle, result, stats.streak) : "";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto font-body text-slate-200"
+      style={{ background: "radial-gradient(circle at 50% 0%, #16233d 0%, #0a1120 55%, #060a14 100%)" }}
+    >
+      <div
+        className="max-w-md mx-auto px-5 pb-10"
+        style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 16px)" }}
+      >
+        <div className="flex items-center justify-between">
+          <button
+            onClick={onClose}
+            aria-label="Back"
+            className="px-3 py-2 -ml-3 text-sm text-slate-300 hover:text-white"
+          >
+            ← Back
+          </button>
+          <span className="text-xs text-slate-400">
+            {liveStreak > 0 ? `🔥 ${liveStreak}-day streak` : "Start a streak today"}
+          </span>
+        </div>
+
+        <h1 className="font-scoreboard text-4xl text-white leading-none mt-2">DAILY SPIN #{puzzle.number}</h1>
+        <p className="mt-1 text-sm text-amber-400 font-semibold">
+          {sport.label} · {puzzle.categoryName} · {puzzle.count} spots
+        </p>
+        <p className="mt-1 text-xs text-slate-400">Same teams for everyone today. Name a player who played for each one.</p>
+        <button
+          onClick={() => setShowHow((v) => !v)}
+          className="mt-2 text-xs text-amber-400 underline decoration-dotted underline-offset-2"
+        >
+          {showHow ? "Hide how it works" : "How it works"}
+        </button>
+        {showHow && (
+          <div className="mt-2 space-y-2 rounded-xl border border-white/10 bg-white/5 p-3 text-xs leading-relaxed text-slate-300">
+            <p>
+              <span className="font-semibold text-white">One puzzle a day, the same for everyone.</span> Each day has a
+              sport, a stat and 5 to 20 teams. The sport changes every day.
+            </p>
+            <p>
+              <span className="font-semibold text-white">Fill every spot.</span> Tap a spot, type a name, and tap it in
+              the list. The player has to have played for that team, and you can't use anyone twice. His career total
+              counts toward your score. You can answer the spots in any order.
+            </p>
+            <p>
+              <span className="font-semibold text-white">Your score is a percent.</span> It's your total divided by the
+              best possible lineup for today's teams: the highest total you could get using a different player for each
+              team. 100% is a perfect day.
+            </p>
+            <p>
+              <span className="font-semibold text-white">The squares.</span> 🟩 is within 15% of the ideal pick for
+              that team, 🟨 is within 40%, 🟥 is lower, and ⬛ is a skip, worth 0.
+            </p>
+            <p>
+              <span className="font-semibold text-white">One try, and a streak.</span> Finish a spin every day to build
+              a streak. Miss a day and it starts over. A new puzzle opens at midnight your time.
+            </p>
+            <p>
+              <span className="font-semibold text-white">Private.</span> Your results are saved on this device only. There
+              is no account.
+            </p>
+          </div>
+        )}
+
+        {!done && (
+          <p className="mt-3 text-xs text-slate-500">
+            {picks.filter(Boolean).length} of {puzzle.count} done · tap any open spot to answer it
+          </p>
+        )}
+
+        <div className="mt-3 space-y-2">
+          {puzzle.teams.map((abbr, i) => {
+            const t = teamByAbbr(abbr, sport.teams);
+            const pick = picks[i];
+            const isSel = !pick && i === sel;
+            return (
+              <div
+                key={abbr}
+                className={
+                  "rounded-xl border px-3 py-2.5 " +
+                  (pick
+                    ? pick.status === "found"
+                      ? "border-emerald-400/40 bg-white/5"
+                      : "border-rose-400/30 bg-white/5"
+                    : isSel
+                    ? "border-amber-400/60 bg-white/10"
+                    : "border-white/10 bg-white/5")
+                }
+              >
+                <div className="flex items-center gap-3">
+                  <span className="w-5 text-xs text-slate-500 text-right">{i + 1}</span>
+                  <span
+                    className="shrink-0 w-12 text-center rounded-md py-1 text-[11px] font-bold text-white"
+                    style={{ background: t ? t.color : "#334155" }}
+                  >
+                    {abbr}
+                  </span>
+                  {pick ? (
+                    <>
+                      <span className={"flex-1 min-w-0 truncate text-sm " + (pick.status === "found" ? "text-white" : "text-slate-500")}>
+                        {pick.status === "found" ? pick.name : "Skipped"}
+                      </span>
+                      <span className={"shrink-0 text-sm font-semibold " + (pick.status === "found" ? "text-emerald-400" : "text-rose-400")}>
+                        {pick.value.toLocaleString()} {cat.unit}
+                      </span>
+                    </>
+                  ) : isSel ? (
+                    <div className="relative flex-1 min-w-0">
+                      <input
+                        type="text"
+                        autoFocus
+                        value={query}
+                        placeholder={`Name a ${t ? t.name : abbr} player`}
+                        onChange={(e) => {
+                          setQuery(e.target.value);
+                          setMsg("");
+                          setReport(null);
+                        }}
+                        className="w-full bg-transparent text-white placeholder-slate-500 outline-none border-b border-white/20 focus:border-amber-400 py-1"
+                        style={{ fontSize: "16px" }}
+                      />
+                      {suggestions.length > 0 && (
+                        <div className="absolute left-0 right-0 z-10 mt-1 max-h-52 overflow-y-auto rounded-lg border border-white/10 bg-slate-900 shadow-xl">
+                          {suggestions.map((p) => (
+                            <button
+                              key={p.name}
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                choose(p);
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm text-white hover:bg-white/10"
+                            >
+                              {p.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <button onClick={() => pickRow(i)} className="flex-1 text-left text-sm text-slate-500">
+                      Tap to answer
+                    </button>
+                  )}
+                </div>
+                {isSel && msg && <p className="mt-1.5 ml-8 text-xs text-rose-300">{msg}</p>}
+                {isSel && report && (
+                  <a
+                    href={
+                      "mailto:jpgsportsbiz@gmail.com?subject=" +
+                      encodeURIComponent("Stat Blitz: missing team") +
+                      "&body=" +
+                      encodeURIComponent(
+                        `Daily spin #${puzzle.number} (${sport.label}, ${puzzle.categoryName}): I think ${report.player} played for the ${report.team}, but the app says he didn't.`
+                      )
+                    }
+                    className="mt-1 ml-8 inline-block text-[11px] text-amber-400 underline decoration-dotted underline-offset-2"
+                  >
+                    Think he did? Tell us.
+                  </a>
+                )}
+                {isSel && (
+                  <div className="mt-3 ml-8 flex justify-end">
+                    {confirmSkip ? (
+                      <div className="flex items-center gap-3 text-[11px]">
+                        <span className="text-slate-400">Skip this spot for 0 {cat.unit}?</span>
+                        <button onClick={skip} className="px-2.5 py-1 rounded-md bg-rose-500/20 text-rose-300 font-semibold">
+                          Yes, skip
+                        </button>
+                        <button onClick={() => setConfirmSkip(false)} className="px-2.5 py-1 rounded-md bg-white/10 text-slate-300">
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmSkip(true)}
+                        className="text-[11px] text-slate-500 hover:text-rose-400 underline decoration-dotted underline-offset-2 py-1"
+                      >
+                        Can't think of one? Skip (0 {cat.unit})
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {done && result && (
+          <div className="mt-5 rounded-2xl border border-emerald-400/30 bg-emerald-400/10 p-4 text-center">
+            <p className="text-xs uppercase tracking-wide text-slate-400">Your score</p>
+            <p className="font-scoreboard text-6xl text-emerald-400 leading-none mt-1">{result.pct}%</p>
+            <p className="mt-1 text-sm text-slate-300">
+              {result.total.toLocaleString()} of {result.best.total.toLocaleString()} {cat.unit} possible
+            </p>
+            <p className="mt-3 text-xl tracking-wide leading-snug">
+              {result.squares.slice(0, 10).join("")}
+              {result.squares.length > 10 && <br />}
+              {result.squares.slice(10).join("")}
+            </p>
+            <p className="mt-2 text-xs text-slate-400">
+              🔥 {stats.streak}-day streak · best {stats.best} · played {stats.played}
+            </p>
+            <button
+              onClick={() => dailyShare(shareText, setShareNote)}
+              className="mt-4 w-full rounded-xl bg-amber-400 py-3 text-sm font-semibold text-slate-900 hover:bg-amber-300"
+            >
+              Share result
+            </button>
+            {shareNote && <p className="mt-2 text-xs text-emerald-300">{shareNote}</p>}
+            <p className="mt-3 text-xs text-slate-500">Next daily spin in {nextIn}</p>
+            <button
+              onClick={() => setShowBest((v) => !v)}
+              className="mt-3 text-xs text-amber-400 underline decoration-dotted underline-offset-2"
+            >
+              {showBest ? "Hide best lineup" : "See the best lineup"}
+            </button>
+            {showBest && (
+              <div className="mt-3 space-y-1.5 text-left">
+                {puzzle.teams.map((abbr, i) => {
+                  const b = result.bestBySlot[i];
+                  const t = teamByAbbr(abbr, sport.teams);
+                  const mine = picks[i];
+                  return (
+                    <div key={abbr} className="flex items-center gap-2">
+                      <span className="w-5 text-xs text-slate-500">{i + 1}</span>
+                      <span
+                        className="shrink-0 w-11 text-center rounded px-1 py-0.5 text-[10px] font-bold text-white"
+                        style={{ background: t ? t.color : "#334155" }}
+                      >
+                        {abbr}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-slate-100 truncate">{b ? b.name : "—"}</p>
+                        <p className="text-[10px] text-slate-500 truncate">
+                          You: {mine && mine.status === "found" ? mine.name : "skipped"} ({mine ? mine.value.toLocaleString() : 0})
+                        </p>
+                      </div>
+                      <span className="text-xs font-semibold text-emerald-300">{b ? b.value.toLocaleString() : 0}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
+          <p className="text-xs uppercase tracking-wide text-slate-400">Your longest streaks</p>
+          {runs.length === 0 ? (
+            <p className="mt-2 text-sm text-slate-400">Finish your first daily spin to start your streak board.</p>
+          ) : (
+            <div className="mt-2 space-y-1.5">
+              {runs.slice(0, 5).map((r, i) => (
+                <div key={r.start} className="flex items-center gap-3 text-sm">
+                  <span className="w-5 text-right text-slate-500">{i + 1}</span>
+                  <span className="w-16 font-semibold text-white">
+                    {r.length} day{r.length === 1 ? "" : "s"}
+                  </span>
+                  <span className="flex-1 text-xs text-slate-400">
+                    {dailyShortDate(r.start)}
+                    {r.length > 1 ? ` to ${dailyShortDate(r.end)}` : ""}
+                  </span>
+                  {r.current && <span className="text-[10px] font-semibold text-amber-300">current</span>}
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="mt-3 text-xs text-slate-500">
+            {stats.played} played · average score {avgScore}%
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function StatBlitz() {
   const [sport, setSport] = useState("baseball");
   const [category, setCategory] = useState(Object.keys(SPORTS.baseball.categories)[0]);
@@ -9250,6 +9928,14 @@ function StatBlitz() {
   // Which slot (if any) is showing its "really skip?" confirmation. Skipping
   // permanently scores a spot at 0, so it takes two taps to avoid accidents.
   const [confirmSkipIndex, setConfirmSkipIndex] = useState(null);
+  // Whether the end-of-round "best lineup" list is expanded.
+  const [showBest, setShowBest] = useState(false);
+  // Daily spin screen (opens over the home screen, so nothing reloads).
+  const [dailyOpen, setDailyOpen] = useState(false);
+  const dailyDoneToday = useMemo(() => {
+    const st = dailyRead(DAILY_SPIN_STATS, DAILY_SPIN_EMPTY_STATS);
+    return !!(st.history && st.history[dailyDateString()] != null);
+  }, [dailyOpen]);
 
   const [challengeTarget, setChallengeTarget] = useState(null); // { code, sport, category, difficulty, hardMode, slotCount, total, unit }
   const [myChallengeCode, setMyChallengeCode] = useState(null);
@@ -9310,7 +9996,10 @@ function StatBlitz() {
   const teams = SPORTS[sport].teams;
   const CATEGORY_KEYS = Object.keys(SPORTS[sport].categories);
   const cat = SPORTS[sport].categories[category];
-  const target = getTarget(cat, difficulty, slotCount, positionMode, chosenPosition, builderMode);
+  // "Max" difficulty has no fixed target: the goal is to score as close to the
+  // best possible lineup (worked out once the round is over) as you can.
+  const isMax = difficulty === "max";
+  const target = isMax ? null : getTarget(cat, difficulty, slotCount, positionMode, chosenPosition, builderMode);
 
   // Position filtering only exists for baseball's four position-player
   // batting categories — pitching categories are already position-specific
@@ -9394,9 +10083,16 @@ function StatBlitz() {
   // lineup is already complete. Shared by both Lineup Builder and
   // Position Mode (once a position is chosen), since they run on the
   // same engine.
+  const scoredAtSpinRef = useRef(0);
+  useEffect(() => {
+    scoredAtSpinRef.current = slots.filter((s) => isScored(s.result?.status)).length;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [builderTeam]);
   useEffect(() => {
     if (!sharedSpinActive || !builderTeam || sharedRoundComplete) return;
-    const justUsed = slots.some((s) => s.team === builderTeam.abbr && isScored(s.result?.status));
+    // A slot got filled since this team landed. (Comparing by team name would
+    // wrongly treat a repeat of an earlier team as "already used" and respin.)
+    const justUsed = slots.filter((s) => isScored(s.result?.status)).length > scoredAtSpinRef.current;
     if (justUsed) {
       const timer = setTimeout(() => {
         setBuilderTeam(null);
@@ -9471,6 +10167,7 @@ function StatBlitz() {
       const turningOn = !b;
       if (turningOn) {
         setPositionMode(false);
+        if (difficulty === "max") setDifficulty("medium"); // no "best possible" in Lineup Builder
         setPreBuilderSlotCount(slotCount); // remember it so turning off can restore it
         setSlotCount(BUILDER_POSITIONS.length);
         setSlots(builderEmptySlots());
@@ -9913,13 +10610,18 @@ function StatBlitz() {
       const slot = prev[i];
       if (!slot.team && !slot.position) return prev;
       const next = [...prev];
-      next[i] = { ...slot, result: { status: "missed", actual: 0 } };
+      next[i] = {
+        ...slot,
+        team: slot.team || (sharedSpinActive && builderTeam ? builderTeam.abbr : slot.team),
+        result: { status: "missed", actual: 0 },
+      };
       return next;
     });
   }
 
   function resetBoard() {
     setConfirmSkipIndex(null);
+    setShowBest(false);
     setSlots(rebuildSlotsFor(builderMode, chosenPosition, slotCount));
     setActiveIndex(0);
     setRevealed(false);
@@ -9939,8 +10641,18 @@ function StatBlitz() {
 
   const lockedCount = slots.filter((s) => s.result && isResolved(s.result.status)).length;
 
-  const progressPct = Math.min(100, Math.round((runningTotal / target) * 100));
-  const goalReached = runningTotal >= target;
+  // Best possible lineup for the teams that were spun this round. Team Mode and
+  // Position Mode only — Lineup Builder lets any spin go in any open spot, so
+  // "best possible" there is a different, bigger puzzle.
+  const bestPossible = useMemo(() => {
+    if (!BEST_POSSIBLE_ENABLED || !roundComplete || builderMode) return null;
+    return computeBestPossible(slots, cat.players, positionSpinActive ? chosenPosition : null, PLAYER_POSITIONS);
+  }, [roundComplete, builderMode, slots, cat, positionSpinActive, chosenPosition]);
+  const bestPct =
+    bestPossible && bestPossible.total > 0 ? Math.min(100, Math.round((runningTotal / bestPossible.total) * 100)) : 0;
+
+  const progressPct = isMax ? 0 : Math.min(100, Math.round((runningTotal / target) * 100));
+  const goalReached = isMax ? !!(bestPossible && bestPct >= 85) : runningTotal >= target;
 
   const playersByTeam = {};
   cat.players.forEach((p) => {
@@ -9955,6 +10667,7 @@ function StatBlitz() {
       className="min-h-dvh w-full flex justify-center py-8 px-3"
       style={{ background: "radial-gradient(circle at 50% 0%, #16233d 0%, #0a1120 55%, #060a14 100%)" }}
     >
+      {DAILY_SPIN_ENABLED && dailyOpen && <DailySpin onClose={() => setDailyOpen(false)} />}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
         .font-scoreboard { font-family: 'Teko', sans-serif; letter-spacing: 0.02em; }
@@ -10001,7 +10714,7 @@ function StatBlitz() {
         )}
 
         {/* DAILY QUESTION */}
-        {dailyMode && dailyQuestion ? (
+        {DAILY_QUESTION_ENABLED && (dailyMode && dailyQuestion ? (
           (() => {
             const answeredToday = daily.lastAnsweredDate === todayLocalStr();
             return (
@@ -10058,11 +10771,22 @@ function StatBlitz() {
               Play
             </button>
           </div>
-        )}
+        ))}
 
         {/* SPORT PICKER */}
         <div className="px-5 pt-5">
-          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Pick a sport</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Pick a sport</label>
+            {DAILY_SPIN_ENABLED && (
+              <button
+                onClick={() => setDailyOpen(true)}
+                className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-[11px] font-semibold text-amber-300 hover:bg-amber-400/20"
+              >
+                Daily spin
+                {!dailyDoneToday && <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400" />}
+              </button>
+            )}
+          </div>
           <div className="mt-2 flex gap-1.5">
             {SPORT_KEYS.map((key) => (
               <button
@@ -10106,7 +10830,7 @@ function StatBlitz() {
         <div className="px-5 mt-4">
           <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Target — combined {cat.unit}</label>
           <div className="mt-2 flex gap-1.5">
-            {DIFFICULTIES.map((d) => (
+            {(builderMode || !BEST_POSSIBLE_ENABLED ? DIFFICULTIES : [...DIFFICULTIES, "max"]).map((d) => (
               <button
                 key={d}
                 onClick={() => changeDifficulty(d)}
@@ -10119,7 +10843,9 @@ function StatBlitz() {
               >
                 {d}
                 <span className="block text-[10px] font-normal opacity-80">
-                  {getTarget(cat, d, slotCount, positionMode, chosenPosition, builderMode).toLocaleString()} {cat.unit}
+                  {d === "max"
+                    ? "best score"
+                    : `${getTarget(cat, d, slotCount, positionMode, chosenPosition, builderMode).toLocaleString()} ${cat.unit}`}
                 </span>
               </button>
             ))}
@@ -10367,15 +11093,27 @@ function StatBlitz() {
           </div>
           <p className="font-scoreboard text-3xl text-white leading-none">
             {runningTotal.toLocaleString()}
-            <span className="text-slate-500 text-xl"> / {target.toLocaleString()} {cat.unit}</span>
+            {isMax ? (
+              <span className="text-slate-500 text-xl"> {cat.unit}</span>
+            ) : (
+              <span className="text-slate-500 text-xl"> / {target.toLocaleString()} {cat.unit}</span>
+            )}
           </p>
-          <div className="mt-2 h-2.5 rounded-full bg-white/10 overflow-hidden">
-            <div
-              className={"h-full rounded-full transition-all duration-500 " + (goalReached ? "bg-emerald-400" : "bg-amber-400")}
-              style={{ width: progressPct + "%" }}
-            />
-          </div>
-          {goalReached && <p className="mt-1.5 text-xs font-semibold text-emerald-400">Goal reached — lineup complete!</p>}
+          {isMax ? (
+            !roundComplete && (
+              <p className="mt-2 text-xs text-slate-400">
+                Max mode: no target. Score as close to the best possible lineup as you can.
+              </p>
+            )
+          ) : (
+            <div className="mt-2 h-2.5 rounded-full bg-white/10 overflow-hidden">
+              <div
+                className={"h-full rounded-full transition-all duration-500 " + (goalReached ? "bg-emerald-400" : "bg-amber-400")}
+                style={{ width: progressPct + "%" }}
+              />
+            </div>
+          )}
+          {goalReached && !isMax && <p className="mt-1.5 text-xs font-semibold text-emerald-400">Goal reached — lineup complete!</p>}
 
           <div className="mt-3 flex flex-wrap gap-2">
             {hardMode ? (
@@ -10770,8 +11508,53 @@ function StatBlitz() {
         {roundComplete && (
           <div className="mx-5 mb-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-3 text-center">
             <p className="text-sm font-semibold text-emerald-400">
-              Lineup complete — {goalReached ? "you hit the target!" : "reset to try beating it."}
+              {isMax && bestPossible
+                ? `Lineup complete — ${bestPct}% of the best possible`
+                : `Lineup complete — ${goalReached ? "you hit the target!" : "reset to try beating it."}`}
             </p>
+            {bestPossible && bestPossible.total > 0 && (
+              <>
+                <p className="mt-1 text-xs text-slate-300">
+                  You scored {runningTotal.toLocaleString()} of {bestPossible.total.toLocaleString()} {cat.unit} possible
+                  {isMax ? "" : ` (${bestPct}%)`} for the teams you spun.
+                </p>
+                <button
+                  onClick={() => setShowBest((v) => !v)}
+                  className="mt-2 text-xs text-amber-400 underline decoration-dotted underline-offset-2"
+                >
+                  {showBest ? "Hide best lineup" : "See the best lineup"}
+                </button>
+                {showBest && (
+                  <div className="mt-2 space-y-1.5 text-left">
+                    {[...bestPossible.lineup]
+                      .sort((a, b) => a.slotIndex - b.slotIndex)
+                      .map(({ slotIndex, player }) => {
+                        const slot = slots[slotIndex];
+                        const t = teamByAbbr(slot.team, teams);
+                        const mine = slot.result && isScored(slot.result.status) ? slot.result.actual : 0;
+                        return (
+                          <div key={slotIndex} className="flex items-center gap-2">
+                            <span className="w-5 text-xs text-slate-500">{slotIndex + 1}</span>
+                            <span
+                              className="shrink-0 w-11 text-center rounded px-1 py-0.5 text-[10px] font-bold text-white"
+                              style={{ background: t ? t.color : "#334155" }}
+                            >
+                              {slot.team}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs text-slate-100 truncate">{player.name}</p>
+                              <p className="text-[10px] text-slate-500 truncate">
+                                You: {slot.name ? slot.name : "skipped"} ({mine.toLocaleString()})
+                              </p>
+                            </div>
+                            <span className="text-xs font-semibold text-emerald-300">{player.value.toLocaleString()}</span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+              </>
+            )}
             {challengeTarget &&
               (() => {
                 const won = runningTotal > challengeTarget.total;
