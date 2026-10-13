@@ -9325,6 +9325,14 @@ const DAILY_SPIN_START = "2026-10-12"; // puzzle #1
 const DAILY_SPIN_STORE = "statBlitzDailySpin";
 const DAILY_SPIN_STATS = "statBlitzDailySpinStats";
 const DAILY_SPIN_SEEN = "statBlitzDailySpinSeen";
+const REPORT_EMAIL = "jpgsportsbiz@gmail.com";
+// Opens an email to you with the details already filled in — used by every
+// "Tell us" link so players can flag a missing player or a missing team.
+function reportHref(body) {
+  return (
+    "mailto:" + REPORT_EMAIL + "?subject=" + encodeURIComponent("Stat Blitz: data fix") + "&body=" + encodeURIComponent(body)
+  );
+}
 const DAILY_SPIN_URL = "https://jgas1234.github.io/stat-blitz/";
 const DAILY_SPIN_EMPTY_STATS = { streak: 0, best: 0, played: 0, last: null, history: {} };
 
@@ -9763,16 +9771,21 @@ function DailySpin({ onClose }) {
                   )}
                 </div>
                 {isSel && msg && <p className="mt-1.5 ml-8 text-xs text-rose-300">{msg}</p>}
+                {isSel && !report && query.trim().length >= 3 && suggestions.length === 0 && (
+                  <a
+                    href={reportHref(
+                      `Daily spin #${puzzle.number} (${sport.label}, ${puzzle.categoryName}): I looked for "${query.trim()}" for the ${teamName(abbr)} but he isn't in the app's list.`
+                    )}
+                    className="mt-1 ml-8 inline-block text-[11px] text-amber-400 underline decoration-dotted underline-offset-2"
+                  >
+                    Not in our list? Tell us.
+                  </a>
+                )}
                 {isSel && report && (
                   <a
-                    href={
-                      "mailto:jpgsportsbiz@gmail.com?subject=" +
-                      encodeURIComponent("Stat Blitz: missing team") +
-                      "&body=" +
-                      encodeURIComponent(
-                        `Daily spin #${puzzle.number} (${sport.label}, ${puzzle.categoryName}): I think ${report.player} played for the ${report.team}, but the app says he didn't.`
-                      )
-                    }
+                    href={reportHref(
+                      `Daily spin #${puzzle.number} (${sport.label}, ${puzzle.categoryName}): I think ${report.player} played for the ${report.team}, but the app says he didn't.`
+                    )}
                     className="mt-1 ml-8 inline-block text-[11px] text-amber-400 underline decoration-dotted underline-offset-2"
                   >
                     Think he did? Tell us.
@@ -9928,6 +9941,8 @@ function StatBlitz() {
   // Which slot (if any) is showing its "really skip?" confirmation. Skipping
   // permanently scores a spot at 0, so it takes two taps to avoid accidents.
   const [confirmSkipIndex, setConfirmSkipIndex] = useState(null);
+  // Spot where the Self-report button was tapped before any name was typed.
+  const [selfReportHint, setSelfReportHint] = useState(null);
   // Whether the end-of-round "best lineup" list is expanded.
   const [showBest, setShowBest] = useState(false);
   // Daily spin screen (opens over the home screen, so nothing reloads).
@@ -10569,6 +10584,17 @@ function StatBlitz() {
       next[i] = { ...slot, result: { status: "unverified" } };
       return next;
     });
+  }
+
+  // The Self-report button: opens the "enter their stat yourself" row for the
+  // name already typed in this spot. It needs a name first.
+  function openSelfReport(i) {
+    if (!slots[i].name.trim()) {
+      setSelfReportHint(i);
+      return;
+    }
+    setSelfReportHint(null);
+    markUnverifiedIfNeeded(i);
   }
 
   function updateManualStat(i, value) {
@@ -11272,10 +11298,23 @@ function StatBlitz() {
               } else if (r.status === "wrongteam") {
                 ring = "border-rose-500/50";
                 badge = "bg-rose-500 text-white";
-                feedback = hardMode ? (
-                  <span className="text-rose-400">Not this team</span>
-                ) : (
-                  <span className="text-rose-400">Played for: {teamNames(r.actualTeams, teams)} — not this team</span>
+                const reportTeam = slot.team ? (teamByAbbr(slot.team, teams) || {}).name || slot.team : "";
+                feedback = (
+                  <>
+                    {hardMode ? (
+                      <span className="text-rose-400">Not this team</span>
+                    ) : (
+                      <span className="text-rose-400">Played for: {teamNames(r.actualTeams, teams)} — not this team</span>
+                    )}{" "}
+                    <a
+                      href={reportHref(
+                        `${slot.name} (${category}): I think he played for the ${reportTeam}, but the app says he didn't.`
+                      )}
+                      className="ml-1 text-amber-400 underline decoration-dotted underline-offset-2"
+                    >
+                      Think he did? Tell us.
+                    </a>
+                  </>
                 );
               } else if (r.status === "wrongposition") {
                 ring = "border-rose-500/50";
@@ -11445,7 +11484,17 @@ function StatBlitz() {
                 {feedback && <p className="mt-1.5 ml-9 text-xs">{feedback}</p>}
 
                 {isActive && filled && !locked && (
-                  <div className="mt-4 ml-9 flex justify-end">
+                  <div className="mt-4 ml-9 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                    {!r ? (
+                      <button
+                        onClick={() => openSelfReport(i)}
+                        className="text-[11px] text-amber-400 underline decoration-dotted underline-offset-2 py-1"
+                      >
+                        Not in the list? Self-report
+                      </button>
+                    ) : (
+                      <span />
+                    )}
                     {confirmSkipIndex === i ? (
                       <div className="flex items-center gap-3 text-[11px]">
                         <span className="text-slate-400">Skip this spot for 0 {cat.unit}?</span>
@@ -11476,8 +11525,15 @@ function StatBlitz() {
                   </div>
                 )}
 
+                {isActive && !r && selfReportHint === i && !slot.name.trim() && (
+                  <p className="mt-1 ml-9 text-[11px] text-amber-300">
+                    Type the player's name above first, then tap Self-report.
+                  </p>
+                )}
+
                 {isActive && r && r.status === "unverified" && (
-                  <div className="mt-2 ml-9 flex items-center gap-2">
+                  <div className="mt-2 ml-9">
+                  <div className="flex items-center gap-2">
                     <p className="text-xs text-amber-400 shrink-0">Not in our pool — self-report their {cat.unit}:</p>
                     <input
                       type="number"
@@ -11494,6 +11550,13 @@ function StatBlitz() {
                     >
                       Add
                     </button>
+                  </div>
+                    <a
+                      href={reportHref(`${slot.name} (${category}): he isn't in the app's list. Please add him.`)}
+                      className="mt-1.5 inline-block text-[11px] text-amber-400 underline decoration-dotted underline-offset-2"
+                    >
+                      Should he be in our list? Tell us.
+                    </a>
                   </div>
                 )}
 
