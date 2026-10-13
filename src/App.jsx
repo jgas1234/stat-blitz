@@ -11484,17 +11484,12 @@ function StatBlitz() {
                 {feedback && <p className="mt-1.5 ml-9 text-xs">{feedback}</p>}
 
                 {isActive && filled && !locked && (
-                  <div className="mt-4 ml-9 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                    {!r ? (
-                      <button
-                        onClick={() => openSelfReport(i)}
-                        className="text-[11px] text-amber-400 underline decoration-dotted underline-offset-2 py-1"
-                      >
-                        Not in the list? Self-report
-                      </button>
-                    ) : (
-                      <span />
-                    )}
+                  <div
+                    className={
+                      "mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 " +
+                      (confirmSkipIndex === i || r ? "justify-end" : "justify-between")
+                    }
+                  >
                     {confirmSkipIndex === i ? (
                       <div className="flex items-center gap-3 text-[11px]">
                         <span className="text-slate-400">Skip this spot for 0 {cat.unit}?</span>
@@ -11515,12 +11510,22 @@ function StatBlitz() {
                         </button>
                       </div>
                     ) : (
-                      <button
-                        onClick={() => setConfirmSkipIndex(i)}
-                        className="text-[11px] text-slate-500 hover:text-rose-400 underline decoration-dotted underline-offset-2 py-1"
-                      >
-                        Can't think of one? Skip (0 {cat.unit})
-                      </button>
+                      <>
+                        {!r && (
+                          <button
+                            onClick={() => openSelfReport(i)}
+                            className="whitespace-nowrap text-[11px] text-amber-400 underline decoration-dotted underline-offset-2 py-1"
+                          >
+                            Not in the list? Self-report
+                          </button>
+                        )}
+                        <button
+                          onClick={() => setConfirmSkipIndex(i)}
+                          className="whitespace-nowrap text-[11px] text-slate-500 hover:text-rose-400 underline decoration-dotted underline-offset-2 py-1"
+                        >
+                          Can't think of one? Skip
+                        </button>
+                      </>
                     )}
                   </div>
                 )}
