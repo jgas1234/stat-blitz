@@ -9627,19 +9627,13 @@ function DailySpin({ onClose }) {
   const shareText = result ? dailyShareText(puzzle, result, stats.streak) : "";
 
   return (
-    <div
-      className="fixed inset-0 z-50 overflow-y-auto font-body text-slate-200"
-      style={{ background: "radial-gradient(circle at 50% 0%, #16233d 0%, #0a1120 55%, #060a14 100%)" }}
-    >
-      <div
-        className="max-w-md mx-auto px-5 pb-10"
-        style={{ paddingTop: "max(env(safe-area-inset-top, 0px), 16px)" }}
-      >
+    <div data-daily-spin className="w-full max-w-md font-body text-slate-200">
+      <div className="px-2 pb-10">
         <div className="flex items-center justify-between">
           <button
             onClick={onClose}
             aria-label="Back"
-            className="px-3 py-2 -ml-3 text-sm text-slate-300 hover:text-white"
+            className="px-4 py-3.5 -ml-4 text-sm text-slate-300 hover:text-white"
           >
             ← Back
           </button>
@@ -9902,6 +9896,13 @@ function DailySpin({ onClose }) {
             {stats.played} played · average score {avgScore}%
           </p>
         </div>
+
+        <button
+          onClick={onClose}
+          className="mt-6 w-full rounded-xl border border-white/15 py-3 text-sm text-slate-300 hover:bg-white/10"
+        >
+          ← Back to the game
+        </button>
       </div>
     </div>
   );
@@ -9950,6 +9951,18 @@ function StatBlitz() {
   const dailyDoneToday = useMemo(() => {
     const st = dailyRead(DAILY_SPIN_STATS, DAILY_SPIN_EMPTY_STATS);
     return !!(st.history && st.history[dailyDateString()] != null);
+  }, [dailyOpen]);
+  const homeScrollRef = useRef(0);
+  function openDaily() {
+    homeScrollRef.current = window.scrollY || 0;
+    setDailyOpen(true);
+  }
+  function closeDaily() {
+    setDailyOpen(false);
+  }
+  // Show the daily spin from the top, and put the home screen back where you left it.
+  useEffect(() => {
+    window.scrollTo(0, dailyOpen ? 0 : homeScrollRef.current);
   }, [dailyOpen]);
 
   const [challengeTarget, setChallengeTarget] = useState(null); // { code, sport, category, difficulty, hardMode, slotCount, total, unit }
@@ -10693,7 +10706,6 @@ function StatBlitz() {
       className="min-h-dvh w-full flex justify-center py-8 px-3"
       style={{ background: "radial-gradient(circle at 50% 0%, #16233d 0%, #0a1120 55%, #060a14 100%)" }}
     >
-      {DAILY_SPIN_ENABLED && dailyOpen && <DailySpin onClose={() => setDailyOpen(false)} />}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
         .font-scoreboard { font-family: 'Teko', sans-serif; letter-spacing: 0.02em; }
@@ -10709,7 +10721,7 @@ function StatBlitz() {
       `}</style>
 
       <div
-        className="font-body w-full max-w-md rounded-[2rem] overflow-hidden border border-white/10"
+        className={"font-body w-full max-w-md rounded-[2rem] overflow-hidden border border-white/10" + (dailyOpen ? " hidden" : "")}
         style={{ background: "linear-gradient(180deg, #101a2e 0%, #0b1424 100%)", boxShadow: "0 30px 60px -20px rgba(0,0,0,0.6)" }}
       >
         {/* HEADER */}
@@ -10721,7 +10733,7 @@ function StatBlitz() {
           >
             {muted ? "🔇" : "🔊"}
           </button>
-          <p className="text-[11px] tracking-widest text-amber-400/80 font-semibold mb-1">SPIN A TEAM. FIND ANY PLAYER WHO SUITED UP.</p>
+          <p className="px-8 text-[11px] tracking-widest text-amber-400/80 font-semibold mb-1">SPIN A TEAM. FIND ANY PLAYER WHO SUITED UP.</p>
           <h1 className="font-scoreboard text-white text-5xl leading-none">STAT BLITZ</h1>
           <p className="text-slate-400 text-sm mt-2">Build a lineup that hits the target total.</p>
         </div>
@@ -10805,7 +10817,7 @@ function StatBlitz() {
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Pick a sport</label>
             {DAILY_SPIN_ENABLED && (
               <button
-                onClick={() => setDailyOpen(true)}
+                onClick={openDaily}
                 className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-[11px] font-semibold text-amber-300 hover:bg-amber-400/20"
               >
                 Daily spin
@@ -11644,6 +11656,7 @@ function StatBlitz() {
           </p>
         </div>
       </div>
+      {DAILY_SPIN_ENABLED && dailyOpen && <DailySpin onClose={closeDaily} />}
     </div>
   );
 }
