@@ -30,18 +30,6 @@ const BUILDER_POSITIONS = ["C", "1B", "2B", "3B", "SS", "OF", "OF", "OF", "DH"];
 // no legal action to take anyway.
 const BUILDER_RESPINS = { easy: 6, medium: 3, hard: 0, max: 3 };
 
-// Challenge codes need a shared server-side store so a friend on another
-// device can look the code up. The only store the app has (window.storage)
-// exists inside Claude's environment, not in a real browser or iOS/Android
-// app, so creating a code fails there. Hidden until a real backend exists.
-const CHALLENGES_ENABLED = false;
-
-// The Daily Question picks "the player with the most career X among those who
-// played for TEAM" straight from the team lists, so any wrong team tag in the
-// top players makes it mark correct answers wrong. Hidden until the basketball
-// and football team lists get the same audit baseball did.
-const DAILY_QUESTION_ENABLED = false;
-
 // "Max" difficulty plus the end-of-round "best possible lineup" comparison.
 // Team Mode and Position Mode only. Set to false to hide both.
 const BEST_POSSIBLE_ENABLED = true;
@@ -9076,126 +9064,6 @@ function getTarget(cat, difficulty, slotCount, positionMode, chosenPosition, bui
   return Math.round(cat.targets[difficulty] * (slotCount / 10));
 }
 
-function todayLocalStr() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-function yesterdayLocalStr() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-// Every possible daily-question "slot": one entry per (sport, category,
-// team-or-all-time) combination. Built once from real data — no hand
-// curation, no hardcoded counts, so it stays correct if categories or
-// teams are ever added later.
-function buildAllDailyCombos() {
-  const combos = [];
-  for (const sportKey of SPORT_KEYS) {
-    const categoryKeys = Object.keys(SPORTS[sportKey].categories);
-    const teamsList = SPORTS[sportKey].teams;
-    for (const categoryKey of categoryKeys) {
-      combos.push({ sport: sportKey, category: categoryKey, teamAbbr: null }); // all-time
-      for (const t of teamsList) {
-        combos.push({ sport: sportKey, category: categoryKey, teamAbbr: t.abbr });
-      }
-    }
-  }
-  return combos;
-}
-
-function pickDistractors(pool, count) {
-  const candidates = pool.slice(1, 11);
-  const picked = [];
-  while (picked.length < count && candidates.length > 0) {
-    const idx = Math.floor(Math.random() * candidates.length);
-    picked.push(candidates[idx]);
-    candidates.splice(idx, 1);
-  }
-  return picked;
-}
-
-function shuffleRandom(arr) {
-  const result = [...arr];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
-
-// Turns one combo (sport/category/team-or-null) into an actual question:
-// text, correct answer, and 4 shuffled multiple-choice options.
-function buildQuestionFromCombo(combo) {
-  const cat = SPORTS[combo.sport].categories[combo.category];
-  const label = combo.category.replace(/^Career /, "").toLowerCase();
-
-  let team = null;
-  let pool = cat.players;
-  if (combo.teamAbbr) {
-    const candidateTeam = SPORTS[combo.sport].teams.find((t) => t.abbr === combo.teamAbbr);
-    const filtered = cat.players.filter((p) => p.teams.includes(combo.teamAbbr));
-    if (candidateTeam && filtered.length > 0) {
-      team = candidateTeam;
-      pool = filtered; // already sorted descending, since cat.players is
-    }
-  }
-
-  const answer = pool[0];
-  const questionText = team
-    ? `Which player has the most career ${label} among those who played for the ${team.name}?`
-    : `Who has the most career ${label} of all time?`;
-
-  const distractors = pickDistractors(pool, 3);
-  const options = shuffleRandom([answer, ...distractors].map((p) => p.name));
-
-  return {
-    sport: combo.sport,
-    category: combo.category,
-    team,
-    questionText,
-    answerName: answer.name,
-    answerValue: answer.value,
-    unit: cat.unit,
-    options,
-  };
-}
-
-// Picks today's combo from a shuffled "bag" of every possible combo,
-// guaranteeing no repeat until the whole set has been seen once. State
-// (the shuffled order, position, and today's already-picked combo) is
-// persisted locally so re-opening the app the same day shows the same
-// question, and the sequence survives between sessions.
-function pickTodaysCombo(daily) {
-  const today = todayLocalStr();
-  if (daily.bagDate === today && daily.currentCombo) {
-    return { combo: daily.currentCombo, bag: daily };
-  }
-
-  let order = daily.bagOrder || [];
-  let position = daily.bagPosition || 0;
-
-  if (order.length === 0 || position >= order.length) {
-    const allCombos = buildAllDailyCombos();
-    order = shuffleRandom(allCombos.map((_, i) => i));
-    position = 0;
-  }
-
-  const allCombos = buildAllDailyCombos();
-  const combo = allCombos[order[position]];
-  const newBag = {
-    ...daily,
-    bagOrder: order,
-    bagPosition: position + 1,
-    bagDate: today,
-    currentCombo: combo,
-  };
-  return { combo, bag: newBag };
-}
-
-
 // All three sounds are synthesized entirely in-browser with the Web
 // Audio API — no audio files to host, license, or bundle. They share one
 // AudioContext (created lazily on first use) rather than each spinning up
@@ -9302,11 +9170,6 @@ function playMissSound() {
   } catch (err) {
     // Audio unavailable — fail silently, never block gameplay.
   }
-}
-
-function challengeSummaryText(cat, difficulty, total) {
-  const diffLabel = difficulty.charAt(0).toUpperCase() + difficulty.slice(1);
-  return `hit ${total.toLocaleString()} ${cat.unit} on ${diffLabel}`;
 }
 
 /* ---------------------------------------------------------
@@ -9965,13 +9828,6 @@ function StatBlitz() {
     window.scrollTo(0, dailyOpen ? 0 : homeScrollRef.current);
   }, [dailyOpen]);
 
-  const [challengeTarget, setChallengeTarget] = useState(null); // { code, sport, category, difficulty, hardMode, slotCount, total, unit }
-  const [myChallengeCode, setMyChallengeCode] = useState(null);
-  const [challengeInput, setChallengeInput] = useState("");
-  const [challengePanel, setChallengePanel] = useState(null); // null | "create" | "enter"
-  const [challengeStatus, setChallengeStatus] = useState("");
-  const [challengeBusy, setChallengeBusy] = useState(false);
-
   const [muted, setMuted] = useState(false);
 
   // Load the saved mute preference from this device once, on first render.
@@ -9994,32 +9850,6 @@ function StatBlitz() {
       // localStorage unavailable — preference just won't persist this session
     }
   }, [muted]);
-
-  const [dailyMode, setDailyMode] = useState(false); // is the daily question panel open
-  const [dailyQuestion, setDailyQuestion] = useState(null); // built question text/options for display
-  const [daily, setDaily] = useState({
-    streak: 0,
-    lastAnsweredDate: null, // last day they submitted any guess
-    lastCorrectDate: null, // last day they got it right
-    lastGuess: "",
-    lastCorrect: null,
-    bagOrder: [], // shuffled combo indices — the "bag" of unseen questions
-    bagPosition: 0,
-    bagDate: null, // date the current bag position was last picked for
-    currentCombo: null, // today's already-picked combo, so reopening shows the same question
-  });
-
-  // Load the saved daily-question state from this device once, on first render.
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("statBlitzDaily");
-      if (saved) {
-        setDaily((prev) => ({ ...prev, ...JSON.parse(saved) }));
-      }
-    } catch (err) {
-      // localStorage unavailable — daily progress just won't persist this session
-    }
-  }, []);
 
   const teams = SPORTS[sport].teams;
   const CATEGORY_KEYS = Object.keys(SPORTS[sport].categories);
@@ -10214,124 +10044,6 @@ function StatBlitz() {
     });
   }
 
-  function generateChallengeCode() {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no O/0/I/1 confusion
-    let code = "";
-    for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
-    return code;
-  }
-
-  async function createChallenge() {
-    setChallengeBusy(true);
-    setChallengeStatus("");
-    const code = generateChallengeCode();
-    const payload = {
-      sport,
-      category,
-      difficulty,
-      hardMode,
-      slotCount,
-      total: runningTotal,
-      unit: cat.unit,
-    };
-    try {
-      await window.storage.set(`challenge:${code}`, JSON.stringify(payload), true);
-      setMyChallengeCode(code);
-      setChallengeStatus("");
-    } catch (err) {
-      setChallengeStatus("Couldn't create the challenge — try again.");
-    }
-    setChallengeBusy(false);
-  }
-
-  async function copyChallengeMessage() {
-    if (!myChallengeCode) return;
-    const scoreText = challengeSummaryText(cat, difficulty, runningTotal);
-    const message = `I ${scoreText} in a ${slotCount}-slot ${SPORTS[sport].label} challenge on Stat Blitz. Beat me — enter code ${myChallengeCode} in the app!`;
-    try {
-      await navigator.clipboard.writeText(message);
-      setChallengeStatus("Copied! Paste it to your friend.");
-    } catch (err) {
-      setChallengeStatus(`Code: ${myChallengeCode} (copy failed — just share the code)`);
-    }
-  }
-
-  async function loadChallenge() {
-    const code = challengeInput.trim().toUpperCase();
-    if (!code) return;
-    setChallengeBusy(true);
-    setChallengeStatus("");
-    try {
-      const result = await window.storage.get(`challenge:${code}`, true);
-      const data = JSON.parse(result.value);
-      const n = data.slotCount || 10;
-      const loadedSport = data.sport && SPORTS[data.sport] ? data.sport : "baseball";
-      setChallengeTarget({ ...data, code });
-      setChallengePanel(null);
-      setChallengeInput("");
-      setSport(loadedSport);
-      setCategory(data.category);
-      setDifficulty(data.difficulty);
-      setHardMode(!!data.hardMode);
-      setSlotCount(n);
-      setSlots(emptySlots(n));
-      setActiveIndex(0);
-      setRevealed(false);
-    } catch (err) {
-      setChallengeStatus("Couldn't find that code — double-check it.");
-    }
-    setChallengeBusy(false);
-  }
-
-  function clearChallenge() {
-    setChallengeTarget(null);
-    setMyChallengeCode(null);
-    setChallengeStatus("");
-    setChallengePanel(null);
-  }
-
-  function startDaily() {
-    const { combo, bag } = pickTodaysCombo(daily);
-    setDaily(bag);
-    setDailyQuestion(buildQuestionFromCombo(combo));
-    setDailyMode(true);
-    try {
-      localStorage.setItem("statBlitzDaily", JSON.stringify(bag));
-    } catch (err) {
-      // localStorage unavailable — daily progress just won't persist this session
-    }
-  }
-
-  function exitDaily() {
-    setDailyMode(false);
-  }
-
-  function submitDailyGuess(guessName) {
-    if (!dailyQuestion) return;
-    const today = todayLocalStr();
-    if (daily.lastAnsweredDate === today) return; // already answered today
-
-    const isCorrect = guessName === dailyQuestion.answerName;
-    const wasYesterday = daily.lastCorrectDate === yesterdayLocalStr();
-    const newStreak = isCorrect ? (wasYesterday ? daily.streak + 1 : 1) : 0;
-
-    const updated = {
-      ...daily,
-      streak: newStreak,
-      lastAnsweredDate: today,
-      lastCorrectDate: isCorrect ? today : daily.lastCorrectDate,
-      lastGuess: guessName,
-      lastCorrect: isCorrect,
-    };
-    setDaily(updated);
-
-    try {
-      localStorage.setItem("statBlitzDaily", JSON.stringify(updated));
-    } catch (err) {
-      // localStorage unavailable — streak just won't persist this session
-    }
-  }
-
   // Rebuilds the board for whichever mode is currently active, given a
   // (possibly new) slot count — the one thing all four change-handlers
   // below need in common.
@@ -10357,10 +10069,6 @@ function StatBlitz() {
     setSlots(emptySlots(slotCount));
     setActiveIndex(0);
     setRevealed(false);
-    setChallengeTarget(null);
-    setMyChallengeCode(null);
-    setChallengeStatus("");
-    setChallengePanel(null);
   }
 
   function changeCategory(key) {
@@ -10738,79 +10446,6 @@ function StatBlitz() {
           <p className="text-slate-400 text-sm mt-2">Build a lineup that hits the target total.</p>
         </div>
 
-        {/* ACTIVE CHALLENGE BANNER */}
-        {challengeTarget && (
-          <div className="mx-5 mt-4 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 flex items-center justify-between gap-2">
-            <p className="text-xs text-amber-300">
-              🎯 Challenge <span className="font-semibold">{challengeTarget.code}</span>: beat{" "}
-              {challengeTarget.total.toLocaleString()} {challengeTarget.unit}
-            </p>
-            <button onClick={clearChallenge} className="shrink-0 text-xs text-slate-400 hover:text-white">
-              Clear
-            </button>
-          </div>
-        )}
-
-        {/* DAILY QUESTION */}
-        {DAILY_QUESTION_ENABLED && (dailyMode && dailyQuestion ? (
-          (() => {
-            const answeredToday = daily.lastAnsweredDate === todayLocalStr();
-            return (
-              <div className="mx-5 mt-4 rounded-lg border border-orange-400/40 bg-orange-400/10 px-3 py-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-[10px] font-semibold text-orange-300 uppercase tracking-wide">
-                    🔥 Daily Question — {SPORTS[dailyQuestion.sport].label}
-                  </p>
-                  <button onClick={exitDaily} className="shrink-0 text-xs text-slate-400 hover:text-white">
-                    Close
-                  </button>
-                </div>
-                <p className="mt-1.5 text-sm text-white">{dailyQuestion.questionText}</p>
-
-                {answeredToday ? (
-                  <div className="mt-2">
-                    <p className={"text-sm font-semibold " + (daily.lastCorrect ? "text-emerald-400" : "text-rose-400")}>
-                      {daily.lastCorrect ? "✅ Correct!" : `❌ Not quite — you picked ${daily.lastGuess}`}
-                    </p>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      Answer: {dailyQuestion.answerName} ({dailyQuestion.answerValue.toLocaleString()} {dailyQuestion.unit})
-                    </p>
-                    <p className="text-xs text-orange-300 mt-1">🔥 {daily.streak}-day streak — come back tomorrow!</p>
-                  </div>
-                ) : (
-                  <div className="mt-2 grid grid-cols-1 gap-2">
-                    {dailyQuestion.options.map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => submitDailyGuess(opt)}
-                        className="px-3 py-2 rounded-lg text-sm text-left text-white bg-white/5 border border-white/10 hover:bg-orange-400/20 hover:border-orange-400/50 transition-colors"
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })()
-        ) : (
-          <div className="mx-5 mt-4 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 flex items-center justify-between gap-2">
-            <div>
-              <p className="text-xs font-semibold text-slate-200">🔥 Daily Question</p>
-              <p className="text-[10px] text-slate-500">
-                {daily.streak > 0 ? `${daily.streak}-day streak` : "A new question every day"}
-                {daily.lastAnsweredDate === todayLocalStr() ? " — answered today ✅" : ""}
-              </p>
-            </div>
-            <button
-              onClick={startDaily}
-              className="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold bg-orange-400 text-slate-900 hover:bg-orange-300"
-            >
-              Play
-            </button>
-          </div>
-        ))}
-
         {/* SPORT PICKER */}
         <div className="px-5 pt-5">
           <div className="flex items-center justify-between">
@@ -11172,105 +10807,7 @@ function StatBlitz() {
             >
               Reset
             </button>
-            {CHALLENGES_ENABLED && (
-              <button
-                onClick={() => {
-                  setChallengeStatus("");
-                  setChallengePanel((p) => (p ? null : "menu"));
-                }}
-                className="px-3 py-1.5 rounded-full text-xs font-medium bg-amber-400/10 text-amber-400 border border-amber-400/30 hover:bg-amber-400/20"
-              >
-                🎯 Challenge
-              </button>
-            )}
           </div>
-
-          {CHALLENGES_ENABLED && challengePanel && (
-            <div className="mt-2 rounded-lg border border-white/10 bg-black/20 p-3 space-y-3">
-              {challengePanel === "menu" && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setChallengePanel("create");
-                      setChallengeStatus("");
-                    }}
-                    className="flex-1 px-3 py-2 rounded-lg text-xs font-semibold bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10"
-                  >
-                    Send a challenge
-                  </button>
-                  <button
-                    onClick={() => {
-                      setChallengePanel("enter");
-                      setChallengeStatus("");
-                    }}
-                    className="flex-1 px-3 py-2 rounded-lg text-xs font-semibold bg-white/5 text-slate-200 border border-white/10 hover:bg-white/10"
-                  >
-                    Enter a code
-                  </button>
-                </div>
-              )}
-
-              {challengePanel === "create" &&
-                (roundComplete ? (
-                  <div>
-                    <p className="text-xs text-slate-400">
-                      Send this to a friend — they open this same app and enter the code to try to beat you.
-                    </p>
-                    {myChallengeCode ? (
-                      <>
-                        <p className="mt-2 text-center font-scoreboard text-3xl tracking-widest text-amber-400">
-                          {myChallengeCode}
-                        </p>
-                        <button
-                          onClick={copyChallengeMessage}
-                          className="mt-2 w-full px-3 py-2 rounded-lg text-xs font-semibold bg-amber-400 text-slate-900 hover:bg-amber-300"
-                        >
-                          Copy challenge message
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={createChallenge}
-                        disabled={challengeBusy}
-                        className="mt-2 w-full px-3 py-2 rounded-lg text-xs font-semibold bg-amber-400 text-slate-900 hover:bg-amber-300 disabled:opacity-50"
-                      >
-                        {challengeBusy ? "Creating…" : "Generate challenge code"}
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-xs text-slate-400">
-                    Finish this lineup first — a challenge is built from a completed run.
-                  </p>
-                ))}
-
-              {challengePanel === "enter" && (
-                <div>
-                  <p className="text-xs text-slate-400">Enter the 5-letter code your friend sent you.</p>
-                  <div className="mt-2 flex gap-2">
-                    <input
-                      type="text"
-                      value={challengeInput}
-                      onChange={(e) => setChallengeInput(e.target.value.toUpperCase())}
-                      placeholder="ABCDE"
-                      maxLength={5}
-                      className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-center tracking-widest placeholder-slate-500 outline-none focus:border-amber-400"
-                      style={{ fontSize: "16px" }}
-                    />
-                    <button
-                      onClick={loadChallenge}
-                      disabled={challengeBusy || !challengeInput.trim()}
-                      className="px-4 py-2 rounded-lg text-xs font-semibold bg-amber-400 text-slate-900 hover:bg-amber-300 disabled:opacity-50"
-                    >
-                      Go
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {challengeStatus && <p className="text-xs text-emerald-400">{challengeStatus}</p>}
-            </div>
-          )}
         </div>
 
         {!hardMode && revealed && (
@@ -11635,17 +11172,6 @@ function StatBlitz() {
                 )}
               </>
             )}
-            {challengeTarget &&
-              (() => {
-                const won = runningTotal > challengeTarget.total;
-                return (
-                  <p className={"mt-1 text-xs font-semibold " + (won ? "text-emerald-300" : "text-rose-400")}>
-                    {won
-                      ? `You beat challenge ${challengeTarget.code}! 🏆`
-                      : `Didn't beat challenge ${challengeTarget.code} this time — reset to retry.`}
-                  </p>
-                );
-              })()}
           </div>
         )}
 
