@@ -3429,7 +3429,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Bill Dinneen", value: 170, teams: ["ATL", "BAL", "BOS", "MON/WAS"] },
       { name: "Ron Guidry", value: 170, teams: ["NYY"] },
       { name: "Kevin Appier", value: 169, teams: ["KC", "LAA", "NYM", "OAK"] },
-      { name: "Bill Lee", value: 169, teams: ["ATL", "BOS", "CHC", "MON/WAS", "PHI"] },
+      { name: "Bill Lee", value: 169, teams: ["ATL", "CHC", "PHI"] },
       { name: "Kevin Millwood", value: 169, teams: ["ATL", "BAL", "CLE", "COL", "PHI", "SEA", "TEX"] },
       { name: "Felix Hernandez", value: 169, teams: ["SEA"] },
       { name: "Bill Doak", value: 169, teams: ["CIN", "LAD", "STL"] },
@@ -3901,6 +3901,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Red Ames", value: 1702, teams: ["CIN", "PHI", "SFG", "STL"] },
       { name: "Charlie Buffinton", value: 1700, teams: ["ATL", "BLO", "BRS", "PHI", "PHQ"] },
       { name: "Curt Simmons", value: 1697, teams: ["CHC", "LAA", "PHI", "STL"] },
+      { name: "Chris Carpenter", value: 1697, teams: ["STL", "TOR"] },
       { name: "Matt Cain", value: 1694, teams: ["SFG"] },
       { name: "Bruce Hurst", value: 1689, teams: ["BOS", "COL", "SDP", "TEX"] },
       { name: "Ted Lilly", value: 1681, teams: ["CHC", "LAD", "MON/WAS", "NYY", "OAK", "TOR"] },
@@ -4084,6 +4085,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Bob Turley", value: 1265, teams: ["BAL", "BOS", "LAA", "NYY"] },
       { name: "Darren Oliver", value: 1259, teams: ["BOS", "COL", "HOU", "LAA", "MIA", "NYM", "STL", "TEX", "TOR"] },
       { name: "C. J. Wilson", value: 1259, teams: ["LAA", "TEX"] },
+      { name: "Mel Stottlemyre", value: 1257, teams: ["NYY"] },
       { name: "Mark Gardner", value: 1256, teams: ["KC", "MIA", "MON/WAS", "SFG"] },
       { name: "Dizzy Trout", value: 1256, teams: ["BAL", "BOS", "DET"] },
       { name: "Wilbur Cooper", value: 1252, teams: ["CHC", "DET", "PIT"] },
@@ -8073,7 +8075,7 @@ const CATEGORIES_FOOTBALL = {
       { name: "Vincent Jackson", value: 9080, teams: ["LAC", "TB"] },
       { name: "Tony Martin", value: 9065, teams: ["ATL", "LAC", "MIA"] },
       { name: "Harold Carmichael", value: 8985, teams: ["DAL", "PHI"] },
-      { name: "Mark Clayton", value: 8974, teams: ["BAL", "LAR"] },
+      { name: "Mark Clayton", value: 8974, teams: ["GB", "MIA"] },
       { name: "Fred Biletnikoff", value: 8974, teams: ["LV"] },
       { name: "Wes Chandler", value: 8966, teams: ["LAC", "NO", "SF"] },
       { name: "Roy Green", value: 8965, teams: ["ARI", "PHI"] },
@@ -8585,7 +8587,7 @@ const CATEGORIES_FOOTBALL = {
       { name: "Paul Warfield", value: 85, teams: ["CLE", "MIA"] },
       { name: "DeAndre Hopkins", value: 85, teams: ["ARI", "HOU", "KC", "TEN"] },
       { name: "Andre Rison", value: 84, teams: ["ATL", "CLE", "GB", "IND", "JAX", "KC"] },
-      { name: "Mark Clayton", value: 84, teams: ["BAL", "LAR"] },
+      { name: "Mark Clayton", value: 84, teams: ["GB", "MIA"] },
       { name: "Irving Fryar", value: 84, teams: ["NE", "MIA", "PHI", "WAS"] },
       { name: "Tommy McDonald", value: 84, teams: ["PHI", "DAL", "LAR", "ATL", "CLE"] },
       { name: "Travis Kelce", value: 83, teams: ["KC"] },
@@ -10497,6 +10499,13 @@ function StatBlitz() {
               </button>
             ))}
           </div>
+          {/* The NBA only started counting these in 1973-74, so older stars can't appear. */}
+          {sport === "basketball" && (category === "Career Steals" || category === "Career Blocks") && (
+            <p className="mt-2 text-[11px] text-slate-500">
+              Official {category === "Career Steals" ? "steals" : "blocks"} totals begin in 1973-74, so earlier stars like Wilt
+              Chamberlain and Bill Russell aren't listed here.
+            </p>
+          )}
         </div>
 
         {/* DIFFICULTY / TARGET */}
