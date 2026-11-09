@@ -37,6 +37,8 @@ const BEST_POSSIBLE_ENABLED = true;
 // Daily spin: a once-a-day puzzle with the same random teams for everyone, opened
 // from a small button beside "Pick a sport". Set to false to hide it.
 const DAILY_SPIN_ENABLED = true;
+// "Who has more?" is a never-ending higher/lower streak game for every stat.
+const WHO_HAS_MORE_ENABLED = true;
 
 // The sports the daily spin takes turns with. A puzzle is only as fair as the team
 // lists behind it (a player missing a team makes a spot unanswerable), so if one
@@ -9410,6 +9412,295 @@ async function dailyShare(text, setNote) {
   }
 }
 
+/* ---------------------------------------------------------
+   WHO HAS MORE? A never-ending higher/lower streak game.
+   Two players from the chosen stat show up; tap the one with
+   the bigger career total. One wrong answer ends the run and
+   the streak starts over at 0.
+--------------------------------------------------------- */
+const MORE_STORE = "statBlitzWhoHasMore";
+const MORE_EMPTY = { best: {}, longest: 0, seen: false };
+
+function moreKey(sportKey, catName) {
+  return sportKey + "|" + catName;
+}
+
+// Two players with different totals. The longer the streak, the closer their totals get.
+function morePickPair(players, streak, recent, rng) {
+  const rand = rng || Math.random;
+  const n = players.length;
+  if (n < 2) return null;
+  const target = Math.max(1.05, 4 * Math.pow(0.92, streak));
+  let best = null;
+  let bestScore = Infinity;
+  const consider = (a, b) => {
+    if (!a || !b || a.name === b.name || a.value === b.value) return;
+    const lo = Math.min(a.value, b.value);
+    const hi = Math.max(a.value, b.value);
+    if (lo <= 0) return;
+    if (recent.includes([a.name, b.name].sort().join("|"))) return;
+    const score = Math.abs(Math.log(hi / lo) - Math.log(target));
+    if (score < bestScore) {
+      bestScore = score;
+      best = [a, b];
+    }
+  };
+  for (let k = 0; k < 40; k++) {
+    consider(players[Math.floor(rand() * n)], players[Math.floor(rand() * n)]);
+  }
+  if (!best) {
+    // Unlucky sample: fall back to the first usable pair.
+    for (let i = 0; i < n && !best; i++) {
+      for (let j = i + 1; j < n && !best; j++) consider(players[i], players[j]);
+    }
+  }
+  if (!best) return null;
+  return rand() < 0.5 ? best : [best[1], best[0]];
+}
+
+function moreTeamsLine(p) {
+  const t = p.teams || [];
+  const shown = t.slice(0, 4).join(" · ");
+  return t.length > 4 ? shown + " +" + (t.length - 4) : shown;
+}
+
+function WhoHasMore({ onClose, initialSport, initialCategory }) {
+  const startSport = SPORTS[initialSport] && SPORTS[initialSport].categories[initialCategory] ? initialSport : SPORT_KEYS[0];
+  const startCat = SPORTS[startSport].categories[initialCategory] ? initialCategory : Object.keys(SPORTS[startSport].categories)[0];
+  const [sportKey, setSportKey] = useState(startSport);
+  const [catName, setCatName] = useState(startCat);
+  const sport = SPORTS[sportKey];
+  const cat = sport.categories[catName];
+  const key = moreKey(sportKey, catName);
+
+  const [stats, setStats] = useState(() => dailyRead(MORE_STORE, MORE_EMPTY));
+  const [streak, setStreak] = useState(0);
+  const [round, setRound] = useState(() => {
+    const pair = morePickPair(SPORTS[startSport].categories[startCat].players, 0, []);
+    return pair ? { a: pair[0], b: pair[1], picked: null, correct: false } : null;
+  });
+  const [shareNote, setShareNote] = useState("");
+  const recentRef = useRef([]);
+  const best = (stats.best && stats.best[key]) || 0;
+
+  // Remember that this screen has been opened (the home pill drops its "New" tag).
+  useEffect(() => {
+    setStats((prev) => {
+      if (prev.seen) return prev;
+      const next = { ...prev, seen: true };
+      dailyWrite(MORE_STORE, next);
+      return next;
+    });
+  }, []);
+
+  function nextRound(s) {
+    const pair = morePickPair(cat.players, s, recentRef.current);
+    if (!pair) {
+      setRound(null);
+      return;
+    }
+    recentRef.current = recentRef.current.concat([[pair[0].name, pair[1].name].sort().join("|")]).slice(-12);
+    setRound({ a: pair[0], b: pair[1], picked: null, correct: false });
+  }
+
+  // A new sport or stat is a fresh run. Everything changes in one step, so the screen
+  // never shows one stat's name over another stat's players.
+  function startRun(k, c) {
+    if (k === sportKey && c === catName) return; // tapping the stat you're on does nothing
+    const pair = morePickPair(SPORTS[k].categories[c].players, 0, []);
+    recentRef.current = pair ? [[pair[0].name, pair[1].name].sort().join("|")] : [];
+    setSportKey(k);
+    setCatName(c);
+    setStreak(0);
+    setShareNote("");
+    setRound(pair ? { a: pair[0], b: pair[1], picked: null, correct: false } : null);
+  }
+
+  function choose(side) {
+    if (!round || round.picked) return;
+    const mine = side === "a" ? round.a : round.b;
+    const other = side === "a" ? round.b : round.a;
+    const correct = mine.value > other.value;
+    if (correct) {
+      const s = streak + 1;
+      setStreak(s);
+      setStats((prev) => {
+        const next = { ...prev, best: { ...(prev.best || {}) }, longest: prev.longest || 0 };
+        if (s > (next.best[key] || 0)) next.best[key] = s;
+        if (s > next.longest) next.longest = s;
+        dailyWrite(MORE_STORE, next);
+        return next;
+      });
+    }
+    setRound({ ...round, picked: side, correct });
+  }
+
+  // After a right answer, move on by itself after a moment.
+  useEffect(() => {
+    if (!round || !round.picked || !round.correct) return undefined;
+    const t = setTimeout(() => nextRound(streak), 1500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [round]);
+
+  function playAgain() {
+    setStreak(0);
+    setShareNote("");
+    nextRound(0);
+  }
+
+  function share() {
+    dailyShare(
+      `Stat Blitz: Who has more? I got ${streak} in a row on ${catName}. Can you beat it? ${DAILY_SPIN_URL}`,
+      setShareNote
+    );
+  }
+
+  const reveal = !!(round && round.picked);
+  const over = !!(round && round.picked && !round.correct);
+
+  function renderCard(side) {
+    const mine = side === "a" ? round.a : round.b;
+    const other = side === "a" ? round.b : round.a;
+    let tone = "border-white/10 bg-white/5 hover:bg-white/10 active:bg-white/10";
+    if (reveal) {
+      const isWinner = mine.value > other.value;
+      if (round.picked === side) tone = round.correct ? "border-emerald-400 bg-emerald-400/15" : "border-rose-400 bg-rose-500/15";
+      else tone = isWinner ? "border-emerald-400/60 bg-white/5" : "border-white/10 bg-white/5 opacity-70";
+    }
+    return (
+      <button
+        key={side}
+        data-more-card={side}
+        disabled={reveal}
+        onClick={() => choose(side)}
+        className={"w-full min-h-[112px] rounded-2xl border p-4 text-left transition-colors " + tone}
+      >
+        <div className="font-scoreboard text-3xl leading-none text-white">{mine.name}</div>
+        <div className="mt-1 text-[11px] tracking-wide text-slate-400">{moreTeamsLine(mine)}</div>
+        <div className="mt-3 text-lg font-semibold text-amber-300" data-more-value={side}>
+          {reveal ? mine.value.toLocaleString() + " " + cat.unit : "Tap to pick"}
+        </div>
+      </button>
+    );
+  }
+
+  return (
+    <div data-who-has-more className="w-full max-w-md font-body text-slate-200">
+      <div className="px-2 pb-10">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={onClose}
+            aria-label="Back"
+            className="px-4 py-3.5 -ml-4 text-sm text-slate-300 hover:text-white"
+          >
+            ← Back
+          </button>
+          <span className="text-xs text-slate-400">
+            Best streak: <span className="font-semibold text-amber-300">{best}</span>
+          </span>
+        </div>
+
+        <h1 className="font-scoreboard text-4xl text-white leading-none mt-2">WHO HAS MORE?</h1>
+        <p className="mt-1 text-xs text-slate-400">
+          Pick the player with the bigger career total. One wrong answer and your streak goes back to 0.
+        </p>
+
+        <div className="mt-4 flex gap-1.5">
+          {SPORT_KEYS.map((k) => (
+            <button
+              key={k}
+              onClick={() => (k === sportKey ? null : startRun(k, Object.keys(SPORTS[k].categories)[0]))}
+              className={
+                "flex-1 px-3 py-2 rounded-lg text-xs font-semibold border transition-colors " +
+                (sportKey === k
+                  ? "bg-emerald-400 text-slate-900 border-emerald-400"
+                  : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10")
+              }
+            >
+              {SPORTS[k].label}
+            </button>
+          ))}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {Object.keys(sport.categories).map((c) => (
+            <button
+              key={c}
+              onClick={() => startRun(sportKey, c)}
+              className={
+                "px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors " +
+                (catName === c
+                  ? "bg-amber-400 text-slate-900 border-amber-400"
+                  : "bg-white/5 text-slate-300 border-white/10 hover:bg-white/10")
+              }
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-5 text-center">
+          <div className="text-[11px] uppercase tracking-wide text-slate-400">Current streak</div>
+          <div data-more-streak className="font-scoreboard text-6xl text-white leading-none">{streak}</div>
+        </div>
+        <p className="mt-3 text-center text-sm text-slate-300">
+          Who has more <span className="font-semibold text-amber-300">{cat.unit}</span>?
+        </p>
+
+        {round ? (
+          <div className="mt-3 space-y-2">
+            {renderCard("a")}
+            <div className="text-center text-[11px] font-semibold tracking-widest text-slate-500">VS</div>
+            {renderCard("b")}
+          </div>
+        ) : (
+          <p className="mt-4 text-center text-sm text-slate-400">Not enough players in this stat yet.</p>
+        )}
+
+        {reveal && round.correct && (
+          <div className="mt-4 text-center">
+            <p className="font-semibold text-emerald-300">Correct!</p>
+          </div>
+        )}
+        {over && (
+          <div data-more-over className="mt-4 rounded-2xl border border-rose-400/30 bg-rose-500/10 p-4 text-center">
+            <p className="font-scoreboard text-3xl leading-none text-white">GAME OVER</p>
+            <p className="mt-1 text-sm text-slate-300">
+              {streak > 0 ? `You got ${streak} in a row.` : "No streak this time."}
+              {streak > 0 && streak >= best ? " That's your best." : ""}
+            </p>
+            <div className="mt-3 flex justify-center gap-2">
+              <button
+                data-more-again
+                onClick={playAgain}
+                className="rounded-xl bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-900"
+              >
+                Play again
+              </button>
+              {streak > 0 && (
+                <button
+                  onClick={share}
+                  className="rounded-xl border border-white/15 bg-white/5 px-5 py-3 text-sm font-semibold text-slate-200"
+                >
+                  Share
+                </button>
+              )}
+            </div>
+            {shareNote && <p className="mt-2 text-xs text-slate-400">{shareNote}</p>}
+          </div>
+        )}
+
+        <button
+          onClick={onClose}
+          className="mt-8 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-sm text-slate-300 hover:text-white"
+        >
+          ← Back to the game
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function DailySpin({ onClose }) {
   const today = dailyDateString();
   const puzzle = useMemo(() => buildDailyPuzzle(today), [today]);
@@ -9834,6 +10125,8 @@ function StatBlitz() {
   const [showBest, setShowBest] = useState(false);
   // Daily spin screen (opens over the home screen, so nothing reloads).
   const [dailyOpen, setDailyOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreIsNew = useMemo(() => !dailyRead(MORE_STORE, MORE_EMPTY).seen, [moreOpen]);
   const dailyDoneToday = useMemo(() => {
     const st = dailyRead(DAILY_SPIN_STATS, DAILY_SPIN_EMPTY_STATS);
     return !!(st.history && st.history[dailyDateString()] != null);
@@ -9846,10 +10139,17 @@ function StatBlitz() {
   function closeDaily() {
     setDailyOpen(false);
   }
+  function openMore() {
+    homeScrollRef.current = window.scrollY || 0;
+    setMoreOpen(true);
+  }
+  function closeMore() {
+    setMoreOpen(false);
+  }
   // Show the daily spin from the top, and put the home screen back where you left it.
   useEffect(() => {
-    window.scrollTo(0, dailyOpen ? 0 : homeScrollRef.current);
-  }, [dailyOpen]);
+    window.scrollTo(0, dailyOpen || moreOpen ? 0 : homeScrollRef.current);
+  }, [dailyOpen, moreOpen]);
 
   const [muted, setMuted] = useState(false);
 
@@ -10452,7 +10752,7 @@ function StatBlitz() {
       `}</style>
 
       <div
-        className={"font-body w-full max-w-md rounded-[2rem] overflow-hidden border border-white/10" + (dailyOpen ? " hidden" : "")}
+        className={"font-body w-full max-w-md rounded-[2rem] overflow-hidden border border-white/10" + (dailyOpen || moreOpen ? " hidden" : "")}
         style={{ background: "linear-gradient(180deg, #101a2e 0%, #0b1424 100%)", boxShadow: "0 30px 60px -20px rgba(0,0,0,0.6)" }}
       >
         {/* HEADER */}
@@ -10472,16 +10772,27 @@ function StatBlitz() {
         {/* SPORT PICKER */}
         <div className="px-5 pt-5">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Pick a sport</label>
-            {DAILY_SPIN_ENABLED && (
-              <button
-                onClick={openDaily}
-                className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-[11px] font-semibold text-amber-300 hover:bg-amber-400/20"
-              >
-                Daily spin
-                {!dailyDoneToday && <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400" />}
-              </button>
-            )}
+            <label className="shrink-0 text-xs font-semibold text-slate-400 uppercase tracking-wide">Pick a sport</label>
+            <div className="flex flex-wrap items-center justify-end gap-1.5">
+              {WHO_HAS_MORE_ENABLED && (
+                <button
+                  onClick={openMore}
+                  className="flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-3 py-1 text-[11px] font-semibold text-emerald-300 hover:bg-emerald-400/20"
+                >
+                  Who has more?
+                  {moreIsNew && <span className="rounded bg-emerald-400 px-1 text-[9px] font-bold text-slate-900">NEW</span>}
+                </button>
+              )}
+              {DAILY_SPIN_ENABLED && (
+                <button
+                  onClick={openDaily}
+                  className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-amber-400/10 px-3 py-1 text-[11px] font-semibold text-amber-300 hover:bg-amber-400/20"
+                >
+                  Daily spin
+                  {!dailyDoneToday && <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                </button>
+              )}
+            </div>
           </div>
           <div className="mt-2 flex gap-1.5">
             {SPORT_KEYS.map((key) => (
@@ -11214,6 +11525,9 @@ function StatBlitz() {
         </div>
       </div>
       {DAILY_SPIN_ENABLED && dailyOpen && <DailySpin onClose={closeDaily} />}
+      {WHO_HAS_MORE_ENABLED && moreOpen && (
+        <WhoHasMore onClose={closeMore} initialSport={sport} initialCategory={category} />
+      )}
     </div>
   );
 }
