@@ -9917,7 +9917,12 @@ function normalize(str) {
 // "J. R. Richard" all find the same player (and "AJ Burnett" finds "A. J. Burnett").
 function searchPlayers(players, text) {
   const q = normalize(text);
-  if (q.length < 2) return [];
+  if (q.length < 1) return [];
+  // One letter: names whose first or last name starts with it (biggest totals first, since the
+  // lists are sorted), instead of every name that has that letter somewhere inside.
+  if (q.length === 1) {
+    return players.filter((p) => normalize(p.name).split(/\s+/).some((w) => w.startsWith(q)));
+  }
   const plain = players.filter((p) => normalize(p.name).includes(q));
   if (plain.length) return plain;
   const flat = q.replace(/\s+/g, "");
