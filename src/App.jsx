@@ -64,7 +64,7 @@ const PLAYER_POSITIONS = {
   "Ramon Hernandez": "C", "Mike Stanley": "C", "Andy Seminick": "C", "Cal Raleigh": "C",
   "Yasmani Grandal": "C", "Kurt Suzuki": "C", "George Miller": "C", "Ernie Whitt": "C",
   "Matt Wieters": "C", "Jody Davis": "C", "Brad Ausmus": "C", "Chris Iannetta": "C",
-  "Wilson Ramos": "C", "Mike Lieberthal": "C", "Gary Sanchez": "C", "Gus Triandos": "C",
+  "Wilson Ramos": "C", "Mike Lieberthal": "C", "Gary Sanchez": "C", "Will Smith": "C", "Gus Triandos": "C",
   "Mike Macfarlane": "C", "Al Lopez": "C", "Todd Hundley": "C",
   "Bengie Molina": "C", "Mike Zunino": "C", "Matt Nokes": "C", "Jack O'Connor": "C",
   "Earl Williams": "C", "Miguel Olivo": "C", "Evan Gattis": "C", "Wilbert Robinson": "C",
@@ -122,7 +122,7 @@ const PLAYER_POSITIONS = {
   "Del Pratt": "2B", "Steve Sax": "2B", "Bobby Lowe": "2B", "Marty McManus": "2B",
   "Luis Castillo": "2B", "Larry Doyle": "2B", "Chase Utley": "2B", "Pete Runnels": "2B",
   "Tony Lazzeri": "2B", "Chuck Knoblauch": "2B", "Bobby Grich": "2B", "Dustin Pedroia": "2B",
-  "Joe Quinn": "2B", "Bret Boone": "2B", "DJ LeMahieu": "2B", "Howie Kendrick": "2B",
+  "Joe Quinn": "2B", "Bret Boone": "2B", "DJ LeMahieu": "2B", "Howie Kendrick": "2B", "Kolten Wong": "2B", "Bo Bichette": "SS", "Whit Merrifield": "2B", "Jazz Chisholm Jr.": "2B", "Tommy Edman": "2B",
   "Tony Cuccinello": "2B", "Cupid Childs": "2B", "Marcus Semien": "2B", "Mark Loretta": "2B",
   "Jim Gantner": "2B", "Hardy Richardson": "2B", "Billy Goodman": "2B", "Fred Pfeffer": "2B",
   "Davey Lopes": "2B", "Cookie Rojas": "2B", "Johnny Evers": "2B", "Bill Hallman": "2B",
@@ -218,7 +218,7 @@ const PLAYER_POSITIONS = {
   "Red Kress": "SS", "Hubie Brooks": "SS", "Paul Radford": "SS", "Mickey Doolin": "SS",
   "Cristian Guzman": "SS", "Julio Lugo": "SS", "Jose Hernandez": "SS", "Paul DeJong": "SS",
   "Jonathan Villar": "SS", "Ivan de Jesus": "SS", "Alcides Escobar": "SS", "Shawon Dunston": "SS",
-  "Alex Gonzalez": "SS", "Don Kessinger": "SS", "Bones Ely": "SS",
+  "Alex Gonzalez (1973)": "SS", "Alex Gonzalez (1977)": "SS", "Don Kessinger": "SS", "Bones Ely": "SS",
   "Jose Vizcaino": "SS", "Tim Foli": "SS", "Shorty Fuller": "SS",
   "Ivy Olson": "SS", "Alfredo Griffin": "SS", "Frank Taveras": "SS",
   "Willie Mays": "OF", "Ty Cobb": "OF", "Tris Speaker": "OF", "Mickey Mantle": "OF",
@@ -358,11 +358,39 @@ const PLAYER_POSITIONS = {
   "Billy Hatcher": "OF", "George Tebeau": "OF", "Blondie Purcell": "OF", "Jason Kubel": "OF",
   "Jonny Gomes": "OF", "Ron Kittle": "OF", "Henry Rodriguez": "OF", "Miguel Dilone": "OF",
   "Cal Ripken": "SS", "Eric Young": "2B", "Jose Cruz Jr.": "OF", "Jose Cruz Sr.": "OF", "Ken Griffey Sr.": "OF", "Matt Joyce": "OF", "Pat Kelly": "OF",
+  // Added later: hitters who were missing a position (they could only be used at DH).
+  "J. D. Martinez": "OF", "Shohei Ohtani": "DH", "Juan Soto": "OF", "Nick Castellanos": "OF", "Teoscar Hernandez": "OF", "Joey Gallo": "OF", "Ronald Acuna Jr.": "OF", "Justin Smoak": "1B", "Steve Balboni": "1B", "Fernando Tatis Jr.": "SS", "Paul Sorrento": "1B", "Kyle Tucker": "OF", "Anthony Santander": "OF", "Chris Carter": "1B", "Wil Myers": "OF", "Walt Dropo": "1B", "High Pockets Kelly": "1B", "Adolis Garcia": "OF", "Jim Spencer": "1B", "Kevin Young": "1B", "Lee Stevens": "1B", "Logan Morrison": "1B", "Willie Montanez": "1B", "Jim Presley": "3B", "George Burns Sr.": "1B", "Dummy Hoy": "OF", "Kid Gleason": "2B", "Joe Jackson": "OF", "Dave Foutz": "1B", "Candy LaChance": "1B", "Billy Hamilton Sr.": "OF", "George Case": "OF", "Cub Stricker": "2B", "Doggie Miller": "C", "Doc Casey": "3B", "Tom Poorman": "OF",
+  // Added from the home run / hits audit.
+  "Enrique Hernandez": "2B", "Julio Rodriguez": "OF", "Andrew Benintendi": "OF", "Lourdes Gurriel Jr.": "OF", "Maikel Franco": "3B", "Mitch Haniger": "OF", "Travis d'Arnaud": "C", "Trey Mancini": "1B", "Tyler O'Neill": "OF", "Wally Westlake": "OF", "Aaron Boone": "3B", "Jason Kipnis": "2B", "Miguel Montero": "C", "Seth Smith": "OF", "Bill Hall": "3B", "Bob Nieman": "OF", "David Peralta": "OF", "Jurickson Profar": "OF",
+  // Added from the home run / hits audit.
+  "Michael Tucker": "OF", "Milton Bradley": "OF", "Tito Francona": "OF", "Vince DiMaggio": "OF", "Brad Hawpe": "OF", "Carlos Guillen": "SS", "Corey Koskie": "3B", "Darrin Fletcher": "C", "John Valentin": "SS", "Nathaniel Lowe": "1B", "Bobby Witt Jr.": "SS", "Brad Miller": "SS", "David Bell": "3B", "Ellis Valentine": "OF", "Ken Phelps": "1B", "Rowdy Tellez": "1B", "Stephen Drew": "SS", "Willie Upshaw": "1B", "Brad Wilkerson": "OF", "Don Lock": "OF", "Garrett Jones": "1B", "Jeff Blauser": "SS", "Joe Ferguson": "C", "Ken Henderson": "OF", "Marty Cordova": "OF", "Nick Esasky": "1B", "Trent Grisham": "OF", "Wil Cordero": "OF", "Yandy Diaz": "1B", "Austin Kearns": "OF", "Dan Ford": "OF", "Gary Roenicke": "OF", "Jed Lowrie": "SS", "Jedd Gyorko": "3B", "Jimmie Hall": "OF", "Mark Canha": "OF", "Wayne Gross": "3B", "Brook Jacoby": "3B", "Taylor Ward": "OF", "Brent Rooker": "OF", "Frankie Hayes": "C", "Jay Payton": "OF", "Martin Maldonado": "C", "Robby Thompson": "2B", "Rusty Greer": "OF", "Scott Spiezio": "1B", "Ben Grieve": "OF", "Bernard Gilkey": "OF", "Cedric Mullins": "OF", "Ed Kranepool": "1B",
+  // Added from the home run / hits audit.
+  "Kevin Bass": "OF", "Matt Adams": "1B", "Mike Easler": "OF", "Chet Laabs": "OF", "Dan Pasqua": "OF", "Isaac Paredes": "3B", "Jim King": "OF", "Kelly Gruber": "3B", "Mickey Stanley": "OF", "Chris Sabo": "3B", "Jake Burger": "3B", "John Lowenstein": "OF", "Rick Reichardt": "OF", "Stan Lopata": "C",
+  // Added from the home run / hits audit.
+  "Alexei Ramirez": "SS", "Bob Robertson": "1B", "Craig Monroe": "OF", "Don Hurst": "1B", "Gene Freese": "3B", "Jerry Lynch": "OF", "Marcus Thames": "OF", "Travis Lee": "1B", "Brad Fullmer": "1B", "Jesus Aguilar": "1B", "Josh Naylor": "1B", "Kevin Pillar": "OF", "Luis Valbuena": "3B", "Ronnie Belliard": "2B", "Travis Shaw": "3B", "Chuck Hinton": "OF", "David Freese": "3B", "Fernando Tatis": "3B", "Greg Walker": "1B", "Lefty O'Doul": "OF", "Luis Robert Jr.": "OF", "Ramon Laureano": "OF", "Seiya Suzuki": "OF", "Terry Kennedy": "C", "Curt Blefary": "OF", "Dave Hollins": "3B", "Gil McDougald": "3B", "Jackie Brandt": "OF", "Jim Morrison": "3B", "Sandy Alomar Jr.": "C", "Daulton Varsho": "OF", "Max Alvis": "3B", "Shea Langeliers": "C", "Chris Taylor": "OF", "Greg Brock": "1B", "Gunnar Henderson": "SS", "Jarrod Saltalamacchia": "C", "Jeffrey Hammonds": "OF", "Jeimer Candelario": "3B", "Mitch Garver": "C", "Morgan Ensberg": "3B", "Roy Cullenbine": "OF", "Willie Aikens": "1B", "Aaron Hicks": "OF", "Brandon Drury": "3B", "Dave Duncan": "C", "Delmon Young": "OF", "Eric Byrnes": "OF", "Freddy Galvis": "SS", "Jackie Bradley Jr.": "OF", "Michael A. Taylor": "OF", "Buck Leonard": "1B", "Carmelo Martinez": "OF", "Franmil Reyes": "OF", "Fred Whitfield": "1B", "Gary Matthews Jr.": "OF", "George Selkirk": "OF", "Geovany Soto": "C", "Jack Howell": "3B", "James Loney": "1B", "Jonathan Lucroy": "C", "Luke Easter": "1B", "Ron Northey": "OF", "Shea Hillenbrand": "3B", "Yoan Moncada": "3B", "Danny Litwhiler": "OF", "Larry Herndon": "OF", "Marwin Gonzalez": "SS", "Todd Walker": "2B", "David Ross": "C", "Frank Bolling": "2B", "Lee Thomas": "1B", "Rico Brogna": "1B", "Rip Repulski": "OF", "Ron Hansen": "SS", "Scott Hairston": "OF", "Scott Hatteberg": "1B", "Spencer Torkelson": "1B", "Trevor Plouffe": "3B", "Whitey Kurowski": "3B", "Alex Avila": "C", "Bob Cerv": "OF", "Daryl Spencer": "SS", "Dave Nilsson": "C", "Jack Cust": "OF", "Mark Ellis": "2B", "Mark Whiten": "OF", "Mike Devereaux": "OF", "Mike Morse": "OF", "Corbin Carroll": "OF", "David Murphy": "OF", "Earl Battey": "C", "Franklin Stubbs": "1B", "Ivan Calderon": "OF", "James McCann": "C", "Jim Tabor": "3B", "Johnny Roseboro": "C", "Jorge Cantu": "1B", "Kal Daniels": "OF", "Ryan Doumit": "C", "Xavier Nady": "OF", "Bob Skinner": "OF", "Dick Gernert": "1B", "Orlando Merced": "OF", "Randy Jackson": "3B", "William Contreras": "C",
+  // Added from the home run / hits audit.
+  "Alex Johnson": "OF", "Andy High": "3B", "Barney McCosky": "OF", "Bill Wambsganss": "2B", "Billy Rogell": "SS", "Billy Southworth": "OF", "Bobby Avila": "2B", "Bobby Richardson": "2B", "Chief Wilson": "OF", "Dale Mitchell": "OF", "David Eckstein": "SS", "Del Unser": "OF", "Denis Menke": "SS", "Don Blasingame": "2B", "Don Mueller": "OF", "Ed Brinkman": "SS", "Eddie Miller": "SS", "Elbie Fletcher": "1B", "Elmer Valo": "OF", "Erick Aybar": "SS",
+  // Added from the home run / hits audit.
+  "Ethan Allen": "OF", "Fred Luderus": "1B", "George Stovall": "1B", "Gerardo Parra": "OF",
+  // Added from the home run / hits audit.
+  "Hank Severeid": "C", "Hod Ford": "SS", "Hy Myers": "OF",
+  // Added from the home run / hits audit.
+  "Jack Wilson": "SS", "Jay Johnstone": "OF", "Jerry Denny": "3B",
+  // Added from the home run / hits audit.
+  "Jerry Lumpe": "SS", "Jerry Priddy": "2B", "Jimmie Wilson": "C",
+  // Added from the home run / hits audit.
+  "Johnny Hopp": "OF", "Johnny Logan": "SS", "Juan Beniquez": "OF",
+  // Added from the home run / hits audit.
+  "Ken Oberkfell": "3B", "Ken Reitz": "3B", "Leo Durocher": "SS", "Les Mann": "OF", "Lou Finney": "OF", "Marco Scutaro": "2B",
+  // Added from the home run / hits audit.
+  "Mike Kreevich": "OF", "Mike Yastrzemski": "OF", "Monte Irvin": "OF",
+  // Added from the home run / hits audit.
+  "Jimmy Wolf": "OF", "Johnny Briggs": "OF", "Wally Gerber": "SS", "Woody English": "SS", "Ray Knight": "3B", "Rey Sanchez": "SS", "Omar Infante": "2B", "Yan Gomes": "C", "John Titus": "OF", "Muddy Ruel": "C", "Mule Haas": "OF", "Neifi Perez": "SS", "Orlando Hudson": "2B", "Pete Suder": "2B", "Rafael Ramirez": "SS", "Red Rolfe": "3B", "Rick Burleson": "SS", "Rip Radcliff": "OF", "Rollie Hemsley": "C", "Ron Hunt": "2B", "Roy Johnson": "OF", "Scott Fletcher": "SS", "Ski Melillo": "2B", "Spud Davis": "C", "Steve O'Neill": "C", "Ted Sizemore": "2B", "Terry Moore": "OF", "Tommy Griffith": "OF", "Tommy Helms": "2B", "Walter Holke": "1B", "Zoilo Versalles": "SS",
 };
 
 // A few players are eligible at a second position too (Ernie Banks played both
 // shortstop and first base). The main table above stays one position per player.
-const PLAYER_ALT_POSITIONS = { "Ernie Banks": ["1B"] };
+const PLAYER_ALT_POSITIONS = { "Johnny Briggs": ["1B"], "Woody English": ["3B"], "Ray Knight": ["1B"], "Rey Sanchez": ["2B"], "Omar Infante": ["SS", "3B"], "Scott Fletcher": ["2B"], "Lou Finney": ["1B"], "Marco Scutaro": ["SS", "3B"], "Johnny Hopp": ["1B"], "Jerry Lumpe": ["2B"], "Hod Ford": ["2B"], "Andy High": ["2B"], "Luis Valbuena": ["1B"], "Travis Shaw": ["1B"], "Gil McDougald": ["2B", "SS"], "Daulton Varsho": ["C"], "Chris Taylor": ["SS", "2B"], "Gunnar Henderson": ["3B"], "Brandon Drury": ["2B", "1B"], "Shea Hillenbrand": ["1B"], "Yoan Moncada": ["2B"], "Marwin Gonzalez": ["2B", "3B", "OF"], "Lee Thomas": ["OF"], "Scott Hatteberg": ["C"], "Mike Morse": ["1B"], "Jorge Cantu": ["3B", "2B"], "Orlando Merced": ["1B"], "Mickey Stanley": ["SS"], "Jake Burger": ["1B"], "Tito Francona": ["1B"], "John Valentin": ["3B", "2B"], "Brad Miller": ["2B"], "Brad Wilkerson": ["1B"], "Garrett Jones": ["OF"], "Joe Ferguson": ["OF"], "Wil Cordero": ["SS", "1B"], "Yandy Diaz": ["3B"], "Jed Lowrie": ["2B", "3B"], "Jedd Gyorko": ["2B"], "Mark Canha": ["1B"], "Scott Spiezio": ["3B"], "Enrique Hernandez": ["SS", "OF"], "Trey Mancini": ["OF"], "Bill Hall": ["SS"], "Jurickson Profar": ["SS", "2B"], "Fernando Tatis Jr.": ["OF"], "Ernie Banks": ["1B"], "Tommy Edman": ["SS", "OF"], "Bo Bichette": ["3B"], "Whit Merrifield": ["OF"] };
 function playerHasPosition(name, position) {
   return PLAYER_POSITIONS[name] === position || (PLAYER_ALT_POSITIONS[name] || []).includes(position);
 }
@@ -570,7 +598,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Don Baylor", value: 338, teams: ["BAL", "BOS", "LAA", "MIN", "NYY", "OAK"] },
       { name: "Joe Adcock", value: 336, teams: ["ATL", "CIN", "CLE", "LAA"] },
       { name: "Darryl Strawberry", value: 335, teams: ["LAD", "NYM", "NYY", "SFG"] },
-      { name: "Robinson Cano", value: 335, teams: ["NYM", "NYY", "SEA"] },
+      { name: "Robinson Cano", value: 335, teams: ["ATL", "NYM", "NYY", "SDP", "SEA"] },
       { name: "Carlos Santana", value: 335, teams: ["CLE", "KC", "SEA", "PHI", "MIN", "PIT", "MIL", "ARI", "CHC"] },
       { name: "Andrew McCutchen", value: 333, teams: ["NYY", "PHI", "PIT", "SFG"] },
       { name: "Bobby Bonds", value: 332, teams: ["CHC", "CHW", "CLE", "LAA", "NYY", "SFG", "STL", "TEX"] },
@@ -812,7 +840,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Brady Anderson", value: 210, teams: ["BAL", "BOS", "CLE"] },
       { name: "Wally Post", value: 210, teams: ["CIN", "CLE", "MIN", "PHI"] },
       { name: "Matt Chapman", value: 210, teams: ["OAK", "TOR", "SFG"] },
-      { name: "Trevor Story", value: 209, teams: ["COL"] },
+      { name: "Trevor Story", value: 209, teams: ["BOS", "COL"] },
       { name: "Xander Bogaerts", value: 209, teams: ["BOS", "SDP"] },
       { name: "Phil Nevin", value: 208, teams: ["CHC", "DET", "HOU", "LAA", "MIN", "SDP", "TEX"] },
       { name: "Devon White", value: 208, teams: ["ARI", "LAA", "LAD", "MIA", "MIL", "TOR"] },
@@ -886,10 +914,10 @@ const CATEGORIES_BASEBALL = {
       { name: "Hunter Renfroe", value: 192, teams: ["BOS", "SDP", "TB"] },
       { name: "Vladimir Guerrero Jr.", value: 192, teams: ["TOR"] },
       { name: "Turkey Stearnes", value: 192, teams: ["DET"] },
+      { name: "Brandon Lowe", value: 192, teams: ["PIT", "TB"] },
       { name: "Chris Young", value: 191, teams: ["ARI", "BOS", "KC", "LAA", "NYM", "NYY", "OAK", "SDP", "SEA", "TEX"] },
       { name: "Russell Martin", value: 191, teams: ["LAD", "NYY", "PIT", "TOR"] },
       { name: "Hal McRae", value: 191, teams: ["CIN", "KC"] },
-      { name: "Brandon Lowe", value: 191, teams: ["PIT", "TB"] },
       { name: "J.T. Realmuto", value: 191, teams: ["MIA", "PHI"] },
       { name: "Ernie Lombardi", value: 190, teams: ["ATL", "CIN", "LAD", "SFG"] },
       { name: "Glenn Davis", value: 190, teams: ["BAL", "HOU"] },
@@ -1030,7 +1058,6 @@ const CATEGORIES_BASEBALL = {
       { name: "Buster Posey", value: 158, teams: ["SFG"] },
       { name: "Anthony Rendon", value: 158, teams: ["LAA", "MON/WAS"] },
       { name: "Alex Gonzalez (1977)", value: 157, teams: ["ATL", "BOS", "CIN", "DET", "MIA", "MIL", "TOR"] },
-      { name: "Alex Gonzalez", value: 157, teams: ["TOR", "CHC", "MON/WAS", "SDP", "TB", "PHI"] },
       { name: "Ken McMullen", value: 156, teams: ["LAA", "LAD", "MIL", "OAK", "TEX"] },
       { name: "Juan Encarnacion", value: 156, teams: ["CIN", "DET", "LAD", "MIA", "STL"] },
       { name: "Bob Meusel", value: 156, teams: ["CIN", "NYY"] },
@@ -1087,7 +1114,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Leon Durham", value: 147, teams: ["CHC", "CIN", "STL"] },
       { name: "Ruppert Jones", value: 147, teams: ["DET", "KC", "LAA", "NYY", "SDP", "SEA"] },
       { name: "Gene Woodling", value: 147, teams: ["BAL", "CLE", "NYM", "NYY", "PIT", "TEX"] },
-      { name: "Brandon Crawford", value: 147, teams: ["SFG"] },
+      { name: "Brandon Crawford", value: 147, teams: ["SFG", "STL"] },
       { name: "Tommy Harper", value: 146, teams: ["BAL", "BOS", "CIN", "CLE", "LAA", "MIL", "OAK"] },
       { name: "Jim Spencer", value: 146, teams: ["CHW", "LAA", "NYY", "OAK", "TEX"] },
       { name: "Josh Reddick", value: 146, teams: ["ARI", "BOS", "HOU", "LAD", "OAK"] },
@@ -1125,22 +1152,28 @@ const CATEGORIES_BASEBALL = {
       { name: "Dustin Pedroia", value: 140, teams: ["BOS"] },
       { name: "Terry Pendleton", value: 140, teams: ["ATL", "CIN", "KC", "MIA", "STL"] },
       { name: "Oscar Charleston", value: 140, teams: ["IND"] },
+      { name: "Avisail Garcia", value: 140, teams: ["CHW", "DET", "MIL", "TB"] },
       { name: "Willie Montanez", value: 139, teams: ["ATL", "LAA", "MON/WAS", "NYM", "PHI", "PIT", "SDP", "SFG", "TEX"] },
       { name: "David Segui", value: 139, teams: ["BAL", "CLE", "MON/WAS", "NYM", "SEA", "TEX", "TOR"] },
       { name: "Eddie Yost", value: 139, teams: ["DET", "LAA", "MIN"] },
       { name: "Evan Gattis", value: 139, teams: ["ATL", "HOU"] },
       { name: "Brett Gardner", value: 139, teams: ["NYY"] },
+      { name: "Monte Irvin", value: 139, teams: ["CHC", "NWE", "SFG"] },
+      { name: "Johnny Briggs", value: 139, teams: ["MIL", "MIN", "PHI"] },
       { name: "Earl Williams", value: 138, teams: ["ATL", "BAL", "MON/WAS", "OAK"] },
       { name: "Roger Connor", value: 138, teams: ["NYI", "PHI", "SFG", "STL", "TRT"] },
       { name: "Jose Cardenal", value: 138, teams: ["CHC", "CLE", "KC", "LAA", "MIL", "NYM", "PHI", "SFG", "STL"] },
       { name: "Matt Lawton", value: 138, teams: ["CHC", "CLE", "MIN", "NYM", "NYY", "PIT", "SEA"] },
       { name: "Daniel Murphy", value: 138, teams: ["CHC", "COL", "MON/WAS", "NYM"] },
-      { name: "Starlin Castro", value: 138, teams: ["CHC", "MIA", "MON/WAS", "NYY"] },
       { name: "Bill Mazeroski", value: 138, teams: ["PIT"] },
+      { name: "Will Smith", value: 138, teams: ["LAD"] },
+      { name: "Alex Gonzalez (1973)", value: 137, teams: ["TOR", "CHC", "MON/WAS", "SDP", "TB", "PHI"] },
+      { name: "Starlin Castro", value: 137, teams: ["CHC", "MIA", "MON/WAS", "NYY"] },
       { name: "Steve Buechele", value: 137, teams: ["CHC", "PIT", "TEX"] },
       { name: "Eric Hinske", value: 137, teams: ["ARI", "ATL", "BOS", "NYY", "PIT", "TB", "TOR"] },
       { name: "Trot Nixon", value: 137, teams: ["BOS", "CLE", "NYM"] },
       { name: "Darren Daulton", value: 137, teams: ["MIA", "PHI"] },
+      { name: "Yan Gomes", value: 137, teams: ["CHC", "CLE", "MON/WAS", "OAK", "TOR"] },
       { name: "Hector Lopez", value: 136, teams: ["NYY", "OAK"] },
       { name: "Matt Nokes", value: 136, teams: ["BAL", "COL", "DET", "NYY", "SFG"] },
       { name: "Aaron Rowand", value: 136, teams: ["CHW", "PHI", "SFG"] },
@@ -1149,11 +1182,14 @@ const CATEGORIES_BASEBALL = {
       { name: "Rod Barajas", value: 136, teams: ["ARI", "LAD", "NYM", "PHI", "PIT", "TEX", "TOR"] },
       { name: "Carl Crawford", value: 136, teams: ["BOS", "LAD", "TB"] },
       { name: "Wilson Ramos", value: 136, teams: ["CLE", "DET", "MIN", "MON/WAS", "NYM", "PHI", "TB"] },
+      { name: "Corey Dickerson", value: 136, teams: ["COL", "MIA", "PHI", "PIT", "TB", "TOR"] },
       { name: "George McQuinn", value: 135, teams: ["BAL", "CIN", "NYY", "OAK"] },
       { name: "Travis Jackson", value: 135, teams: ["SFG"] },
       { name: "Ripper Collins", value: 135, teams: ["CHC", "PIT", "STL"] },
       { name: "Jim Presley", value: 135, teams: ["ATL", "SDP", "SEA"] },
       { name: "Luke Scott", value: 135, teams: ["BAL", "HOU", "TB"] },
+      { name: "Tony Gwynn", value: 135, teams: ["SDP"] },
+      { name: "Mike Yastrzemski", value: 135, teams: ["ATL", "KC", "SFG"] },
       { name: "Eddie Joost", value: 134, teams: ["ATL", "BOS", "CIN", "OAK"] },
       { name: "Tom Haller", value: 134, teams: ["DET", "LAD", "SFG"] },
       { name: "Mel Hall", value: 134, teams: ["CHC", "CLE", "NYY", "SFG"] },
@@ -1163,9 +1199,12 @@ const CATEGORIES_BASEBALL = {
       { name: "Ernie Whitt", value: 134, teams: ["ATL", "BAL", "BOS", "TOR"] },
       { name: "Mike Pagliarulo", value: 134, teams: ["BAL", "MIN", "NYY", "SDP", "TEX"] },
       { name: "Paul Blair", value: 134, teams: ["BAL", "CIN", "NYY"] },
-      { name: "Didi Gregorius", value: 133, teams: ["ARI", "CIN", "NYY", "PHI"] },
+      { name: "Didi Gregorius", value: 134, teams: ["ARI", "CIN", "NYY", "PHI"] },
+      { name: "Enrique Hernandez", value: 134, teams: ["BOS", "HOU", "LAD", "MIA"] },
+      { name: "Julio Rodriguez", value: 134, teams: ["SEA"] },
       { name: "Frank Malzone", value: 133, teams: ["BOS", "LAA"] },
       { name: "Mack Jones", value: 133, teams: ["ATL", "CIN", "MON/WAS"] },
+      { name: "Andrew Benintendi", value: 133, teams: ["BOS", "CHW", "KC", "NYY"] },
       { name: "Zack Wheat", value: 132, teams: ["LAD", "OAK"] },
       { name: "Norm Siebern", value: 132, teams: ["BAL", "BOS", "LAA", "NYY", "OAK", "SFG"] },
       { name: "Cody Ross", value: 132, teams: ["ARI", "BOS", "CIN", "DET", "LAD", "MIA", "OAK", "SFG"] },
@@ -1177,6 +1216,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Ken Harrelson", value: 131, teams: ["BOS", "CLE", "OAK", "TEX"] },
       { name: "Joe Kuhel", value: 131, teams: ["CHW", "MIN"] },
       { name: "John Milner", value: 131, teams: ["MON/WAS", "NYM", "PIT"] },
+      { name: "Lourdes Gurriel Jr.", value: 131, teams: ["ARI", "TOR"] },
       { name: "Mike Epstein", value: 130, teams: ["BAL", "LAA", "OAK", "TEX"] },
       { name: "Coco Crisp", value: 130, teams: ["BOS", "CLE", "KC", "OAK"] },
       { name: "Willard Marshall", value: 130, teams: ["ATL", "CHW", "CIN", "SFG"] },
@@ -1188,19 +1228,320 @@ const CATEGORIES_BASEBALL = {
       { name: "Mike Greenwell", value: 130, teams: ["BOS"] },
       { name: "Gary Ward", value: 130, teams: ["DET", "MIN", "NYY", "TEX"] },
       { name: "Chase Headley", value: 130, teams: ["NYY", "SDP"] },
+      { name: "Maikel Franco", value: 130, teams: ["BAL", "KC", "MON/WAS", "PHI"] },
+      { name: "Mitch Haniger", value: 130, teams: ["ARI", "SEA", "SFG"] },
+      { name: "Travis d'Arnaud", value: 130, teams: ["ATL", "LAA", "LAD", "NYM", "TB"] },
       { name: "Mike Macfarlane", value: 129, teams: ["BOS", "KC", "OAK"] },
       { name: "John Romano", value: 129, teams: ["CHW", "CLE", "STL"] },
+      { name: "Bo Bichette", value: 129, teams: ["NYM", "TOR"] },
+      { name: "Michael Brantley", value: 129, teams: ["CLE", "HOU"] },
+      { name: "Trey Mancini", value: 129, teams: ["BAL", "CHC", "HOU", "LAA"] },
       { name: "Kiki Cuyler", value: 128, teams: ["CHC", "CIN", "LAD", "PIT"] },
       { name: "Jose Vidro", value: 128, teams: ["MON/WAS", "SEA"] },
-      { name: "Corey Dickerson", value: 128, teams: ["COL", "MIA", "PHI", "PIT", "TB", "TOR"] },
       { name: "Frank McCormick", value: 128, teams: ["ATL", "CIN", "PHI"] },
+      { name: "Tyler O'Neill", value: 128, teams: ["BAL", "BOS", "STL"] },
       { name: "Mark Kotsay", value: 127, teams: ["ATL", "BOS", "CHW", "MIA", "MIL", "OAK", "SDP"] },
       { name: "Jody Davis", value: 127, teams: ["ATL", "CHC"] },
       { name: "Troy O'Leary", value: 127, teams: ["BOS", "CHC", "MIL", "MON/WAS"] },
       { name: "Dexter Fowler", value: 127, teams: ["CHC", "COL", "HOU", "LAA", "STL"] },
-      { name: "Avisail Garcia", value: 127, teams: ["CHW", "DET", "MIL", "TB"] },
       { name: "Jay Gibbons", value: 127, teams: ["BAL", "LAD"] },
+      { name: "Jazz Chisholm Jr.", value: 127, teams: ["MIA", "NYY"] },
+      { name: "Howie Kendrick", value: 127, teams: ["LAA", "LAD", "MON/WAS", "PHI"] },
+      { name: "Sam Thompson", value: 127, teams: ["DET", "DTN", "PHI"] },
+      { name: "Wally Westlake", value: 127, teams: ["BAL", "CIN", "CLE", "PHI", "PIT", "STL"] },
+      { name: "Smoky Burgess", value: 126, teams: ["CHC", "CHW", "CIN", "PHI", "PIT"] },
+      { name: "Gregg Jefferies", value: 126, teams: ["DET", "KC", "LAA", "NYM", "PHI", "STL"] },
+      { name: "DJ LeMahieu", value: 126, teams: ["CHC", "COL", "NYY"] },
+      { name: "Vic Power", value: 126, teams: ["CLE", "LAA", "MIN", "OAK", "PHI"] },
+      { name: "Pee Wee Reese", value: 126, teams: ["LAD"] },
+      { name: "Al Dark", value: 126, teams: ["ATL", "CHC", "PHI", "SFG", "STL"] },
+      { name: "Aaron Boone", value: 126, teams: ["CIN", "CLE", "HOU", "MIA", "MON/WAS", "NYY"] },
+      { name: "Jason Kipnis", value: 126, teams: ["CHC", "CLE"] },
+      { name: "Miguel Montero", value: 126, teams: ["ARI", "CHC", "MON/WAS", "TOR"] },
+      { name: "Seth Smith", value: 126, teams: ["BAL", "COL", "OAK", "SDP", "SEA"] },
+      { name: "Bill Hall", value: 125, teams: ["BAL", "BOS", "HOU", "MIL", "SEA", "SFG"] },
+      { name: "Bob Nieman", value: 125, teams: ["BAL", "CHW", "CLE", "DET", "SFG", "STL"] },
+      { name: "David Peralta", value: 125, teams: ["ARI", "LAD", "SDP", "TB"] },
+      { name: "Jurickson Profar", value: 125, teams: ["ATL", "COL", "OAK", "SDP", "TEX"] },
+      { name: "Michael Tucker", value: 125, teams: ["ATL", "CHC", "CIN", "KC", "NYM", "PHI", "SFG"] },
+      { name: "Milton Bradley", value: 125, teams: ["CHC", "CLE", "LAD", "MON/WAS", "OAK", "SDP", "SEA", "TEX"] },
+      { name: "Tito Francona", value: 125, teams: ["ATL", "BAL", "CHW", "CLE", "DET", "MIL", "PHI", "STL"] },
+      { name: "Vince DiMaggio", value: 125, teams: ["ATL", "CIN", "PHI", "PIT"] },
+      { name: "Darin Erstad", value: 124, teams: ["CHW", "HOU", "LAA"] },
+      { name: "Roberto Kelly", value: 124, teams: ["ATL", "CIN", "LAD", "MIN", "MON/WAS", "NYY", "SEA", "TEX"] },
+      { name: "Aurelio Rodriguez", value: 124, teams: ["BAL", "CHW", "DET", "LAA", "NYY", "SDP", "TEX"] },
+      { name: "Gee Walker", value: 124, teams: ["CHW", "CIN", "CLE", "DET", "MIN"] },
+      { name: "Brad Hawpe", value: 124, teams: ["COL", "LAA", "SDP", "TB"] },
+      { name: "Carlos Guillen", value: 124, teams: ["DET", "HOU", "SEA"] },
+      { name: "Corey Koskie", value: 124, teams: ["MIL", "MIN", "TOR"] },
+      { name: "Darrin Fletcher", value: 124, teams: ["LAD", "MON/WAS", "TOR"] },
+      { name: "John Valentin", value: 124, teams: ["BOS", "NYM"] },
+      { name: "Nathaniel Lowe", value: 124, teams: ["TB", "TEX"] },
+      { name: "Orlando Cabrera", value: 123, teams: ["BOS", "CHW", "CIN", "CLE", "LAA", "MIN", "MON/WAS", "OAK", "SFG"] },
+      { name: "Joe Randa", value: 123, teams: ["CIN", "DET", "KC", "PIT", "SDP"] },
+      { name: "Bobby Witt Jr.", value: 123, teams: ["KC"] },
+      { name: "Brad Miller", value: 123, teams: ["MIL", "PHI", "SEA", "STL", "TB", "TEX"] },
+      { name: "David Bell", value: 123, teams: ["CHC", "CLE", "MIL", "PHI", "SEA", "SFG", "STL"] },
+      { name: "Ellis Valentine", value: 123, teams: ["LAA", "MON/WAS", "NYM", "TEX"] },
+      { name: "Ken Phelps", value: 123, teams: ["CLE", "KC", "MON/WAS", "NYY", "OAK"] },
+      { name: "Rowdy Tellez", value: 123, teams: ["MIL", "PIT", "TOR"] },
+      { name: "Stephen Drew", value: 123, teams: ["ARI", "BOS", "MON/WAS", "NYY", "OAK"] },
+      { name: "Willie Upshaw", value: 123, teams: ["CLE", "TOR"] },
+      { name: "Harry Stovey", value: 122, teams: ["ATL", "BLO", "BRS", "LAD", "PHQ", "WOR"] },
+      { name: "Brad Wilkerson", value: 122, teams: ["MON/WAS", "SEA", "TEX", "TOR"] },
+      { name: "Don Lock", value: 122, teams: ["BOS", "PHI", "TEX"] },
+      { name: "Garrett Jones", value: 122, teams: ["MIA", "MIN", "NYY", "PIT"] },
+      { name: "Jeff Blauser", value: 122, teams: ["ATL", "CHC"] },
+      { name: "Joe Ferguson", value: 122, teams: ["HOU", "LAA", "LAD", "OAK"] },
+      { name: "Ken Henderson", value: 122, teams: ["ATL", "CHC", "CIN", "NYY", "SFG", "TEX"] },
+      { name: "Marty Cordova", value: 122, teams: ["BAL", "CLE", "MIN", "TOR"] },
+      { name: "Nick Esasky", value: 122, teams: ["ATL", "BOS", "CIN"] },
+      { name: "Trent Grisham", value: 122, teams: ["MIL", "NYY", "SDP"] },
+      { name: "Wil Cordero", value: 122, teams: ["BOS", "CHW", "CLE", "MIA", "MON/WAS", "PIT"] },
+      { name: "Yandy Diaz", value: 122, teams: ["CLE", "TB"] },
+      { name: "Keith Moreland", value: 121, teams: ["BAL", "CHC", "DET", "PHI", "SDP"] },
+      { name: "Austin Kearns", value: 121, teams: ["CIN", "CLE", "MON/WAS", "NYY"] },
+      { name: "Dan Ford", value: 121, teams: ["BAL", "LAA", "OAK", "TEX"] },
+      { name: "Gary Roenicke", value: 121, teams: ["BAL", "NYY", "SDP"] },
+      { name: "Jed Lowrie", value: 121, teams: ["BOS", "HOU", "NYM", "OAK"] },
+      { name: "Jedd Gyorko", value: 121, teams: ["LAD", "MIL", "SDP", "STL"] },
+      { name: "Jimmie Hall", value: 121, teams: ["CLE", "LAA", "MIN", "NYY"] },
+      { name: "Mark Canha", value: 121, teams: ["DET", "MIL", "NYM", "OAK", "SFG"] },
+      { name: "Wayne Gross", value: 121, teams: ["BAL", "CHC", "OAK"] },
+      { name: "Marty McManus", value: 120, teams: ["ATL", "BAL", "BOS", "DET"] },
+      { name: "Brook Jacoby", value: 120, teams: ["BAL", "CLE"] },
+      { name: "Taylor Ward", value: 120, teams: ["LAA"] },
+      { name: "Zeke Bonura", value: 119, teams: ["CHC", "CHW", "MIN", "SFG"] },
+      { name: "Mickey Cochrane", value: 119, teams: ["DET", "OAK"] },
+      { name: "Gavvy Cravath", value: 119, teams: ["BOS", "CHW", "MIN", "PHI"] },
+      { name: "Brent Rooker", value: 119, teams: ["KC", "MIN", "OAK", "SDP"] },
+      { name: "Frankie Hayes", value: 119, teams: ["BOS", "CHW", "CLE", "OAK"] },
+      { name: "Jay Payton", value: 119, teams: ["BAL", "BOS", "COL", "NYM", "OAK", "SDP"] },
+      { name: "Martin Maldonado", value: 119, teams: ["CHC", "CHW", "HOU", "LAA", "MIL"] },
+      { name: "Robby Thompson", value: 119, teams: ["SFG"] },
+      { name: "Rusty Greer", value: 119, teams: ["TEX"] },
+      { name: "Scott Spiezio", value: 119, teams: ["LAA", "OAK", "SEA", "STL"] },
+      { name: "Wade Boggs", value: 118, teams: ["BOS", "NYY", "TB"] },
+      { name: "Leo Cardenas", value: 118, teams: ["CIN", "CLE", "LAA", "MIN", "TEX"] },
+      { name: "Corey Patterson", value: 118, teams: ["BAL", "CHC", "CIN", "MIL", "MON/WAS", "STL", "TOR"] },
+      { name: "Jimmy Ryan", value: 118, teams: ["CHC", "CHP", "MIN"] },
+      { name: "Tillie Walker", value: 118, teams: ["BAL", "BOS", "MIN", "OAK"] },
+      { name: "Ben Grieve", value: 118, teams: ["CHC", "MIL", "OAK", "TB"] },
+      { name: "Bernard Gilkey", value: 118, teams: ["ARI", "ATL", "BOS", "NYM", "STL"] },
+      { name: "Cedric Mullins", value: 118, teams: ["BAL"] },
+      { name: "Ed Kranepool", value: 118, teams: ["NYM"] },
+      { name: "Kevin Bass", value: 118, teams: ["BAL", "HOU", "MIL", "NYM", "SFG"] },
+      { name: "Matt Adams", value: 118, teams: ["ATL", "COL", "MON/WAS", "STL"] },
+      { name: "Mike Easler", value: 118, teams: ["BOS", "HOU", "LAA", "NYY", "PHI", "PIT"] },
+      { name: "Ty Cobb", value: 117, teams: ["DET", "OAK"] },
+      { name: "Garry Maddox", value: 117, teams: ["PHI", "SFG"] },
+      { name: "Tris Speaker", value: 117, teams: ["BOS", "CLE", "MIN", "OAK"] },
+      { name: "Ichiro Suzuki", value: 117, teams: ["MIA", "NYY", "SEA"] },
+      { name: "Chet Laabs", value: 117, teams: ["BAL", "DET"] },
+      { name: "Dan Pasqua", value: 117, teams: ["CHW", "NYY"] },
+      { name: "Isaac Paredes", value: 117, teams: ["CHC", "DET", "HOU", "TB"] },
+      { name: "Jim King", value: 117, teams: ["CHC", "CLE", "LAA", "PHI", "STL", "TEX"] },
+      { name: "Kelly Gruber", value: 117, teams: ["LAA", "TOR"] },
+      { name: "Mickey Stanley", value: 117, teams: ["DET"] },
+      { name: "Bing Miller", value: 116, teams: ["BAL", "BOS", "MIN", "OAK"] },
+      { name: "Chris Sabo", value: 116, teams: ["BAL", "CHW", "CIN", "STL"] },
+      { name: "Jake Burger", value: 116, teams: ["CHW", "MIA"] },
+      { name: "John Lowenstein", value: 116, teams: ["BAL", "CLE", "TEX"] },
+      { name: "Rick Reichardt", value: 116, teams: ["KC", "LAA", "MIL"] },
+      { name: "Stan Lopata", value: 116, teams: ["MIL", "PHI"] },
+      { name: "Shannon Stewart", value: 115, teams: ["MIN", "OAK", "TOR"] },
+      { name: "Alexei Ramirez", value: 115, teams: ["CHW", "SDP", "TB"] },
+      { name: "Bob Robertson", value: 115, teams: ["PIT", "SEA", "TOR"] },
+      { name: "Craig Monroe", value: 115, teams: ["CHC", "DET", "MIN", "PIT"] },
+      { name: "Don Hurst", value: 115, teams: ["CHC", "PHI"] },
+      { name: "Gene Freese", value: 115, teams: ["CHW", "CIN", "HOU", "PHI", "PIT", "STL"] },
+      { name: "Jerry Lynch", value: 115, teams: ["CIN", "LAD", "PIT"] },
+      { name: "Marcus Thames", value: 115, teams: ["DET", "LAD", "NYY", "TEX"] },
+      { name: "Travis Lee", value: 115, teams: ["ARI", "DET", "NYY", "PHI", "TB"] },
+      { name: "Whitey Lockman", value: 114, teams: ["BAL", "CIN", "SFG", "STL"] },
+      { name: "Brad Fullmer", value: 114, teams: ["BOS", "LAA", "MON/WAS", "TEX", "TOR"] },
+      { name: "Jesus Aguilar", value: 114, teams: ["BAL", "CLE", "MIA", "MIL", "OAK", "TB"] },
+      { name: "Josh Naylor", value: 114, teams: ["ARI", "CLE", "MIA", "SDP"] },
+      { name: "Kevin Pillar", value: 114, teams: ["ATL", "BOS", "CHC", "CHW", "COL", "LAA", "LAD", "NYM", "SFG", "TOR"] },
+      { name: "Luis Valbuena", value: 114, teams: ["CHC", "CLE", "HOU", "LAA", "SEA"] },
+      { name: "Ronnie Belliard", value: 114, teams: ["CLE", "LAD", "MIL", "MON/WAS", "STL"] },
+      { name: "Travis Shaw", value: 114, teams: ["BOS", "LAA", "MIL", "TOR"] },
+      { name: "Rafael Furcal", value: 113, teams: ["ATL", "LAD", "MIA", "STL"] },
+      { name: "Thurman Munson", value: 113, teams: ["NYY"] },
+      { name: "Paul Waner", value: 113, teams: ["ATL", "LAD", "NYY", "PIT"] },
+      { name: "Chuck Hinton", value: 113, teams: ["CIN", "CLE", "LAA", "TEX"] },
+      { name: "David Freese", value: 113, teams: ["LAA", "LAD", "PIT", "STL"] },
+      { name: "Fernando Tatis", value: 113, teams: ["BAL", "MON/WAS", "STL", "TB", "TEX"] },
+      { name: "Greg Walker", value: 113, teams: ["BAL", "CHW"] },
+      { name: "Lefty O'Doul", value: 113, teams: ["BOS", "LAD", "NYY", "PHI", "SFG"] },
+      { name: "Luis Robert Jr.", value: 113, teams: ["CHW"] },
+      { name: "Ramon Laureano", value: 113, teams: ["ATL", "BAL", "HOU", "OAK"] },
+      { name: "Seiya Suzuki", value: 113, teams: ["CHC"] },
+      { name: "Terry Kennedy", value: 113, teams: ["BAL", "SDP", "SFG", "STL"] },
+      { name: "Jeff Cirillo", value: 112, teams: ["ARI", "COL", "MIL", "MIN", "SDP", "SEA"] },
+      { name: "Chris Speier", value: 112, teams: ["CHC", "MIN", "MON/WAS", "SFG", "STL"] },
+      { name: "Curt Blefary", value: 112, teams: ["BAL", "HOU", "NYY", "OAK"] },
+      { name: "Dave Hollins", value: 112, teams: ["BAL", "BOS", "LAA", "MIN", "PHI", "SEA"] },
+      { name: "Gil McDougald", value: 112, teams: ["NYY"] },
+      { name: "Jackie Brandt", value: 112, teams: ["BAL", "HOU", "PHI", "SFG", "STL"] },
+      { name: "Jim Morrison", value: 112, teams: ["ATL", "CHW", "PHI", "PIT"] },
+      { name: "Sandy Alomar Jr.", value: 112, teams: ["CHW", "CLE", "COL", "MIA", "TEX"] },
+      { name: "Greg Gagne", value: 111, teams: ["KC", "LAD", "MIN"] },
+      { name: "Daulton Varsho", value: 111, teams: ["ARI", "TOR"] },
+      { name: "Max Alvis", value: 111, teams: ["CLE", "MIL"] },
+      { name: "Shea Langeliers", value: 111, teams: ["ATL", "OAK"] },
+      { name: "Royce Clayton", value: 110, teams: ["ARI", "BOS", "CHW", "CIN", "COL", "MIL", "MON/WAS", "SFG", "STL", "TEX", "TOR"] },
+      { name: "Heinie Manush", value: 110, teams: ["BAL", "BOS", "DET", "LAD", "MIN", "PIT"] },
+      { name: "Jean Segura", value: 110, teams: ["ARI", "LAA", "MIA", "MIL", "PHI", "SEA"] },
+      { name: "Randy Winn", value: 110, teams: ["NYY", "SEA", "SFG", "STL", "TB"] },
+      { name: "Chris Taylor", value: 110, teams: ["LAD", "SEA"] },
+      { name: "Greg Brock", value: 110, teams: ["LAD", "MIL"] },
+      { name: "Gunnar Henderson", value: 110, teams: ["BAL"] },
+      { name: "Jarrod Saltalamacchia", value: 110, teams: ["ARI", "ATL", "BOS", "DET", "MIA", "TEX", "TOR"] },
+      { name: "Jeffrey Hammonds", value: 110, teams: ["BAL", "CHW", "CIN", "COL", "MIL", "SFG"] },
+      { name: "Jeimer Candelario", value: 110, teams: ["CHC", "CIN", "DET", "MON/WAS"] },
+      { name: "Mitch Garver", value: 110, teams: ["MIN", "SEA", "TEX"] },
+      { name: "Morgan Ensberg", value: 110, teams: ["HOU", "NYY", "SDP"] },
+      { name: "Roy Cullenbine", value: 110, teams: ["BAL", "CLE", "DET", "LAD", "PHI"] },
+      { name: "Willie Aikens", value: 110, teams: ["KC", "LAA", "TOR"] },
+      { name: "Phil Garner", value: 109, teams: ["HOU", "LAD", "OAK", "PIT", "SFG"] },
+      { name: "Aaron Hicks", value: 109, teams: ["BAL", "LAA", "MIN", "NYY"] },
+      { name: "Brandon Drury", value: 109, teams: ["ARI", "CIN", "LAA", "NYY", "SDP", "TOR"] },
+      { name: "Dave Duncan", value: 109, teams: ["BAL", "CLE", "OAK"] },
+      { name: "Delmon Young", value: 109, teams: ["BAL", "DET", "MIN", "PHI", "TB"] },
+      { name: "Eric Byrnes", value: 109, teams: ["ARI", "BAL", "COL", "HOU", "OAK", "SEA"] },
+      { name: "Freddy Galvis", value: 109, teams: ["BAL", "CIN", "PHI", "SDP", "TOR"] },
+      { name: "Jackie Bradley Jr.", value: 109, teams: ["BAL", "BOS", "KC", "MIL", "TOR"] },
+      { name: "Michael A. Taylor", value: 109, teams: ["KC", "MIN", "MON/WAS", "PIT"] },
+      { name: "Al Cowens", value: 108, teams: ["DET", "KC", "LAA", "SEA"] },
+      { name: "Jimmy Dykes", value: 108, teams: ["CHW", "OAK"] },
+      { name: "Shane Victorino", value: 108, teams: ["BOS", "LAA", "LAD", "PHI", "SDP"] },
+      { name: "Buck Leonard", value: 108, teams: ["HOM"] },
+      { name: "Carmelo Martinez", value: 108, teams: ["CHC", "CLE", "PHI", "SDP", "SFG"] },
+      { name: "Franmil Reyes", value: 108, teams: ["CHC", "CLE", "KC", "SDP"] },
+      { name: "Fred Whitfield", value: 108, teams: ["BOS", "CIN", "CLE", "MON/WAS"] },
+      { name: "Gary Matthews Jr.", value: 108, teams: ["BAL", "CHC", "LAA", "NYM", "SDP", "SFG", "TEX"] },
+      { name: "George Selkirk", value: 108, teams: ["NYY"] },
+      { name: "Geovany Soto", value: 108, teams: ["CHC", "CHW", "LAA", "OAK", "TEX"] },
+      { name: "Jack Howell", value: 108, teams: ["HOU", "LAA", "SDP"] },
+      { name: "James Loney", value: 108, teams: ["BOS", "LAD", "NYM", "TB"] },
+      { name: "Jonathan Lucroy", value: 108, teams: ["BOS", "CHC", "COL", "LAA", "MIL", "OAK", "TEX"] },
+      { name: "Luke Easter", value: 108, teams: ["CLE"] },
+      { name: "Ron Northey", value: 108, teams: ["CHC", "CHW", "CIN", "PHI"] },
+      { name: "Shea Hillenbrand", value: 108, teams: ["ARI", "BOS", "CHC", "LAA", "SFG", "TOR"] },
+      { name: "Yoan Moncada", value: 108, teams: ["BOS", "CHW"] },
+      { name: "Tony Pena", value: 107, teams: ["ARI", "ATL", "BOS", "CHW", "CLE", "HOU", "KC", "PIT", "STL"] },
+      { name: "Danny Litwhiler", value: 107, teams: ["BAL", "BOS", "CIN", "PHI"] },
+      { name: "Larry Herndon", value: 107, teams: ["DET", "PHI", "SFG"] },
+      { name: "Marwin Gonzalez", value: 107, teams: ["BOS", "DET", "HOU", "MIN"] },
+      { name: "Todd Walker", value: 107, teams: ["BOS", "CHC", "CIN", "COL", "MIA", "OAK", "SDP"] },
+      { name: "Dan Brouthers", value: 106, teams: ["ATL", "BLO", "BRS", "BUF", "DTN", "LAD", "LOU", "PHI", "SFG", "TRT"] },
+      { name: "Bruce Campbell", value: 106, teams: ["BAL", "CHW", "CLE", "DET", "MIN"] },
+      { name: "Hugh Duffy", value: 106, teams: ["ATL", "BAL", "BRS", "CHC", "CHP", "PHI"] },
+      { name: "Irish Meusel", value: 106, teams: ["LAD", "MIN", "PHI", "SFG"] },
+      { name: "Mike Tiernan", value: 106, teams: ["SFG"] },
+      { name: "David Ross", value: 106, teams: ["ATL", "BOS", "CHC", "CIN", "LAD", "PIT", "SDP"] },
+      { name: "Frank Bolling", value: 106, teams: ["ATL", "DET"] },
+      { name: "Lee Thomas", value: 106, teams: ["ATL", "BOS", "CHC", "LAA", "STL"] },
+      { name: "Rico Brogna", value: 106, teams: ["ATL", "BOS", "DET", "NYM", "PHI"] },
+      { name: "Rip Repulski", value: 106, teams: ["DET", "LAA", "PHI", "STL"] },
+      { name: "Ron Hansen", value: 106, teams: ["BAL", "CHW", "NYY", "TEX"] },
+      { name: "Scott Hairston", value: 106, teams: ["ARI", "CHC", "MON/WAS", "NYM", "OAK", "SDP"] },
+      { name: "Scott Hatteberg", value: 106, teams: ["BOS", "CIN", "OAK"] },
+      { name: "Spencer Torkelson", value: 106, teams: ["DET"] },
+      { name: "Trevor Plouffe", value: 106, teams: ["MIN", "OAK", "TB"] },
+      { name: "Whitey Kurowski", value: 106, teams: ["STL"] },
+      { name: "Bob Boone", value: 105, teams: ["KC", "LAA", "PHI"] },
+      { name: "Frankie Frisch", value: 105, teams: ["SFG", "STL"] },
+      { name: "George Grantham", value: 105, teams: ["CHC", "CIN", "PIT", "SFG"] },
+      { name: "Dixie Walker", value: 105, teams: ["CHW", "DET", "LAD", "MIN", "NYY", "PIT"] },
+      { name: "Alex Avila", value: 105, teams: ["ARI", "CHC", "DET", "MIN", "MON/WAS"] },
+      { name: "Bob Cerv", value: 105, teams: ["HOU", "KC", "LAA", "NYY"] },
+      { name: "Daryl Spencer", value: 105, teams: ["CIN", "LAD", "SFG", "STL"] },
+      { name: "Dave Nilsson", value: 105, teams: ["MIL"] },
+      { name: "Jack Cust", value: 105, teams: ["ARI", "BAL", "COL", "MON/WAS", "OAK", "SEA"] },
+      { name: "Mark Ellis", value: 105, teams: ["COL", "LAD", "OAK", "STL"] },
+      { name: "Mark Whiten", value: 105, teams: ["ATL", "BOS", "CLE", "PHI", "SEA", "STL", "TOR"] },
+      { name: "Mike Devereaux", value: 105, teams: ["ATL", "BAL", "CHC", "LAD", "TEX"] },
+      { name: "Mike Morse", value: 105, teams: ["BAL", "LAD", "MON/WAS", "PIT", "SEA", "SFG"] },
+      { name: "Jacoby Ellsbury", value: 104, teams: ["BOS", "NYY"] },
+      { name: "Granny Hamner", value: 104, teams: ["CLE", "OAK", "PHI"] },
+      { name: "Jim Piersall", value: 104, teams: ["BOS", "CLE", "LAA", "NYM", "TEX"] },
+      { name: "Placido Polanco", value: 104, teams: ["DET", "MIA", "PHI", "STL"] },
+      { name: "Corbin Carroll", value: 104, teams: ["ARI"] },
+      { name: "David Murphy", value: 104, teams: ["BOS", "CLE", "LAA", "TEX"] },
+      { name: "Earl Battey", value: 104, teams: ["BAL", "MIN"] },
+      { name: "Franklin Stubbs", value: 104, teams: ["DET", "HOU", "LAD", "MIL"] },
+      { name: "Ivan Calderon", value: 104, teams: ["BOS", "CHW", "MON/WAS", "SEA"] },
+      { name: "James McCann", value: 104, teams: ["BAL", "CHW", "DET", "NYM", "TEX"] },
+      { name: "Jim Tabor", value: 104, teams: ["BOS", "PHI"] },
+      { name: "Johnny Roseboro", value: 104, teams: ["LAD", "MIN", "TEX"] },
+      { name: "Jorge Cantu", value: 104, teams: ["CIN", "MIA", "SDP", "TB", "TEX"] },
+      { name: "Kal Daniels", value: 104, teams: ["CHC", "CIN", "LAD"] },
+      { name: "Ryan Doumit", value: 104, teams: ["ATL", "MIN", "PIT"] },
+      { name: "Xavier Nady", value: 104, teams: ["CHC", "MON/WAS", "NYM", "NYY", "PIT", "SDP"] },
+      { name: "Tony Gonzalez", value: 103, teams: ["ATL", "CIN", "LAA", "PHI", "SDP"] },
+      { name: "Freddie Lindstrom", value: 103, teams: ["CHC", "LAD", "PIT", "SFG"] },
+      { name: "Brian McRae", value: 103, teams: ["CHC", "COL", "KC", "NYM", "TOR"] },
+      { name: "Bob Skinner", value: 103, teams: ["CIN", "PHI", "PIT", "STL"] },
+      { name: "Dick Gernert", value: 103, teams: ["BOS", "CHC", "DET", "HOU", "STL"] },
+      { name: "Orlando Merced", value: 103, teams: ["CHC", "CHW", "HOU", "KC", "MIN", "MON/WAS", "PIT"] },
+      { name: "Randy Jackson", value: 103, teams: ["CHC", "CHW", "LAA", "STL"] },
+      { name: "William Contreras", value: 103, teams: ["ATL", "MIL"] },
+      { name: "Jay Johnstone", value: 102, teams: ["CHC", "CHW", "LAA", "LAD", "NYY", "OAK", "PHI", "SDP"] },
+      { name: "Denis Menke", value: 101, teams: ["ATL", "CIN", "HOU"] },
+      { name: "Marco Scutaro", value: 101, teams: ["BOS", "CLE", "COL", "NYM", "OAK", "SFG", "TOR"] },
+      { name: "Eddie Miller", value: 97, teams: ["ATL", "CHC", "CIN", "LAD", "PHI", "SFG"] },
+      { name: "Whit Merrifield", value: 94, teams: ["ATL", "KC", "PHI", "TOR"] },
+      { name: "Johnny Logan", value: 93, teams: ["ATL", "PIT"] },
+      { name: "Gerardo Parra", value: 90, teams: ["ARI", "BAL", "COL", "MIL", "MON/WAS", "SFG"] },
+      { name: "Del Unser", value: 87, teams: ["CLE", "MON/WAS", "PHI", "TEX"] },
+      { name: "Kolten Wong", value: 86, teams: ["LAD", "MIL", "SEA", "STL"] },
+      { name: "Fred Luderus", value: 84, teams: ["CHC", "PHI"] },
+      { name: "Ray Knight", value: 84, teams: ["BAL", "CIN", "DET", "HOU", "NYM"] },
+      { name: "Omar Infante", value: 82, teams: ["ATL", "DET", "KC", "MIA"] },
+      { name: "Tommy Edman", value: 80, teams: ["LAD", "STL"] },
+      { name: "Bobby Avila", value: 80, teams: ["ATL", "BAL", "BOS", "CLE"] },
+      { name: "Elbie Fletcher", value: 79, teams: ["ATL", "PIT"] },
+      { name: "Juan Beniquez", value: 79, teams: ["BAL", "BOS", "KC", "LAA", "NYY", "SEA", "TEX", "TOR"] },
+      { name: "Alex Johnson", value: 78, teams: ["CIN", "CLE", "DET", "LAA", "NYY", "PHI", "STL", "TEX"] },
+      { name: "Jerry Denny", value: 74, teams: ["CLV", "IND", "LOU", "PHI", "PRO", "SFG", "SLM"] },
+      { name: "Ken Reitz", value: 68, teams: ["CHC", "PIT", "SFG", "STL"] },
+      { name: "Don Mueller", value: 65, teams: ["CHC", "SFG"] },
+      { name: "Jack Wilson", value: 61, teams: ["ATL", "PIT", "SEA"] },
+      { name: "Jerry Priddy", value: 61, teams: ["BAL", "DET", "MIN", "NYY"] },
+      { name: "Ed Brinkman", value: 60, teams: ["DET", "NYY", "STL", "TEX"] },
+      { name: "Chief Wilson", value: 59, teams: ["PIT", "STL"] },
+      { name: "Elmer Valo", value: 58, teams: ["CLE", "LAD", "MIN", "NYY", "OAK", "PHI"] },
+      { name: "Erick Aybar", value: 58, teams: ["ATL", "DET", "LAA", "SDP"] },
+      { name: "Billy Southworth", value: 52, teams: ["ATL", "CLE", "PIT", "SFG", "STL"] },
+      { name: "Ethan Allen", value: 47, teams: ["BAL", "CHC", "CIN", "PHI", "SFG", "STL"] },
+      { name: "Jerry Lumpe", value: 47, teams: ["DET", "NYY", "OAK"] },
+      { name: "Johnny Hopp", value: 46, teams: ["ATL", "DET", "LAD", "NYY", "PIT", "STL"] },
+      { name: "Mike Kreevich", value: 45, teams: ["BAL", "CHC", "CHW", "MIN", "OAK"] },
+      { name: "Andy High", value: 44, teams: ["ATL", "CIN", "LAD", "PHI", "STL"] },
+      { name: "Les Mann", value: 44, teams: ["ATL", "CHC", "CHH", "CIN", "SFG", "STL"] },
+      { name: "Billy Rogell", value: 42, teams: ["BOS", "CHC", "DET"] },
+      { name: "Dale Mitchell", value: 41, teams: ["CLE", "LAD"] },
+      { name: "Chone Figgins", value: 35, teams: ["LAA", "LAD", "SEA"] },
+      { name: "David Eckstein", value: 35, teams: ["ARI", "LAA", "SDP", "STL", "TOR"] },
+      { name: "Bobby Richardson", value: 34, teams: ["NYY"] },
+      { name: "Hy Myers", value: 32, teams: ["ATL", "CIN", "LAD", "STL"] },
+      { name: "Jimmie Wilson", value: 32, teams: ["CIN", "PHI", "STL"] },
+      { name: "Woody English", value: 32, teams: ["CHC", "LAD"] },
+      { name: "Lou Finney", value: 31, teams: ["BAL", "BOS", "OAK", "PHI"] },
+      { name: "Ken Oberkfell", value: 29, teams: ["ATL", "HOU", "LAA", "PIT", "SFG", "STL"] },
+      { name: "Barney McCosky", value: 24, teams: ["CIN", "CLE", "DET", "OAK"] },
+      { name: "Leo Durocher", value: 24, teams: ["CIN", "LAD", "NYY", "STL"] },
+      { name: "Don Blasingame", value: 21, teams: ["BAL", "CIN", "OAK", "SFG", "STL", "TEX"] },
+      { name: "Jimmy Wolf", value: 18, teams: ["LOU", "STL"] },
+      { name: "Hank Severeid", value: 17, teams: ["BAL", "CIN", "MIN", "NYY"] },
+      { name: "Hod Ford", value: 16, teams: ["ATL", "CIN", "LAD", "PHI", "STL"] },
+      { name: "George Stovall", value: 15, teams: ["BAL", "CLE", "KCP"] },
+      { name: "Rey Sanchez", value: 15, teams: ["ATL", "BOS", "CHC", "KC", "NYM", "NYY", "SEA", "SFG", "TB"] },
       { name: "Otis Nixon", value: 11, teams: ["ATL", "BOS", "CLE", "LAD", "MIN", "MON/WAS", "NYY", "TEX", "TOR"] },
+      { name: "Bill Wambsganss", value: 7, teams: ["BOS", "CLE", "OAK"] },
+      { name: "Wally Gerber", value: 7, teams: ["BAL", "BOS", "PIT"] },
       { name: "Pat Listach", value: 5, teams: ["HOU", "MIL"] },
     
     ],
@@ -1295,7 +1636,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Lave Cross", value: 2651, teams: ["CLV", "LAD", "LOU", "MIN", "OAK", "PHI", "PHQ", "STL"] },
       { name: "Jimmie Foxx", value: 2646, teams: ["BOS", "CHC", "OAK", "PHI"] },
       { name: "Jim O'Rourke", value: 2639, teams: ["ATL", "BNA", "BUF", "MAN", "MON/WAS", "NYI", "PRO", "SFG", "STL"] },
-      { name: "Robinson Cano", value: 2639, teams: ["NYM", "NYY", "SEA"] },
+      { name: "Robinson Cano", value: 2639, teams: ["ATL", "NYM", "NYY", "SDP", "SEA"] },
       { name: "Tim Raines", value: 2605, teams: ["BAL", "CHW", "MIA", "MON/WAS", "NYY", "OAK"] },
       { name: "Rabbit Maranville", value: 2605, teams: ["ATL", "CHC", "LAD", "PIT", "STL"] },
       { name: "Steve Garvey", value: 2599, teams: ["LAD", "SDP"] },
@@ -1786,8 +2127,8 @@ const CATEGORIES_BASEBALL = {
       { name: "Shawon Dunston", value: 1597, teams: ["CHC", "CLE", "NYM", "PIT", "SFG", "STL"] },
       { name: "Germany Smith", value: 1597, teams: ["ALT", "CBL", "CIN", "LAD", "STL"] },
       { name: "Bill Virdon", value: 1596, teams: ["PIT", "STL"] },
+      { name: "George Springer", value: 1595, teams: ["HOU", "TOR"] },
       { name: "Phil Garner", value: 1594, teams: ["HOU", "LAD", "OAK", "PIT", "SFG"] },
-      { name: "George Springer", value: 1594, teams: ["HOU", "TOR"] },
       { name: "Gregg Jefferies", value: 1593, teams: ["DET", "KC", "LAA", "NYM", "PHI", "STL"] },
       { name: "Jose Guillen", value: 1591, teams: ["ARI", "CIN", "KC", "LAA", "MON/WAS", "OAK", "PIT", "SEA", "SFG", "TB"] },
       { name: "Hughie Critz", value: 1591, teams: ["CIN", "SFG"] },
@@ -1866,7 +2207,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Brian Roberts", value: 1527, teams: ["BAL", "NYY"] },
       { name: "Hughie Jennings", value: 1526, teams: ["BLO", "DET", "LAD", "LOU", "PHI"] },
       { name: "Dots Miller", value: 1526, teams: ["PHI", "PIT", "STL"] },
-      { name: "Eugenio Suarez", value: 1525, teams: ["ARI", "CIN", "DET", "SEA"] },
+      { name: "Eugenio Suarez", value: 1526, teams: ["ARI", "CIN", "DET", "SEA"] },
       { name: "Jose Vidro", value: 1524, teams: ["MON/WAS", "SEA"] },
       { name: "Lou Bierbauer", value: 1524, teams: ["BWW", "PHQ", "PIT", "STL"] },
       { name: "Michael Cuddyer", value: 1522, teams: ["COL", "MIN", "NYM"] },
@@ -1947,10 +2288,12 @@ const CATEGORIES_BASEBALL = {
       { name: "Johnny Pesky", value: 1455, teams: ["BOS", "DET", "MIN"] },
       { name: "Red Kress", value: 1454, teams: ["BAL", "CHW", "DET", "MIN", "SFG"] },
       { name: "Brian Jordan", value: 1454, teams: ["ATL", "LAD", "STL", "TEX"] },
+      { name: "Roy Smalley", value: 1454, teams: ["CHW", "MIN", "NYY", "TEX"] },
       { name: "Terry Steinbach", value: 1453, teams: ["MIN", "OAK"] },
       { name: "Jose Vizcaino", value: 1453, teams: ["CHC", "CLE", "HOU", "LAD", "NYM", "NYY", "SFG", "STL"] },
       { name: "Adam LaRoche", value: 1452, teams: ["ARI", "ATL", "BOS", "CHW", "MON/WAS", "PIT"] },
       { name: "Ralph Kiner", value: 1451, teams: ["CHC", "CLE", "PIT"] },
+      { name: "J.T. Realmuto", value: 1451, teams: ["MIA", "PHI"] },
       { name: "Tom Herr", value: 1450, teams: ["MIN", "NYM", "PHI", "SFG", "STL"] },
       { name: "Marty Marion", value: 1448, teams: ["BAL", "STL"] },
       { name: "Deron Johnson", value: 1447, teams: ["ATL", "BOS", "CHW", "CIN", "MIL", "NYY", "OAK", "PHI"] },
@@ -1961,13 +2304,441 @@ const CATEGORIES_BASEBALL = {
       { name: "Jerry Mumphrey", value: 1442, teams: ["CHC", "HOU", "NYY", "SDP", "STL"] },
       { name: "Greg Gagne", value: 1440, teams: ["KC", "LAD", "MIN"] },
       { name: "Howie Shanks", value: 1440, teams: ["BOS", "MIN", "NYY"] },
+      { name: "Jimmy Wolf", value: 1440, teams: ["LOU", "STL"] },
       { name: "Kevin McReynolds", value: 1439, teams: ["KC", "NYM", "SDP"] },
       { name: "Chicken Wolf", value: 1439, teams: ["LOU", "STL"] },
       { name: "J. D. Drew", value: 1437, teams: ["ATL", "BOS", "LAD", "STL"] },
       { name: "David DeJesus", value: 1434, teams: ["CHC", "KC", "LAA", "MON/WAS", "OAK", "TB"] },
+      { name: "Ian Desmond", value: 1432, teams: ["COL", "MON/WAS", "TEX"] },
+      { name: "Carlos Gonzalez", value: 1432, teams: ["CHC", "CLE", "COL", "OAK"] },
+      { name: "Bobby Richardson", value: 1432, teams: ["NYY"] },
+      { name: "Rafael Ramirez", value: 1432, teams: ["ATL", "HOU"] },
+      { name: "Eric Davis", value: 1430, teams: ["BAL", "CIN", "DET", "LAD", "SFG", "STL"] },
+      { name: "Henry Larkin", value: 1429, teams: ["CLI", "MON/WAS", "PHQ"] },
+      { name: "Ron Hunt", value: 1429, teams: ["LAD", "MON/WAS", "NYM", "SFG", "STL"] },
+      { name: "Roy Campanella", value: 1428, teams: ["LAD"] },
+      { name: "Omar Infante", value: 1427, teams: ["ATL", "DET", "KC", "MIA"] },
+      { name: "Vince Coleman", value: 1425, teams: ["CIN", "DET", "KC", "NYM", "SEA", "STL"] },
+      { name: "James Loney", value: 1425, teams: ["BOS", "LAD", "NYM", "TB"] },
+      { name: "Hank Bauer", value: 1424, teams: ["NYY", "OAK"] },
+      { name: "Tillie Walker", value: 1423, teams: ["BAL", "BOS", "MIN", "OAK"] },
+      { name: "Al Bumbry", value: 1422, teams: ["BAL", "SDP"] },
+      { name: "Pete O'Brien", value: 1421, teams: ["CLE", "SEA", "TEX"] },
+      { name: "Kurt Suzuki", value: 1421, teams: ["ATL", "LAA", "MIN", "MON/WAS", "OAK"] },
+      { name: "Elmer Valo", value: 1420, teams: ["CLE", "LAD", "MIN", "NYY", "OAK", "PHI"] },
+      { name: "Alex Gonzalez (1977)", value: 1419, teams: ["ATL", "BOS", "CIN", "DET", "MIA", "MIL", "TOR"] },
+      { name: "Amos Strunk", value: 1418, teams: ["BOS", "CHW", "OAK"] },
+      { name: "Ed Kranepool", value: 1418, teams: ["NYM"] },
+      { name: "Jack O'Connor", value: 1417, teams: ["BAL", "CIN", "CLS", "CLV", "MIN", "MON/WAS", "NYY", "PIT", "STL"] },
+      { name: "Luis Polonia", value: 1417, teams: ["ATL", "BAL", "DET", "LAA", "NYY", "OAK"] },
+      { name: "Russell Martin", value: 1416, teams: ["LAD", "NYY", "PIT", "TOR"] },
+      { name: "George Case", value: 1415, teams: ["CLE", "MIN"] },
+      { name: "Sid Gordon", value: 1415, teams: ["ATL", "PIT", "SFG"] },
+      { name: "Sherm Lollar", value: 1415, teams: ["BAL", "CHW", "CLE", "NYY"] },
+      { name: "Frank Bolling", value: 1415, teams: ["ATL", "DET"] },
+      { name: "David Eckstein", value: 1414, teams: ["ARI", "LAA", "SDP", "STL", "TOR"] },
+      { name: "Ketel Marte", value: 1413, teams: ["ARI"] },
+      { name: "David Segui", value: 1412, teams: ["BAL", "CLE", "MON/WAS", "NYM", "SEA", "TEX", "TOR"] },
+      { name: "Alex Bregman", value: 1411, teams: ["BOS", "HOU"] },
+      { name: "Johnny Logan", value: 1407, teams: ["ATL", "PIT"] },
+      { name: "Brandon Crawford", value: 1404, teams: ["SFG", "STL"] },
+      { name: "Von Hayes", value: 1402, teams: ["CLE", "LAA", "PHI"] },
+      { name: "Erick Aybar", value: 1402, teams: ["ATL", "DET", "LAA", "SDP"] },
       { name: "Darryl Strawberry", value: 1401, teams: ["LAD", "NYM", "NYY", "SFG"] },
+      { name: "John Titus", value: 1401, teams: ["ATL", "PHI"] },
+      { name: "Rick Burleson", value: 1401, teams: ["BAL", "BOS", "LAA", "OAK"] },
+      { name: "Mike Greenwell", value: 1400, teams: ["BOS"] },
+      { name: "Wally Moon", value: 1399, teams: ["LAD", "STL"] },
+      { name: "Mookie Wilson", value: 1397, teams: ["NYM", "TOR"] },
+      { name: "Clete Boyer", value: 1396, teams: ["ATL", "NYY", "OAK"] },
+      { name: "Kyle Seager", value: 1395, teams: ["SEA"] },
+      { name: "Tito Francona", value: 1395, teams: ["ATL", "BAL", "CHW", "CLE", "DET", "MIL", "PHI", "STL"] },
+      { name: "Red Rolfe", value: 1394, teams: ["NYY"] },
+      { name: "Pat Burrell", value: 1393, teams: ["PHI", "SFG", "TB"] },
+      { name: "Luke Sewell", value: 1393, teams: ["BAL", "CHW", "CLE", "MIN"] },
+      { name: "John Stone", value: 1391, teams: ["DET", "MIN"] },
+      { name: "Troy Tulowitzki", value: 1391, teams: ["COL", "NYY", "TOR"] },
+      { name: "Roberto Kelly", value: 1390, teams: ["ATL", "CIN", "LAD", "MIN", "MON/WAS", "NYY", "SEA", "TEX"] },
+      { name: "Oyster Burns", value: 1389, teams: ["BLO", "LAD", "SFG", "WIL"] },
+      { name: "Dmitri Young", value: 1389, teams: ["CIN", "DET", "MON/WAS", "STL"] },
+      { name: "Wilbert Robinson", value: 1388, teams: ["BLO", "NYY", "PHQ", "STL"] },
+      { name: "Alexei Ramirez", value: 1387, teams: ["CHW", "SDP", "TB"] },
+      { name: "Damion Easley", value: 1386, teams: ["ARI", "DET", "LAA", "MIA", "NYM", "TB"] },
+      { name: "Tip O'Neill", value: 1386, teams: ["CHP", "CIN", "SFG", "STL"] },
+      { name: "Tommy Griffith", value: 1383, teams: ["ATL", "CIN", "LAD"] },
+      { name: "Bruce Campbell", value: 1382, teams: ["BAL", "CHW", "CLE", "DET", "MIN"] },
+      { name: "George Stovall", value: 1382, teams: ["BAL", "CLE", "KCP"] },
+      { name: "Hy Myers", value: 1380, teams: ["ATL", "CIN", "LAD", "STL"] },
       { name: "Otis Nixon", value: 1379, teams: ["ATL", "BOS", "CLE", "LAD", "MIN", "MON/WAS", "NYY", "TEX", "TOR"] },
+      { name: "Charlie Hayes", value: 1379, teams: ["COL", "HOU", "MIL", "NYY", "PHI", "PIT", "SFG"] },
+      { name: "John Mayberry", value: 1379, teams: ["HOU", "KC", "NYM", "NYY", "PHI", "TOR"] },
+      { name: "Candy LaChance", value: 1377, teams: ["BLO", "BOS", "CLE", "LAD"] },
+      { name: "Ronnie Belliard", value: 1377, teams: ["CLE", "LAD", "MIL", "MON/WAS", "STL"] },
+      { name: "Mickey Doolin", value: 1376, teams: ["BLT", "CHC", "CHH", "LAD", "PHI", "SFG"] },
+      { name: "Jacoby Ellsbury", value: 1376, teams: ["BOS", "NYY"] },
+      { name: "Scott Fletcher", value: 1376, teams: ["BOS", "CHC", "CHW", "DET", "MIL", "TEX"] },
+      { name: "Troy Glaus", value: 1375, teams: ["ARI", "ATL", "LAA", "STL", "TOR"] },
+      { name: "Billy Rogell", value: 1375, teams: ["BOS", "CHC", "DET"] },
+      { name: "Jeff Francoeur", value: 1373, teams: ["ATL", "KC", "MIA", "NYM", "PHI", "SDP", "SFG", "TEX"] },
+      { name: "Buck Herzog", value: 1370, teams: ["ATL", "CHC", "CIN", "SFG"] },
+      { name: "Neifi Perez", value: 1370, teams: ["CHC", "COL", "DET", "KC", "SFG"] },
+      { name: "Darrell Porter", value: 1369, teams: ["KC", "MIL", "STL", "TEX"] },
+      { name: "Andre Ethier", value: 1367, teams: ["LAD"] },
+      { name: "Bill Doran", value: 1366, teams: ["CIN", "CLE", "HOU", "MIL"] },
+      { name: "Matt Stairs", value: 1366, teams: ["BOS", "CHC", "DET", "KC", "MIL", "MON/WAS", "OAK", "PHI", "PIT", "SDP", "TEX", "TOR"] },
+      { name: "Danny Tartabull", value: 1366, teams: ["CHW", "KC", "NYY", "OAK", "PHI", "SEA"] },
+      { name: "Don Blasingame", value: 1366, teams: ["BAL", "CIN", "OAK", "SFG", "STL", "TEX"] },
+      { name: "Monte Cross", value: 1364, teams: ["BLO", "OAK", "PHI", "PIT", "STL"] },
+      { name: "Billy Werber", value: 1363, teams: ["BOS", "CIN", "NYY", "OAK", "SFG"] },
+      { name: "Terry Puhl", value: 1361, teams: ["HOU", "KC"] },
+      { name: "Rafael Devers", value: 1359, teams: ["BOS", "SFG"] },
+      { name: "Bill Wambsganss", value: 1359, teams: ["BOS", "CLE", "OAK"] },
+      { name: "Stan Javier", value: 1358, teams: ["HOU", "LAA", "LAD", "NYY", "OAK", "PHI", "SEA", "SFG"] },
+      { name: "Jimmie Wilson", value: 1358, teams: ["CIN", "PHI", "STL"] },
+      { name: "Carl Reynolds", value: 1357, teams: ["BAL", "BOS", "CHC", "CHW", "MIN"] },
+      { name: "Woody English", value: 1356, teams: ["CHC", "LAD"] },
+      { name: "Lyle Overbay", value: 1355, teams: ["ARI", "ATL", "MIL", "NYY", "PIT", "TOR"] },
+      { name: "Ed Brinkman", value: 1355, teams: ["DET", "NYY", "STL", "TEX"] },
+      { name: "Marco Scutaro", value: 1355, teams: ["BOS", "CLE", "COL", "NYM", "OAK", "SFG", "TOR"] },
+      { name: "Ken Oberkfell", value: 1354, teams: ["ATL", "HOU", "LAA", "PIT", "SFG", "STL"] },
+      { name: "Tony Womack", value: 1353, teams: ["ARI", "CHC", "CIN", "COL", "NYY", "PIT", "STL"] },
+      { name: "Rico Petrocelli", value: 1352, teams: ["BOS"] },
+      { name: "John Reilly", value: 1352, teams: ["CIN", "CNR"] },
+      { name: "Kitty Bransfield", value: 1351, teams: ["ATL", "CHC", "PHI", "PIT"] },
+      { name: "Rick Manning", value: 1349, teams: ["CLE", "MIL"] },
+      { name: "Jose Valentin", value: 1348, teams: ["CHW", "LAD", "MIL", "NYM"] },
+      { name: "Ramon Hernandez", value: 1345, teams: ["ATL", "BAL", "BOS", "CHC", "CIN", "COL", "LAD", "OAK", "PIT", "SDP"] },
+      { name: "Doggie Miller", value: 1345, teams: ["LOU", "PIT", "STL"] },
+      { name: "Ray Schalk", value: 1345, teams: ["CHW", "SFG"] },
+      { name: "Del Unser", value: 1344, teams: ["CLE", "MON/WAS", "PHI", "TEX"] },
+      { name: "Fred Luderus", value: 1344, teams: ["CHC", "PHI"] },
+      { name: "Mark Ellis", value: 1343, teams: ["COL", "LAD", "OAK", "STL"] },
+      { name: "Jeffrey Leonard", value: 1342, teams: ["HOU", "LAD", "MIL", "SEA", "SFG"] },
+      { name: "Andre Thornton", value: 1342, teams: ["CHC", "CLE", "MON/WAS"] },
+      { name: "Tommy Helms", value: 1342, teams: ["BOS", "CIN", "HOU", "PIT"] },
+      { name: "Walker Cooper", value: 1341, teams: ["ATL", "CHC", "CIN", "PIT", "SFG", "STL"] },
+      { name: "Corey Seager", value: 1341, teams: ["LAD", "TEX"] },
+      { name: "Freddie Patek", value: 1340, teams: ["KC", "LAA", "PIT"] },
+      { name: "Earl Sheely", value: 1340, teams: ["ATL", "CHW", "PIT"] },
+      { name: "Jimmy Slagle", value: 1340, teams: ["ATL", "CHC", "MON/WAS", "PHI"] },
+      { name: "Eddie Joost", value: 1339, teams: ["ATL", "BOS", "CIN", "OAK"] },
+      { name: "Burt Shotton", value: 1338, teams: ["BAL", "MIN", "STL"] },
+      { name: "Nick Swisher", value: 1338, teams: ["ATL", "CHW", "CLE", "NYY", "OAK"] },
+      { name: "Chase Headley", value: 1337, teams: ["NYY", "SDP"] },
+      { name: "Topsy Hartsel", value: 1336, teams: ["CHC", "CIN", "LOU", "OAK"] },
+      { name: "Bobby Higginson", value: 1336, teams: ["DET"] },
+      { name: "Brian McRae", value: 1336, teams: ["CHC", "COL", "KC", "NYM", "TOR"] },
+      { name: "Dave Collins", value: 1335, teams: ["CIN", "DET", "LAA", "NYY", "OAK", "SEA", "STL", "TOR"] },
+      { name: "Gerardo Parra", value: 1335, teams: ["ARI", "BAL", "COL", "MIL", "MON/WAS", "SFG"] },
+      { name: "Larry Herndon", value: 1334, teams: ["DET", "PHI", "SFG"] },
+      { name: "Darryl Hamilton", value: 1333, teams: ["COL", "MIL", "NYM", "SFG", "TEX"] },
+      { name: "Denny Lyons", value: 1333, teams: ["PHQ", "PIT", "PRO", "SFG", "STL"] },
+      { name: "Carlos Correa", value: 1332, teams: ["HOU", "MIN"] },
+      { name: "Les Mann", value: 1332, teams: ["ATL", "CHC", "CHH", "CIN", "SFG", "STL"] },
+      { name: "Bones Ely", value: 1331, teams: ["BUF", "LAD", "LOU", "MIN", "OAK", "PIT", "STL", "SYS"] },
+      { name: "Carlos Guillen", value: 1331, teams: ["DET", "HOU", "SEA"] },
+      { name: "Alex Johnson", value: 1331, teams: ["CIN", "CLE", "DET", "LAA", "NYY", "PHI", "STL", "TEX"] },
+      { name: "Sam Chapman", value: 1329, teams: ["CLE", "OAK"] },
+      { name: "Lou Finney", value: 1329, teams: ["BAL", "BOS", "OAK", "PHI"] },
+      { name: "Jimmy Austin", value: 1328, teams: ["BAL", "NYY"] },
+      { name: "Roger Maris", value: 1325, teams: ["CLE", "NYY", "OAK", "STL"] },
+      { name: "Ethan Allen", value: 1325, teams: ["BAL", "CHC", "CIN", "PHI", "SFG", "STL"] },
+      { name: "Dave Henderson", value: 1324, teams: ["BOS", "KC", "OAK", "SEA", "SFG"] },
+      { name: "Elbie Fletcher", value: 1323, teams: ["ATL", "PIT"] },
+      { name: "Mike Kreevich", value: 1321, teams: ["BAL", "CHC", "CHW", "MIN", "OAK"] },
+      { name: "Rollie Hemsley", value: 1321, teams: ["BAL", "CHC", "CIN", "CLE", "NYY", "PHI", "PIT"] },
+      { name: "Leo Durocher", value: 1320, teams: ["CIN", "LAD", "NYY", "STL"] },
+      { name: "Orlando Hudson", value: 1319, teams: ["ARI", "CHW", "LAD", "MIN", "SDP", "TOR"] },
+      { name: "Smoky Burgess", value: 1318, teams: ["CHC", "CHW", "CIN", "PHI", "PIT"] },
+      { name: "Earl Torgeson", value: 1318, teams: ["ATL", "CHW", "DET", "NYY", "PHI"] },
+      { name: "Terry Moore", value: 1318, teams: ["STL"] },
+      { name: "Bengie Molina", value: 1317, teams: ["LAA", "SFG", "TEX", "TOR"] },
+      { name: "Rey Sanchez", value: 1317, teams: ["ATL", "BOS", "CHC", "KC", "NYM", "NYY", "SEA", "SFG", "TB"] },
+      { name: "Mark Belanger", value: 1316, teams: ["BAL", "LAD"] },
+      { name: "Todd Walker", value: 1316, teams: ["BOS", "CHC", "CIN", "COL", "MIA", "OAK", "SDP"] },
+      { name: "Ski Melillo", value: 1316, teams: ["BAL", "BOS"] },
+      { name: "Joe Pepitone", value: 1315, teams: ["ATL", "CHC", "HOU", "NYY"] },
+      { name: "Jerry Lumpe", value: 1314, teams: ["DET", "NYY", "OAK"] },
+      { name: "Cecil Fielder", value: 1313, teams: ["CLE", "DET", "LAA", "NYY", "TOR"] },
+      { name: "Terry Kennedy", value: 1313, teams: ["BAL", "SDP", "SFG", "STL"] },
+      { name: "Matt Olson", value: 1312, teams: ["ATL", "OAK"] },
+      { name: "Spud Davis", value: 1312, teams: ["CIN", "LAD", "PHI", "PIT", "STL"] },
+      { name: "Ray Knight", value: 1311, teams: ["BAL", "CIN", "DET", "HOU", "NYM"] },
+      { name: "Ted Sizemore", value: 1311, teams: ["BOS", "CHC", "LAD", "PHI", "STL"] },
+      { name: "Josh Donaldson", value: 1310, teams: ["ATL", "CLE", "MIN", "OAK", "TOR"] },
+      { name: "Dick Hoblitzell", value: 1310, teams: ["BOS", "CIN"] },
+      { name: "John McGraw", value: 1309, teams: ["BLO", "NYY", "SFG", "STL"] },
+      { name: "Wally Gerber", value: 1309, teams: ["BAL", "BOS", "PIT"] },
+      { name: "Buck Weaver", value: 1308, teams: ["CHW"] },
+      { name: "Kevin Bass", value: 1308, teams: ["BAL", "HOU", "MIL", "NYM", "SFG"] },
+      { name: "Tom Burns", value: 1307, teams: ["CHC", "PIT"] },
+      { name: "Jason Varitek", value: 1307, teams: ["BOS"] },
+      { name: "Dexter Fowler", value: 1306, teams: ["CHC", "COL", "HOU", "LAA", "STL"] },
+      { name: "Freddy Parent", value: 1306, teams: ["BOS", "CHW", "STL"] },
+      { name: "Carl Everett", value: 1304, teams: ["BOS", "CHW", "HOU", "MIA", "MON/WAS", "NYM", "SEA", "TEX"] },
+      { name: "Lee Lacy", value: 1303, teams: ["ATL", "BAL", "LAD", "PIT"] },
+      { name: "Tony Armas", value: 1302, teams: ["BOS", "LAA", "MON/WAS", "NYM", "OAK", "PIT"] },
+      { name: "Doug Rader", value: 1302, teams: ["HOU", "SDP", "TOR"] },
+      { name: "Josh Bell", value: 1301, teams: ["CLE", "MIA", "MON/WAS", "PIT", "SDP"] },
+      { name: "Jack Smith", value: 1301, teams: ["BOS", "STL"] },
+      { name: "Barney McCosky", value: 1301, teams: ["CIN", "CLE", "DET", "OAK"] },
+      { name: "Lenny Dykstra", value: 1298, teams: ["NYM", "PHI"] },
+      { name: "Chone Figgins", value: 1298, teams: ["LAA", "LAD", "SEA"] },
+      { name: "Bucky Harris", value: 1297, teams: ["DET", "MIN"] },
+      { name: "Tommy Henrich", value: 1297, teams: ["NYY"] },
+      { name: "Billy Southworth", value: 1296, teams: ["ATL", "CLE", "PIT", "SFG", "STL"] },
+      { name: "Bobby Avila", value: 1296, teams: ["ATL", "BAL", "BOS", "CLE"] },
+      { name: "Patsy Dougherty", value: 1294, teams: ["BOS", "CHW", "NYY"] },
+      { name: "Jack Wilson", value: 1294, teams: ["ATL", "PIT", "SEA"] },
+      { name: "Geoff Jenkins", value: 1293, teams: ["MIL", "PHI"] },
+      { name: "Don Mueller", value: 1292, teams: ["CHC", "SFG"] },
+      { name: "Roy Johnson", value: 1292, teams: ["ATL", "BOS", "DET", "NYY"] },
+      { name: "Gil McDougald", value: 1291, teams: ["NYY"] },
+      { name: "Kendrys Morales", value: 1289, teams: ["KC", "LAA", "MIN", "NYY", "OAK", "SEA", "TOR"] },
+      { name: "Ned Hanlon", value: 1287, teams: ["BLO", "CBL", "DTN", "PBB", "PIT"] },
+      { name: "Richie Sexson", value: 1286, teams: ["ARI", "CLE", "MIL", "NYY", "SEA"] },
+      { name: "Patsy Tebeau", value: 1286, teams: ["CHC", "CLI", "CLV", "STL"] },
+      { name: "Jerry Denny", value: 1286, teams: ["CLV", "IND", "LOU", "PHI", "PRO", "SFG", "SLM"] },
+      { name: "Kevin Millar", value: 1284, teams: ["BAL", "BOS", "MIA", "TOR"] },
+      { name: "Ron LeFlore", value: 1283, teams: ["CHW", "DET", "MON/WAS"] },
+      { name: "Mark Reynolds", value: 1283, teams: ["ARI", "BAL", "CLE", "COL", "MIL", "MON/WAS", "NYY", "STL"] },
+      { name: "Mike Donlin", value: 1282, teams: ["ATL", "CIN", "NYY", "PIT", "SFG", "STL"] },
+      { name: "Bob Allison", value: 1281, teams: ["MIN"] },
+      { name: "Julio Lugo", value: 1279, teams: ["ATL", "BAL", "BOS", "HOU", "LAD", "STL", "TB"] },
+      { name: "Keith Moreland", value: 1279, teams: ["BAL", "CHC", "DET", "PHI", "SDP"] },
+      { name: "Pablo Sandoval", value: 1279, teams: ["ATL", "BOS", "SFG"] },
+      { name: "Hank Sauer", value: 1278, teams: ["CHC", "CIN", "SFG", "STL"] },
+      { name: "Walter Holke", value: 1278, teams: ["ATL", "CIN", "PHI", "PIT", "SFG"] },
+      { name: "Dansby Swanson", value: 1277, teams: ["ATL", "CHC"] },
+      { name: "Del Crandall", value: 1276, teams: ["ATL", "CLE", "PIT", "SFG"] },
+      { name: "Shane Victorino", value: 1274, teams: ["BOS", "LAA", "LAD", "PHI", "SDP"] },
+      { name: "Juan Beniquez", value: 1274, teams: ["BAL", "BOS", "KC", "LAA", "NYY", "SEA", "TEX", "TOR"] },
+      { name: "Jay Buhner", value: 1273, teams: ["NYY", "SEA"] },
+      { name: "Frank Chance", value: 1273, teams: ["CHC", "NYY"] },
+      { name: "Donn Clendenon", value: 1273, teams: ["MON/WAS", "NYM", "PIT", "STL"] },
+      { name: "Matt Lawton", value: 1273, teams: ["CHC", "CLE", "MIN", "NYM", "NYY", "PIT", "SEA"] },
+      { name: "Ken McMullen", value: 1273, teams: ["LAA", "LAD", "MIL", "OAK", "TEX"] },
+      { name: "Michael Bourn", value: 1272, teams: ["ARI", "ATL", "BAL", "CLE", "HOU", "PHI"] },
+      { name: "Jacque Jones", value: 1272, teams: ["CHC", "DET", "MIA", "MIN"] },
+      { name: "Denis Menke", value: 1270, teams: ["ATL", "CIN", "HOU"] },
+      { name: "Eddie Miller", value: 1270, teams: ["ATL", "CHC", "CIN", "LAD", "PHI", "SFG"] },
+      { name: "Hod Ford", value: 1269, teams: ["ATL", "CIN", "LAD", "PHI", "STL"] },
+      { name: "Rube Oldring", value: 1268, teams: ["NYY", "OAK"] },
+      { name: "Pete Suder", value: 1268, teams: ["OAK"] },
+      { name: "Rip Radcliff", value: 1267, teams: ["BAL", "CHW", "DET"] },
+      { name: "Juan Encarnacion", value: 1264, teams: ["CIN", "DET", "LAD", "MIA", "STL"] },
+      { name: "Derek Bell", value: 1262, teams: ["HOU", "NYM", "PIT", "SDP", "TOR"] },
+      { name: "Aaron Judge", value: 1262, teams: ["NYY"] },
+      { name: "Johnny Hopp", value: 1262, teams: ["ATL", "DET", "LAD", "NYY", "PIT", "STL"] },
+      { name: "Ray Boone", value: 1260, teams: ["ATL", "BOS", "CHW", "CLE", "DET", "OAK"] },
+      { name: "B. J. Upton", value: 1260, teams: ["ATL", "SDP", "TB", "TOR"] },
+      { name: "Steve O'Neill", value: 1259, teams: ["BAL", "BOS", "CLE", "NYY"] },
+      { name: "Matt Carpenter", value: 1257, teams: ["STL"] },
+      { name: "Wid Conroy", value: 1257, teams: ["BAL", "MIN", "NYY", "PIT"] },
+      { name: "Omar Moreno", value: 1257, teams: ["ATL", "HOU", "KC", "NYY", "PIT"] },
+      { name: "Mule Haas", value: 1257, teams: ["CHW", "OAK", "PIT"] },
+      { name: "Jim Northrup", value: 1254, teams: ["BAL", "DET", "MON/WAS"] },
+      { name: "Jay Johnstone", value: 1254, teams: ["CHC", "CHW", "LAA", "LAD", "NYY", "OAK", "PHI", "SDP"] },
+      { name: "Dave Foutz", value: 1253, teams: ["LAD", "STL"] },
+      { name: "Hideki Matsui", value: 1253, teams: ["LAA", "NYY", "OAK", "TB"] },
+      { name: "Jason Thompson", value: 1253, teams: ["DET", "LAA", "MON/WAS", "PIT", "SDP"] },
+      { name: "Roger Bresnahan", value: 1252, teams: ["CHC", "MON/WAS", "NYY", "SFG", "STL"] },
+      { name: "Davey Johnson", value: 1252, teams: ["ATL", "BAL", "CHC", "PHI"] },
+      { name: "Hans Lobert", value: 1252, teams: ["CHC", "CIN", "PHI", "PIT", "SFG"] },
+      { name: "Mike Moustakas", value: 1252, teams: ["CIN", "KC", "MIL"] },
+      { name: "Jerry Priddy", value: 1252, teams: ["BAL", "DET", "MIN", "NYY"] },
+      { name: "Javier Baez", value: 1251, teams: ["CHC", "DET", "NYM"] },
+      { name: "Hector Lopez", value: 1251, teams: ["NYY", "OAK"] },
+      { name: "Andy High", value: 1250, teams: ["ATL", "CIN", "LAD", "PHI", "STL"] },
+      { name: "Whit Merrifield", value: 1248, teams: ["ATL", "KC", "PHI", "TOR"] },
+      { name: "Mariano Duncan", value: 1247, teams: ["CIN", "LAD", "NYY", "PHI", "TOR"] },
+      { name: "Adam Lind", value: 1247, teams: ["MIL", "MON/WAS", "SEA", "TOR"] },
+      { name: "Chief Wilson", value: 1246, teams: ["PIT", "STL"] },
+      { name: "Zoilo Versalles", value: 1246, teams: ["ATL", "CLE", "LAD", "MIN"] },
+      { name: "Sam Wise", value: 1245, teams: ["ATL", "BFB", "BLO", "DTN", "MON/WAS", "WNL"] },
+      { name: "Hank Severeid", value: 1245, teams: ["BAL", "CIN", "MIN", "NYY"] },
+      { name: "Dale Mitchell", value: 1244, teams: ["CLE", "LAD"] },
+      { name: "Mickey Stanley", value: 1243, teams: ["DET"] },
+      { name: "Ken Reitz", value: 1243, teams: ["CHC", "PIT", "SFG", "STL"] },
+      { name: "Muddy Ruel", value: 1242, teams: ["BAL", "BOS", "CHW", "DET", "MIN", "NYY"] },
+      { name: "Andrew Benintendi", value: 1236, teams: ["BOS", "CHW", "KC", "NYY"] },
+      { name: "Ken Henderson", value: 1226, teams: ["ATL", "CHC", "CIN", "NYY", "SFG", "TEX"] },
+      { name: "Sandy Alomar Jr.", value: 1208, teams: ["CHW", "CLE", "COL", "MIA", "TEX"] },
+      { name: "Dan Ford", value: 1190, teams: ["BAL", "LAA", "OAK", "TEX"] },
+      { name: "Robby Thompson", value: 1186, teams: ["SFG"] },
+      { name: "David Bell", value: 1184, teams: ["CHC", "CLE", "MIL", "PHI", "SEA", "SFG", "STL"] },
+      { name: "Frankie Hayes", value: 1184, teams: ["BOS", "CHW", "CLE", "OAK"] },
+      { name: "David Peralta", value: 1166, teams: ["ARI", "LAD", "SDP", "TB"] },
+      { name: "Chuck Hinton", value: 1162, teams: ["CIN", "CLE", "LAA", "TEX"] },
+      { name: "Bob Skinner", value: 1159, teams: ["CIN", "PHI", "PIT", "STL"] },
+      { name: "Brook Jacoby", value: 1153, teams: ["BAL", "CLE"] },
+      { name: "Johnny Roseboro", value: 1148, teams: ["LAD", "MIN", "TEX"] },
+      { name: "Jason Kipnis", value: 1147, teams: ["CHC", "CLE"] },
+      { name: "Jeff Blauser", value: 1141, teams: ["ATL", "CHC"] },
+      { name: "Jackie Brandt", value: 1139, teams: ["BAL", "HOU", "PHI", "SFG", "STL"] },
+      { name: "Mike Easler", value: 1078, teams: ["BOS", "HOU", "LAA", "NYY", "PHI", "PIT"] },
+      { name: "Monte Irvin", value: 1076, teams: ["CHC", "NWE", "SFG"] },
+      { name: "Bernard Gilkey", value: 1061, teams: ["ARI", "ATL", "BOS", "NYM", "STL"] },
+      { name: "Rusty Greer", value: 1045, teams: ["TEX"] },
+      { name: "Delmon Young", value: 1045, teams: ["BAL", "DET", "MIN", "PHI", "TB"] },
+      { name: "Danny Litwhiler", value: 1042, teams: ["BAL", "BOS", "CIN", "PHI"] },
+      { name: "Ron Hansen", value: 1041, teams: ["BAL", "CHW", "NYY", "TEX"] },
+      { name: "Johnny Briggs", value: 1041, teams: ["MIL", "MIN", "PHI"] },
+      { name: "Jed Lowrie", value: 1040, teams: ["BOS", "HOU", "NYM", "OAK"] },
+      { name: "Jonathan Lucroy", value: 1032, teams: ["BOS", "CHC", "COL", "LAA", "MIL", "OAK", "TEX"] },
+      { name: "George Selkirk", value: 1021, teams: ["NYY"] },
+      { name: "Bob Nieman", value: 1018, teams: ["BAL", "CHW", "CLE", "DET", "SFG", "STL"] },
+      { name: "Mike Devereaux", value: 1018, teams: ["ATL", "BAL", "CHC", "LAD", "TEX"] },
+      { name: "Aaron Boone", value: 1017, teams: ["CIN", "CLE", "HOU", "MIA", "MON/WAS", "NYY"] },
+      { name: "Wil Cordero", value: 1009, teams: ["BOS", "CHW", "CLE", "MIA", "MON/WAS", "PIT"] },
+      { name: "Michael Tucker", value: 1004, teams: ["ATL", "CHC", "CIN", "KC", "NYM", "PHI", "SFG"] },
+      { name: "Jurickson Profar", value: 995, teams: ["ATL", "COL", "OAK", "SDP", "TEX"] },
+      { name: "John Valentin", value: 994, teams: ["BOS", "NYM"] },
+      { name: "Ellis Valentine", value: 993, teams: ["LAA", "MON/WAS", "NYM", "TEX"] },
+      { name: "Willie Upshaw", value: 985, teams: ["CLE", "TOR"] },
+      { name: "Randy Jackson", value: 985, teams: ["CHC", "CHW", "LAA", "STL"] },
+      { name: "Milton Bradley", value: 976, teams: ["CHC", "CLE", "LAD", "MON/WAS", "OAK", "SDP", "SEA", "TEX"] },
+      { name: "Miguel Montero", value: 973, teams: ["ARI", "CHC", "MON/WAS", "TOR"] },
+      { name: "Darrin Fletcher", value: 967, teams: ["LAD", "MON/WAS", "TOR"] },
+      { name: "Vince DiMaggio", value: 959, teams: ["ATL", "CIN", "PHI", "PIT"] },
+      { name: "Rick Reichardt", value: 954, teams: ["KC", "LAA", "MIL"] },
+      { name: "Wally Westlake", value: 948, teams: ["BAL", "CIN", "CLE", "PHI", "PIT", "STL"] },
+      { name: "Shea Hillenbrand", value: 948, teams: ["ARI", "BOS", "CHC", "LAA", "SFG", "TOR"] },
+      { name: "Lourdes Gurriel Jr.", value: 941, teams: ["ARI", "TOR"] },
+      { name: "Seth Smith", value: 934, teams: ["BAL", "COL", "OAK", "SDP", "SEA"] },
+      { name: "Earl Battey", value: 934, teams: ["BAL", "MIN"] },
+      { name: "Brad Hawpe", value: 933, teams: ["COL", "LAA", "SDP", "TB"] },
+      { name: "Kevin Pillar", value: 933, teams: ["ATL", "BOS", "CHC", "CHW", "COL", "LAA", "LAD", "NYM", "SFG", "TOR"] },
+      { name: "Whitey Kurowski", value: 933, teams: ["STL"] },
+      { name: "Yan Gomes", value: 923, teams: ["CHC", "CLE", "MON/WAS", "OAK", "TOR"] },
+      { name: "Orlando Merced", value: 918, teams: ["CHC", "CHW", "HOU", "KC", "MIN", "MON/WAS", "PIT"] },
+      { name: "John Lowenstein", value: 913, teams: ["BAL", "CLE", "TEX"] },
+      { name: "David Freese", value: 913, teams: ["LAA", "LAD", "PIT", "STL"] },
+      { name: "Gary Matthews Jr.", value: 913, teams: ["BAL", "CHC", "LAA", "NYM", "SDP", "SFG", "TEX"] },
+      { name: "Ivan Calderon", value: 913, teams: ["BOS", "CHW", "MON/WAS", "SEA"] },
+      { name: "Yandy Diaz", value: 904, teams: ["CLE", "TB"] },
+      { name: "Joe Ferguson", value: 903, teams: ["HOU", "LAA", "LAD", "OAK"] },
+      { name: "Jim Morrison", value: 903, teams: ["ATL", "CHW", "PHI", "PIT"] },
+      { name: "Freddy Galvis", value: 902, teams: ["BAL", "CIN", "PHI", "SDP", "TOR"] },
+      { name: "Marwin Gonzalez", value: 898, teams: ["BOS", "DET", "HOU", "MIN"] },
+      { name: "Enrique Hernandez", value: 897, teams: ["BOS", "HOU", "LAD", "MIA"] },
+      { name: "Chris Sabo", value: 896, teams: ["BAL", "CHW", "CIN", "STL"] },
+      { name: "Stephen Drew", value: 895, teams: ["ARI", "BOS", "MON/WAS", "NYY", "OAK"] },
+      { name: "Jay Payton", value: 895, teams: ["BAL", "BOS", "COL", "NYM", "OAK", "SDP"] },
+      { name: "Lee Thomas", value: 895, teams: ["ATL", "BOS", "CHC", "LAA", "STL"] },
+      { name: "Mark Canha", value: 877, teams: ["DET", "MIL", "NYM", "OAK", "SFG"] },
+      { name: "Lefty O'Doul", value: 875, teams: ["BOS", "LAD", "NYY", "PHI", "SFG"] },
+      { name: "Jimmie Hall", value: 871, teams: ["CLE", "LAA", "MIN", "NYY"] },
+      { name: "Greg Walker", value: 871, teams: ["BAL", "CHW"] },
+      { name: "Scott Hatteberg", value: 871, teams: ["BOS", "CIN", "OAK"] },
+      { name: "Corey Koskie", value: 868, teams: ["MIL", "MIN", "TOR"] },
+      { name: "Daryl Spencer", value: 868, teams: ["CIN", "LAD", "SFG", "STL"] },
+      { name: "David Murphy", value: 867, teams: ["BOS", "CLE", "LAA", "TEX"] },
+      { name: "Jim King", value: 864, teams: ["CHC", "CLE", "LAA", "PHI", "STL", "TEX"] },
+      { name: "Travis Lee", value: 861, teams: ["ARI", "DET", "NYY", "PHI", "TB"] },
+      { name: "Don Lock", value: 845, teams: ["BOS", "PHI", "TEX"] },
+      { name: "Marty Cordova", value: 845, teams: ["BAL", "CLE", "MIN", "TOR"] },
+      { name: "Chris Taylor", value: 838, teams: ["LAD", "SEA"] },
+      { name: "Bill Hall", value: 827, teams: ["BAL", "BOS", "HOU", "MIL", "SEA", "SFG"] },
+      { name: "Austin Kearns", value: 823, teams: ["CIN", "CLE", "MON/WAS", "NYY"] },
+      { name: "Stan Lopata", value: 823, teams: ["MIL", "PHI"] },
+      { name: "Rico Brogna", value: 823, teams: ["ATL", "BOS", "DET", "NYM", "PHI"] },
+      { name: "Mark Whiten", value: 821, teams: ["ATL", "BOS", "CLE", "PHI", "SEA", "STL", "TOR"] },
+      { name: "Chet Laabs", value: 813, teams: ["BAL", "DET"] },
+      { name: "Maikel Franco", value: 809, teams: ["BAL", "KC", "MON/WAS", "PHI"] },
+      { name: "Jackie Bradley Jr.", value: 808, teams: ["BAL", "BOS", "KC", "MIL", "TOR"] },
+      { name: "Travis d'Arnaud", value: 807, teams: ["ATL", "LAA", "LAD", "NYM", "TB"] },
+      { name: "Trey Mancini", value: 805, teams: ["BAL", "CHC", "HOU", "LAA"] },
+      { name: "Brad Wilkerson", value: 805, teams: ["MON/WAS", "SEA", "TEX", "TOR"] },
+      { name: "Julio Rodriguez", value: 801, teams: ["SEA"] },
+      { name: "Scott Spiezio", value: 800, teams: ["LAA", "OAK", "SEA", "STL"] },
+      { name: "Greg Brock", value: 798, teams: ["LAD", "MIL"] },
+      { name: "Max Alvis", value: 797, teams: ["CLE", "MIL"] },
+      { name: "Jeimer Candelario", value: 796, teams: ["CHC", "CIN", "DET", "MON/WAS"] },
+      { name: "Ben Grieve", value: 794, teams: ["CHC", "MIL", "OAK", "TB"] },
+      { name: "Jerry Lynch", value: 794, teams: ["CIN", "LAD", "PIT"] },
+      { name: "Eric Byrnes", value: 785, teams: ["ARI", "BAL", "COL", "HOU", "OAK", "SEA"] },
+      { name: "Brad Fullmer", value: 774, teams: ["BOS", "LAA", "MON/WAS", "TEX", "TOR"] },
+      { name: "Ryan Doumit", value: 774, teams: ["ATL", "MIN", "PIT"] },
+      { name: "Kelly Gruber", value: 772, teams: ["LAA", "TOR"] },
+      { name: "Don Hurst", value: 772, teams: ["CHC", "PHI"] },
+      { name: "Rip Repulski", value: 772, teams: ["DET", "LAA", "PHI", "STL"] },
+      { name: "Dave Hollins", value: 769, teams: ["BAL", "BOS", "LAA", "MIN", "PHI", "SEA"] },
+      { name: "Fernando Tatis", value: 762, teams: ["BAL", "MON/WAS", "STL", "TB", "TEX"] },
+      { name: "Gene Freese", value: 761, teams: ["CHW", "CIN", "HOU", "PHI", "PIT", "STL"] },
+      { name: "Brandon Drury", value: 761, teams: ["ARI", "CIN", "LAA", "NYY", "SDP", "TOR"] },
+      { name: "Yoan Moncada", value: 759, teams: ["BOS", "CHW"] },
+      { name: "Brad Miller", value: 754, teams: ["MIL", "PHI", "SEA", "STL", "TB", "TEX"] },
+      { name: "Gary Roenicke", value: 752, teams: ["BAL", "NYY", "SDP"] },
+      { name: "Michael A. Taylor", value: 751, teams: ["KC", "MIN", "MON/WAS", "PIT"] },
+      { name: "Jorge Cantu", value: 747, teams: ["CIN", "MIA", "SDP", "TB", "TEX"] },
+      { name: "Bobby Witt Jr.", value: 741, teams: ["KC"] },
+      { name: "James McCann", value: 740, teams: ["BAL", "CHW", "DET", "NYM", "TEX"] },
+      { name: "Jeffrey Hammonds", value: 739, teams: ["BAL", "CHW", "CIN", "COL", "MIL", "SFG"] },
+      { name: "Mike Yastrzemski", value: 735, teams: ["ATL", "KC", "SFG"] },
+      { name: "Cedric Mullins", value: 733, teams: ["BAL"] },
+      { name: "Carmelo Martinez", value: 722, teams: ["CHC", "CLE", "PHI", "SDP", "SFG"] },
+      { name: "Dan Pasqua", value: 711, teams: ["CHW", "NYY"] },
+      { name: "Aaron Hicks", value: 711, teams: ["BAL", "LAA", "MIN", "NYY"] },
+      { name: "Xavier Nady", value: 711, teams: ["CHC", "MON/WAS", "NYM", "NYY", "PIT", "SDP"] },
+      { name: "Nick Esasky", value: 707, teams: ["ATL", "BOS", "CIN"] },
+      { name: "Curt Blefary", value: 702, teams: ["BAL", "HOU", "NYY", "OAK"] },
+      { name: "Nathaniel Lowe", value: 694, teams: ["TB", "TEX"] },
+      { name: "Ron Northey", value: 694, teams: ["CHC", "CHW", "CIN", "PHI"] },
+      { name: "Jack Howell", value: 693, teams: ["HOU", "LAA", "SDP"] },
+      { name: "Alex Avila", value: 693, teams: ["ARI", "CHC", "DET", "MIN", "MON/WAS"] },
+      { name: "Bob Cerv", value: 690, teams: ["HOU", "KC", "LAA", "NYY"] },
+      { name: "Mitch Haniger", value: 688, teams: ["ARI", "SEA", "SFG"] },
+      { name: "Garrett Jones", value: 684, teams: ["MIA", "MIN", "NYY", "PIT"] },
+      { name: "Franklin Stubbs", value: 684, teams: ["DET", "HOU", "LAD", "MIL"] },
+      { name: "Dick Gernert", value: 682, teams: ["BOS", "CHC", "DET", "HOU", "STL"] },
+      { name: "Josh Naylor", value: 674, teams: ["ARI", "CLE", "MIA", "SDP"] },
+      { name: "Jarrod Saltalamacchia", value: 664, teams: ["ARI", "ATL", "BOS", "DET", "MIA", "TEX", "TOR"] },
+      { name: "Roy Cullenbine", value: 663, teams: ["BAL", "CLE", "DET", "LAD", "PHI"] },
+      { name: "Trevor Plouffe", value: 660, teams: ["MIN", "OAK", "TB"] },
+      { name: "Craig Monroe", value: 652, teams: ["CHC", "DET", "MIN", "PIT"] },
+      { name: "Jack Cust", value: 647, teams: ["ARI", "BAL", "COL", "MON/WAS", "OAK", "SEA"] },
+      { name: "Scott Hairston", value: 639, teams: ["ARI", "CHC", "MON/WAS", "NYM", "OAK", "SDP"] },
+      { name: "Jedd Gyorko", value: 632, teams: ["LAD", "MIL", "SDP", "STL"] },
+      { name: "Luis Valbuena", value: 632, teams: ["CHC", "CLE", "HOU", "LAA", "SEA"] },
+      { name: "Wayne Gross", value: 631, teams: ["BAL", "CHC", "OAK"] },
+      { name: "Kal Daniels", value: 630, teams: ["CHC", "CIN", "LAD"] },
+      { name: "Luke Easter", value: 621, teams: ["CLE"] },
+      { name: "Fred Whitfield", value: 617, teams: ["BOS", "CIN", "CLE", "MON/WAS"] },
+      { name: "Morgan Ensberg", value: 610, teams: ["HOU", "NYY", "SDP"] },
+      { name: "Taylor Ward", value: 609, teams: ["LAA"] },
+      { name: "Willie Aikens", value: 609, teams: ["KC", "LAA", "TOR"] },
+      { name: "Corbin Carroll", value: 609, teams: ["ARI"] },
+      { name: "Martin Maldonado", value: 599, teams: ["CHC", "CHW", "HOU", "LAA", "MIL"] },
+      { name: "Dave Nilsson", value: 599, teams: ["MIL"] },
+      { name: "William Contreras", value: 595, teams: ["ATL", "MIL"] },
+      { name: "Ramon Laureano", value: 594, teams: ["ATL", "BAL", "HOU", "OAK"] },
+      { name: "Luis Robert Jr.", value: 590, teams: ["CHW"] },
+      { name: "Gunnar Henderson", value: 585, teams: ["BAL"] },
+      { name: "Bob Robertson", value: 578, teams: ["PIT", "SEA", "TOR"] },
+      { name: "Seiya Suzuki", value: 578, teams: ["CHC"] },
+      { name: "Jesus Aguilar", value: 572, teams: ["BAL", "CLE", "MIA", "MIL", "OAK", "TB"] },
+      { name: "Geovany Soto", value: 567, teams: ["CHC", "CHW", "LAA", "OAK", "TEX"] },
+      { name: "Marcus Thames", value: 557, teams: ["DET", "LAD", "NYY", "TEX"] },
+      { name: "Jim Tabor", value: 555, teams: ["BOS", "PHI"] },
+      { name: "David Ross", value: 552, teams: ["ATL", "BOS", "CHC", "CIN", "LAD", "PIT", "SDP"] },
+      { name: "Mike Morse", value: 551, teams: ["BAL", "LAD", "MON/WAS", "PIT", "SEA", "SFG"] },
+      { name: "Tyler O'Neill", value: 547, teams: ["BAL", "BOS", "STL"] },
+      { name: "Travis Shaw", value: 533, teams: ["BOS", "LAA", "MIL", "TOR"] },
+      { name: "Daulton Varsho", value: 532, teams: ["ARI", "TOR"] },
+      { name: "Trent Grisham", value: 514, teams: ["MIL", "NYY", "SDP"] },
+      { name: "Rowdy Tellez", value: 511, teams: ["MIL", "PIT", "TOR"] },
+      { name: "Franmil Reyes", value: 511, teams: ["CHC", "CLE", "KC", "SDP"] },
+      { name: "Isaac Paredes", value: 507, teams: ["CHC", "DET", "HOU", "TB"] },
+      { name: "Dave Duncan", value: 499, teams: ["BAL", "CLE", "OAK"] },
+      { name: "Ken Phelps", value: 473, teams: ["CLE", "KC", "MON/WAS", "NYY", "OAK"] },
+      { name: "Matt Adams", value: 467, teams: ["ATL", "COL", "MON/WAS", "STL"] },
+      { name: "Jake Burger", value: 454, teams: ["CHW", "MIA"] },
+      { name: "Spencer Torkelson", value: 450, teams: ["DET"] },
       { name: "Pat Listach", value: 444, teams: ["HOU", "MIL"] },
+      { name: "Brent Rooker", value: 439, teams: ["KC", "MIN", "OAK", "SDP"] },
+      { name: "Mitch Garver", value: 432, teams: ["MIN", "SEA", "TEX"] },
+      { name: "Shea Langeliers", value: 425, teams: ["ATL", "OAK"] },
     
     ],
   },
@@ -2092,7 +2863,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Steve Garvey", value: 1308, teams: ["LAD", "SDP"] },
       { name: "Sam Thompson", value: 1308, teams: ["DET", "DTN", "PHI"] },
       { name: "Paul Molitor", value: 1307, teams: ["MIL", "MIN", "TOR"] },
-      { name: "Robinson Cano", value: 1306, teams: ["NYM", "NYY", "SEA"] },
+      { name: "Robinson Cano", value: 1306, teams: ["ATL", "NYM", "NYY", "SDP", "SEA"] },
       { name: "Roberto Clemente", value: 1305, teams: ["PIT"] },
       { name: "Enos Slaughter", value: 1304, teams: ["ATL", "NYY", "OAK", "STL"] },
       { name: "Miguel Tejada", value: 1302, teams: ["BAL", "HOU", "KC", "OAK", "SDP", "SFG"] },
@@ -2588,7 +3359,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Dave Foutz", value: 750, teams: ["LAD", "STL"] },
       { name: "Shohei Ohtani", value: 750, teams: ["LAA", "LAD"] },
       { name: "Alex Gordon", value: 749, teams: ["KC"] },
-      { name: "Brandon Crawford", value: 748, teams: ["SFG"] },
+      { name: "Brandon Crawford", value: 748, teams: ["SFG", "STL"] },
       { name: "Earl Sheely", value: 745, teams: ["ATL", "CHW", "PIT"] },
       { name: "Terry Steinbach", value: 745, teams: ["MIN", "OAK"] },
       { name: "Jorge Orta", value: 745, teams: ["CHW", "CLE", "KC", "LAD", "TOR"] },
@@ -2655,7 +3426,6 @@ const CATEGORIES_BASEBALL = {
       { name: "Michael Brantley", value: 720, teams: ["CLE", "HOU"] },
       { name: "Mike Griffin", value: 720, teams: ["BAL", "PHI", "BRD"] },
       { name: "Gavvy Cravath", value: 719, teams: ["BOS", "CHW", "MIN", "PHI"] },
-      { name: "Gavy Cravath", value: 719, teams: ["BOS", "CHW", "MIN", "PHI"] },
       { name: "Jose Reyes", value: 719, teams: ["NYM", "TOR", "COL", "CHW"] },
       { name: "Tony Batista", value: 718, teams: ["ARI", "BAL", "MIN", "MON/WAS", "OAK", "TOR"] },
       { name: "Al Cowens", value: 717, teams: ["DET", "KC", "LAA", "SEA"] },
@@ -2677,6 +3447,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Granny Hamner", value: 708, teams: ["CLE", "OAK", "PHI"] },
       { name: "Tony Pena", value: 708, teams: ["ARI", "ATL", "BOS", "CHW", "CLE", "HOU", "KC", "PIT", "STL"] },
       { name: "Dick Groat", value: 707, teams: ["PHI", "PIT", "SFG", "STL"] },
+      { name: "Frankie Hayes", value: 707, teams: ["BOS", "CHW", "CLE", "OAK"] },
       { name: "Dan Uggla", value: 706, teams: ["ATL", "MIA", "MON/WAS", "SFG"] },
       { name: "Jim Fregosi", value: 706, teams: ["LAA", "NYM", "PIT", "TEX"] },
       { name: "Wally Schang", value: 705, teams: ["BAL", "BOS", "DET", "NYY", "OAK"] },
@@ -2715,6 +3486,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Bob Horner", value: 685, teams: ["ATL", "STL"] },
       { name: "David Segui", value: 684, teams: ["BAL", "CLE", "MON/WAS", "NYM", "SEA", "TEX", "TOR"] },
       { name: "Damion Easley", value: 684, teams: ["ARI", "DET", "LAA", "MIA", "NYM", "TB"] },
+      { name: "Monte Irvin", value: 684, teams: ["CHC", "NWE", "SFG"] },
       { name: "Alvin Davis", value: 683, teams: ["LAA", "SEA"] },
       { name: "Eddie Yost", value: 683, teams: ["DET", "LAA", "MIN"] },
       { name: "Dmitri Young", value: 683, teams: ["CIN", "DET", "MON/WAS", "STL"] },
@@ -2729,7 +3501,245 @@ const CATEGORIES_BASEBALL = {
       { name: "Keith Moreland", value: 674, teams: ["BAL", "CHC", "DET", "PHI", "SDP"] },
       { name: "Larry Hisle", value: 674, teams: ["MIL", "MIN", "PHI"] },
       { name: "Smoky Burgess", value: 673, teams: ["CHC", "CHW", "CIN", "PHI", "PIT"] },
+      { name: "Jerry Denny", value: 667, teams: ["CLV", "IND", "LOU", "PHI", "PRO", "SFG", "SLM"] },
+      { name: "Tito Francona", value: 656, teams: ["ATL", "BAL", "CHW", "CLE", "DET", "MIL", "PHI", "STL"] },
+      { name: "Fred Luderus", value: 642, teams: ["CHC", "PHI"] },
+      { name: "Eddie Miller", value: 640, teams: ["ATL", "CHC", "CIN", "LAD", "PHI", "SFG"] },
+      { name: "Carlos Guillen", value: 639, teams: ["DET", "HOU", "SEA"] },
+      { name: "Andrew Benintendi", value: 634, teams: ["BOS", "CHW", "KC", "NYY"] },
+      { name: "Jimmie Wilson", value: 621, teams: ["CIN", "PHI", "STL"] },
+      { name: "Dan Ford", value: 618, teams: ["BAL", "LAA", "OAK", "TEX"] },
+      { name: "Elbie Fletcher", value: 616, teams: ["ATL", "PIT"] },
+      { name: "Ed Kranepool", value: 614, teams: ["NYM"] },
+      { name: "Kevin Bass", value: 611, teams: ["BAL", "HOU", "MIL", "NYM", "SFG"] },
+      { name: "Billy Rogell", value: 609, teams: ["BOS", "CHC", "DET"] },
+      { name: "Denis Menke", value: 606, teams: ["ATL", "CIN", "HOU"] },
+      { name: "Rusty Greer", value: 604, teams: ["TEX"] },
+      { name: "Elmer Valo", value: 601, teams: ["CLE", "LAD", "MIN", "NYY", "OAK", "PHI"] },
+      { name: "Ray Knight", value: 595, teams: ["BAL", "CIN", "DET", "HOU", "NYM"] },
+      { name: "Ken Henderson", value: 593, teams: ["ATL", "CHC", "CIN", "NYY", "SFG", "TEX"] },
+      { name: "Johnny Roseboro", value: 593, teams: ["LAD", "MIN", "TEX"] },
+      { name: "Jimmy Wolf", value: 592, teams: ["LOU", "STL"] },
+      { name: "Alexei Ramirez", value: 590, teams: ["CHW", "SDP", "TB"] },
+      { name: "David Bell", value: 589, teams: ["CHC", "CLE", "MIL", "PHI", "SEA", "SFG", "STL"] },
+      { name: "Sandy Alomar Jr.", value: 588, teams: ["CHW", "CLE", "COL", "MIA", "TEX"] },
+      { name: "Vince DiMaggio", value: 584, teams: ["ATL", "CIN", "PHI", "PIT"] },
+      { name: "George Selkirk", value: 579, teams: ["NYY"] },
+      { name: "Gil McDougald", value: 576, teams: ["NYY"] },
+      { name: "James Loney", value: 572, teams: ["BOS", "LAD", "NYM", "TB"] },
+      { name: "Chief Wilson", value: 570, teams: ["PIT", "STL"] },
+      { name: "David Peralta", value: 569, teams: ["ARI", "LAD", "SDP", "TB"] },
+      { name: "Mickey Stanley", value: 569, teams: ["DET"] },
+      { name: "Terry Kennedy", value: 569, teams: ["BAL", "SDP", "SFG", "STL"] },
+      { name: "Leo Durocher", value: 567, teams: ["CIN", "LAD", "NYY", "STL"] },
+      { name: "George Stovall", value: 564, teams: ["BAL", "CLE", "KCP"] },
+      { name: "Willie Upshaw", value: 563, teams: ["CLE", "TOR"] },
+      { name: "Billy Southworth", value: 561, teams: ["ATL", "CLE", "PIT", "SFG", "STL"] },
+      { name: "Hy Myers", value: 559, teams: ["ATL", "CIN", "LAD", "STL"] },
+      { name: "Brook Jacoby", value: 557, teams: ["BAL", "CLE"] },
+      { name: "Danny Litwhiler", value: 557, teams: ["BAL", "BOS", "CIN", "PHI"] },
+      { name: "Todd Walker", value: 556, teams: ["BOS", "CHC", "CIN", "COL", "MIA", "OAK", "SDP"] },
+      { name: "Aaron Boone", value: 555, teams: ["CIN", "CLE", "HOU", "MIA", "MON/WAS", "NYY"] },
+      { name: "Bernard Gilkey", value: 555, teams: ["ARI", "ATL", "BOS", "NYM", "STL"] },
+      { name: "Miguel Montero", value: 550, teams: ["ARI", "CHC", "MON/WAS", "TOR"] },
+      { name: "John Valentin", value: 549, teams: ["BOS", "NYM"] },
+      { name: "Delmon Young", value: 549, teams: ["BAL", "DET", "MIN", "PHI", "TB"] },
+      { name: "Ken Reitz", value: 548, teams: ["CHC", "PIT", "SFG", "STL"] },
+      { name: "Johnny Logan", value: 547, teams: ["ATL", "PIT"] },
+      { name: "Jason Kipnis", value: 545, teams: ["CHC", "CLE"] },
+      { name: "Bob Nieman", value: 544, teams: ["BAL", "CHW", "CLE", "DET", "SFG", "STL"] },
+      { name: "Jeff Blauser", value: 542, teams: ["ATL", "CHC"] },
+      { name: "Lefty O'Doul", value: 542, teams: ["BOS", "LAD", "NYY", "PHI", "SFG"] },
+      { name: "Omar Infante", value: 542, teams: ["ATL", "DET", "KC", "MIA"] },
+      { name: "Jerry Priddy", value: 541, teams: ["BAL", "DET", "MIN", "NYY"] },
+      { name: "Wally Westlake", value: 539, teams: ["BAL", "CIN", "CLE", "PHI", "PIT", "STL"] },
+      { name: "Hank Severeid", value: 539, teams: ["BAL", "CIN", "MIN", "NYY"] },
+      { name: "Frank Bolling", value: 538, teams: ["ATL", "DET"] },
+      { name: "Randy Jackson", value: 538, teams: ["CHC", "CHW", "LAA", "STL"] },
+      { name: "Joe Ferguson", value: 536, teams: ["HOU", "LAA", "LAD", "OAK"] },
+      { name: "Chuck Hinton", value: 536, teams: ["CIN", "CLE", "LAA", "TEX"] },
+      { name: "Marco Scutaro", value: 536, teams: ["BOS", "CLE", "COL", "NYM", "OAK", "SFG", "TOR"] },
+      { name: "Darrin Fletcher", value: 534, teams: ["LAD", "MON/WAS", "TOR"] },
+      { name: "Jed Lowrie", value: 532, teams: ["BOS", "HOU", "NYM", "OAK"] },
+      { name: "Gerardo Parra", value: 532, teams: ["ARI", "BAL", "COL", "MIL", "MON/WAS", "SFG"] },
+      { name: "David Freese", value: 531, teams: ["LAA", "LAD", "PIT", "STL"] },
+      { name: "Jay Johnstone", value: 531, teams: ["CHC", "CHW", "LAA", "LAD", "NYY", "OAK", "PHI", "SDP"] },
+      { name: "Whitey Kurowski", value: 529, teams: ["STL"] },
+      { name: "Michael Tucker", value: 528, teams: ["ATL", "CHC", "CIN", "KC", "NYM", "PHI", "SFG"] },
+      { name: "Larry Herndon", value: 525, teams: ["DET", "PHI", "SFG"] },
+      { name: "Alex Johnson", value: 525, teams: ["CIN", "CLE", "DET", "LAA", "NYY", "PHI", "STL", "TEX"] },
+      { name: "Stan Lopata", value: 524, teams: ["MIL", "PHI"] },
+      { name: "Mike Easler", value: 522, teams: ["BOS", "HOU", "LAA", "NYY", "PHI", "PIT"] },
+      { name: "Bill Wambsganss", value: 521, teams: ["BOS", "CLE", "OAK"] },
+      { name: "Don Mueller", value: 520, teams: ["CHC", "SFG"] },
+      { name: "Brad Hawpe", value: 519, teams: ["COL", "LAA", "SDP", "TB"] },
+      { name: "Jonathan Lucroy", value: 519, teams: ["BOS", "CHC", "COL", "LAA", "MIL", "OAK", "TEX"] },
+      { name: "Yan Gomes", value: 517, teams: ["CHC", "CLE", "MON/WAS", "OAK", "TOR"] },
+      { name: "Jackie Brandt", value: 516, teams: ["BAL", "HOU", "PHI", "SFG", "STL"] },
+      { name: "Wil Cordero", value: 515, teams: ["BOS", "CHW", "CLE", "MIA", "MON/WAS", "PIT"] },
+      { name: "Mark Whiten", value: 515, teams: ["ATL", "BOS", "CLE", "PHI", "SEA", "STL", "TOR"] },
+      { name: "Mike Kreevich", value: 514, teams: ["BAL", "CHC", "CHW", "MIN", "OAK"] },
+      { name: "Lourdes Gurriel Jr.", value: 513, teams: ["ARI", "TOR"] },
+      { name: "Greg Walker", value: 510, teams: ["BAL", "CHW"] },
+      { name: "Chet Laabs", value: 509, teams: ["BAL", "DET"] },
+      { name: "Johnny Briggs", value: 507, teams: ["MIL", "MIN", "PHI"] },
+      { name: "Ron Hansen", value: 506, teams: ["BAL", "CHW", "NYY", "TEX"] },
+      { name: "Bob Skinner", value: 506, teams: ["CIN", "PHI", "PIT", "STL"] },
+      { name: "Corey Koskie", value: 504, teams: ["MIL", "MIN", "TOR"] },
+      { name: "Don Lock", value: 503, teams: ["BOS", "PHI", "TEX"] },
+      { name: "Les Mann", value: 503, teams: ["ATL", "CHC", "CHH", "CIN", "SFG", "STL"] },
+      { name: "Ethan Allen", value: 501, teams: ["BAL", "CHC", "CIN", "PHI", "SFG", "STL"] },
+      { name: "Lee Thomas", value: 499, teams: ["ATL", "BOS", "CHC", "LAA", "STL"] },
+      { name: "Rick Reichardt", value: 496, teams: ["KC", "LAA", "MIL"] },
+      { name: "Chris Sabo", value: 495, teams: ["BAL", "CHW", "CIN", "STL"] },
+      { name: "Hod Ford", value: 494, teams: ["ATL", "CIN", "LAD", "PHI", "STL"] },
+      { name: "Lou Finney", value: 494, teams: ["BAL", "BOS", "OAK", "PHI"] },
+      { name: "Jurickson Profar", value: 487, teams: ["ATL", "COL", "OAK", "SDP", "TEX"] },
+      { name: "Ronnie Belliard", value: 487, teams: ["CLE", "LAD", "MIL", "MON/WAS", "STL"] },
+      { name: "Orlando Merced", value: 487, teams: ["CHC", "CHW", "HOU", "KC", "MIN", "MON/WAS", "PIT"] },
+      { name: "Don Hurst", value: 485, teams: ["CHC", "PHI"] },
+      { name: "Ellis Valentine", value: 484, teams: ["LAA", "MON/WAS", "NYM", "TEX"] },
+      { name: "Scott Spiezio", value: 483, teams: ["LAA", "OAK", "SEA", "STL"] },
+      { name: "Enrique Hernandez", value: 482, teams: ["BOS", "HOU", "LAD", "MIA"] },
+      { name: "Jimmie Hall", value: 482, teams: ["CLE", "LAA", "MIN", "NYY"] },
+      { name: "Andy High", value: 482, teams: ["ATL", "CIN", "LAD", "PHI", "STL"] },
+      { name: "Milton Bradley", value: 481, teams: ["CHC", "CLE", "LAD", "MON/WAS", "OAK", "SDP", "SEA", "TEX"] },
+      { name: "Del Unser", value: 481, teams: ["CLE", "MON/WAS", "PHI", "TEX"] },
+      { name: "Mike Devereaux", value: 480, teams: ["ATL", "BAL", "CHC", "LAD", "TEX"] },
+      { name: "John Lowenstein", value: 476, teams: ["BAL", "CLE", "TEX"] },
+      { name: "Juan Beniquez", value: 476, teams: ["BAL", "BOS", "KC", "LAA", "NYY", "SEA", "TEX", "TOR"] },
+      { name: "Wally Gerber", value: 476, teams: ["BAL", "BOS", "PIT"] },
+      { name: "Jim King", value: 473, teams: ["CHC", "CLE", "LAA", "PHI", "STL", "TEX"] },
+      { name: "Shea Hillenbrand", value: 473, teams: ["ARI", "BOS", "CHC", "LAA", "SFG", "TOR"] },
+      { name: "Earl Battey", value: 473, teams: ["BAL", "MIN"] },
+      { name: "Erick Aybar", value: 473, teams: ["ATL", "DET", "LAA", "SDP"] },
+      { name: "Austin Kearns", value: 468, teams: ["CIN", "CLE", "MON/WAS", "NYY"] },
+      { name: "Jim Morrison", value: 468, teams: ["ATL", "CHW", "PHI", "PIT"] },
+      { name: "Maikel Franco", value: 467, teams: ["BAL", "KC", "MON/WAS", "PHI"] },
+      { name: "Ivan Calderon", value: 467, teams: ["BOS", "CHW", "MON/WAS", "SEA"] },
+      { name: "Bobby Avila", value: 467, teams: ["ATL", "BAL", "BOS", "CLE"] },
+      { name: "Travis d'Arnaud", value: 462, teams: ["ATL", "LAA", "LAD", "NYM", "TB"] },
+      { name: "Ed Brinkman", value: 461, teams: ["DET", "NYY", "STL", "TEX"] },
+      { name: "Mark Canha", value: 459, teams: ["DET", "MIL", "NYM", "OAK", "SFG"] },
+      { name: "Jerry Lynch", value: 459, teams: ["CIN", "LAD", "PIT"] },
+      { name: "Seth Smith", value: 458, teams: ["BAL", "COL", "OAK", "SDP", "SEA"] },
+      { name: "Johnny Hopp", value: 458, teams: ["ATL", "DET", "LAD", "NYY", "PIT", "STL"] },
+      { name: "Marty Cordova", value: 456, teams: ["BAL", "CLE", "MIN", "TOR"] },
+      { name: "Stephen Drew", value: 455, teams: ["ARI", "BOS", "MON/WAS", "NYY", "OAK"] },
+      { name: "Nick Esasky", value: 455, teams: ["ATL", "BOS", "CIN"] },
+      { name: "Ben Grieve", value: 455, teams: ["CHC", "MIL", "OAK", "TB"] },
+      { name: "Jerry Lumpe", value: 454, teams: ["DET", "NYY", "OAK"] },
+      { name: "Brad Fullmer", value: 453, teams: ["BOS", "LAA", "MON/WAS", "TEX", "TOR"] },
+      { name: "Greg Brock", value: 453, teams: ["LAD", "MIL"] },
+      { name: "Robby Thompson", value: 451, teams: ["SFG"] },
+      { name: "Mark Ellis", value: 451, teams: ["COL", "LAD", "OAK", "STL"] },
+      { name: "Brad Wilkerson", value: 450, teams: ["MON/WAS", "SEA", "TEX", "TOR"] },
+      { name: "Fernando Tatis", value: 448, teams: ["BAL", "MON/WAS", "STL", "TB", "TEX"] },
+      { name: "Ken Oberkfell", value: 446, teams: ["ATL", "HOU", "LAA", "PIT", "SFG", "STL"] },
+      { name: "Kelly Gruber", value: 442, teams: ["LAA", "TOR"] },
+      { name: "Roy Cullenbine", value: 441, teams: ["BAL", "CLE", "DET", "LAD", "PHI"] },
+      { name: "Bill Hall", value: 440, teams: ["BAL", "BOS", "HOU", "MIL", "SEA", "SFG"] },
+      { name: "Chris Taylor", value: 440, teams: ["LAD", "SEA"] },
+      { name: "Rip Repulski", value: 440, teams: ["DET", "LAA", "PHI", "STL"] },
+      { name: "Dave Hollins", value: 438, teams: ["BAL", "BOS", "LAA", "MIN", "PHI", "SEA"] },
+      { name: "Gene Freese", value: 437, teams: ["CHW", "CIN", "HOU", "PHI", "PIT", "STL"] },
+      { name: "Gary Roenicke", value: 436, teams: ["BAL", "NYY", "SDP"] },
+      { name: "Jay Payton", value: 435, teams: ["BAL", "BOS", "COL", "NYM", "OAK", "SDP"] },
+      { name: "Luke Easter", value: 435, teams: ["CLE"] },
+      { name: "Ron Northey", value: 434, teams: ["CHC", "CHW", "CIN", "PHI"] },
+      { name: "Travis Lee", value: 433, teams: ["ARI", "DET", "NYY", "PHI", "TB"] },
+      { name: "Jackie Bradley Jr.", value: 432, teams: ["BAL", "BOS", "KC", "MIL", "TOR"] },
+      { name: "Rico Brogna", value: 432, teams: ["ATL", "BOS", "DET", "NYM", "PHI"] },
+      { name: "David Murphy", value: 432, teams: ["BOS", "CLE", "LAA", "TEX"] },
+      { name: "Gary Matthews Jr.", value: 427, teams: ["BAL", "CHC", "LAA", "NYM", "SDP", "SFG", "TEX"] },
+      { name: "Scott Hatteberg", value: 427, teams: ["BOS", "CIN", "OAK"] },
+      { name: "Jack Wilson", value: 426, teams: ["ATL", "PIT", "SEA"] },
+      { name: "Brad Miller", value: 425, teams: ["MIL", "PHI", "SEA", "STL", "TB", "TEX"] },
+      { name: "Dan Pasqua", value: 425, teams: ["CHW", "NYY"] },
+      { name: "Curt Blefary", value: 425, teams: ["BAL", "HOU", "NYY", "OAK"] },
+      { name: "Daryl Spencer", value: 425, teams: ["CIN", "LAD", "SFG", "STL"] },
+      { name: "Carmelo Martinez", value: 424, teams: ["CHC", "CLE", "PHI", "SDP", "SFG"] },
+      { name: "Woody English", value: 422, teams: ["CHC", "LAD"] },
+      { name: "Jorge Cantu", value: 421, teams: ["CIN", "MIA", "SDP", "TB", "TEX"] },
+      { name: "Freddy Galvis", value: 417, teams: ["BAL", "CIN", "PHI", "SDP", "TOR"] },
+      { name: "Kevin Pillar", value: 415, teams: ["ATL", "BOS", "CHC", "CHW", "COL", "LAA", "LAD", "NYM", "SFG", "TOR"] },
+      { name: "Marwin Gonzalez", value: 414, teams: ["BOS", "DET", "HOU", "MIN"] },
+      { name: "Julio Rodriguez", value: 412, teams: ["SEA"] },
+      { name: "Jeimer Candelario", value: 412, teams: ["CHC", "CIN", "DET", "MON/WAS"] },
+      { name: "Jeffrey Hammonds", value: 409, teams: ["BAL", "CHW", "CIN", "COL", "MIL", "SFG"] },
+      { name: "Eric Byrnes", value: 409, teams: ["ARI", "BAL", "COL", "HOU", "OAK", "SEA"] },
+      { name: "Jack Cust", value: 407, teams: ["ARI", "BAL", "COL", "MON/WAS", "OAK", "SEA"] },
+      { name: "Yandy Diaz", value: 405, teams: ["CLE", "TB"] },
+      { name: "Mike Yastrzemski", value: 405, teams: ["ATL", "KC", "SFG"] },
+      { name: "Trey Mancini", value: 404, teams: ["BAL", "CHC", "HOU", "LAA"] },
+      { name: "Dale Mitchell", value: 403, teams: ["CLE", "LAD"] },
+      { name: "Willie Aikens", value: 400, teams: ["KC", "LAA", "TOR"] },
+      { name: "Bob Cerv", value: 400, teams: ["HOU", "KC", "LAA", "NYY"] },
+      { name: "Matt Adams", value: 399, teams: ["ATL", "COL", "MON/WAS", "STL"] },
+      { name: "Jack Howell", value: 399, teams: ["HOU", "LAA", "SDP"] },
+      { name: "Xavier Nady", value: 399, teams: ["CHC", "MON/WAS", "NYM", "NYY", "PIT", "SDP"] },
+      { name: "Josh Naylor", value: 398, teams: ["ARI", "CLE", "MIA", "SDP"] },
+      { name: "Barney McCosky", value: 397, teams: ["CIN", "CLE", "DET", "OAK"] },
+      { name: "Dick Gernert", value: 396, teams: ["BOS", "CHC", "DET", "HOU", "STL"] },
+      { name: "Mitch Haniger", value: 395, teams: ["ARI", "SEA", "SFG"] },
+      { name: "Wayne Gross", value: 393, teams: ["BAL", "CHC", "OAK"] },
+      { name: "Michael A. Taylor", value: 393, teams: ["KC", "MIN", "MON/WAS", "PIT"] },
+      { name: "Franklin Stubbs", value: 393, teams: ["DET", "HOU", "LAD", "MIL"] },
+      { name: "Ryan Doumit", value: 393, teams: ["ATL", "MIN", "PIT"] },
+      { name: "David Eckstein", value: 392, teams: ["ARI", "LAA", "SDP", "STL", "TOR"] },
+      { name: "Garrett Jones", value: 390, teams: ["MIA", "MIN", "NYY", "PIT"] },
+      { name: "Brandon Drury", value: 390, teams: ["ARI", "CIN", "LAA", "NYY", "SDP", "TOR"] },
+      { name: "Bobby Richardson", value: 390, teams: ["NYY"] },
+      { name: "Rey Sanchez", value: 389, teams: ["ATL", "BOS", "CHC", "KC", "NYM", "NYY", "SEA", "SFG", "TB"] },
+      { name: "Bobby Witt Jr.", value: 387, teams: ["KC"] },
+      { name: "Yoan Moncada", value: 387, teams: ["BOS", "CHW"] },
+      { name: "Aaron Hicks", value: 385, teams: ["BAL", "LAA", "MIN", "NYY"] },
+      { name: "Cedric Mullins", value: 382, teams: ["BAL"] },
+      { name: "Alex Avila", value: 379, teams: ["ARI", "CHC", "DET", "MIN", "MON/WAS"] },
+      { name: "Morgan Ensberg", value: 375, teams: ["HOU", "NYY", "SDP"] },
+      { name: "Max Alvis", value: 373, teams: ["CLE", "MIL"] },
+      { name: "James McCann", value: 372, teams: ["BAL", "CHW", "DET", "NYM", "TEX"] },
+      { name: "Jesus Aguilar", value: 370, teams: ["BAL", "CLE", "MIA", "MIL", "OAK", "TB"] },
+      { name: "Dave Nilsson", value: 370, teams: ["MIL"] },
+      { name: "Bob Robertson", value: 368, teams: ["PIT", "SEA", "TOR"] },
+      { name: "Jarrod Saltalamacchia", value: 368, teams: ["ARI", "ATL", "BOS", "DET", "MIA", "TEX", "TOR"] },
+      { name: "Luis Valbuena", value: 367, teams: ["CHC", "CLE", "HOU", "LAA", "SEA"] },
+      { name: "Nathaniel Lowe", value: 363, teams: ["TB", "TEX"] },
+      { name: "Fred Whitfield", value: 363, teams: ["BOS", "CIN", "CLE", "MON/WAS"] },
+      { name: "Scott Hairston", value: 361, teams: ["ARI", "CHC", "MON/WAS", "NYM", "OAK", "SDP"] },
+      { name: "Trevor Plouffe", value: 360, teams: ["MIN", "OAK", "TB"] },
+      { name: "Jedd Gyorko", value: 358, teams: ["LAD", "MIL", "SDP", "STL"] },
+      { name: "Kal Daniels", value: 358, teams: ["CHC", "CIN", "LAD"] },
+      { name: "David Ross", value: 355, teams: ["ATL", "BOS", "CHC", "CIN", "LAD", "PIT", "SDP"] },
+      { name: "Luis Robert Jr.", value: 352, teams: ["CHW"] },
+      { name: "Marcus Thames", value: 346, teams: ["DET", "LAD", "NYY", "TEX"] },
+      { name: "Ken Phelps", value: 344, teams: ["CLE", "KC", "MON/WAS", "NYY", "OAK"] },
+      { name: "Taylor Ward", value: 344, teams: ["LAA"] },
+      { name: "Craig Monroe", value: 344, teams: ["CHC", "DET", "MIN", "PIT"] },
+      { name: "William Contreras", value: 344, teams: ["ATL", "MIL"] },
+      { name: "Martin Maldonado", value: 338, teams: ["CHC", "CHW", "HOU", "LAA", "MIL"] },
+      { name: "Isaac Paredes", value: 338, teams: ["CHC", "DET", "HOU", "TB"] },
+      { name: "Travis Shaw", value: 338, teams: ["BOS", "LAA", "MIL", "TOR"] },
+      { name: "Rowdy Tellez", value: 329, teams: ["MIL", "PIT", "TOR"] },
+      { name: "Jim Tabor", value: 329, teams: ["BOS", "PHI"] },
+      { name: "Geovany Soto", value: 328, teams: ["CHC", "CHW", "LAA", "OAK", "TEX"] },
+      { name: "Tyler O'Neill", value: 327, teams: ["BAL", "BOS", "STL"] },
+      { name: "Gunnar Henderson", value: 322, teams: ["BAL"] },
+      { name: "Seiya Suzuki", value: 321, teams: ["CHC"] },
+      { name: "Mike Morse", value: 321, teams: ["BAL", "LAD", "MON/WAS", "PIT", "SEA", "SFG"] },
       { name: "Otis Nixon", value: 318, teams: ["ATL", "BOS", "CLE", "LAD", "MIN", "MON/WAS", "NYY", "TEX", "TOR"] },
+      { name: "Corbin Carroll", value: 316, teams: ["ARI"] },
+      { name: "Franmil Reyes", value: 314, teams: ["CHC", "CLE", "KC", "SDP"] },
+      { name: "Daulton Varsho", value: 310, teams: ["ARI", "TOR"] },
+      { name: "Ramon Laureano", value: 309, teams: ["ATL", "BAL", "HOU", "OAK"] },
+      { name: "Don Blasingame", value: 308, teams: ["BAL", "CIN", "OAK", "SFG", "STL", "TEX"] },
+      { name: "Jake Burger", value: 303, teams: ["CHW", "MIA"] },
+      { name: "Dave Duncan", value: 303, teams: ["BAL", "CLE", "OAK"] },
+      { name: "Mitch Garver", value: 290, teams: ["MIN", "SEA", "TEX"] },
+      { name: "Spencer Torkelson", value: 277, teams: ["DET"] },
+      { name: "Trent Grisham", value: 269, teams: ["MIL", "NYY", "SDP"] },
+      { name: "Brent Rooker", value: 265, teams: ["KC", "MIN", "OAK", "SDP"] },
+      { name: "Shea Langeliers", value: 260, teams: ["ATL", "OAK"] },
       { name: "Pat Listach", value: 143, teams: ["HOU", "MIL"] },
     
     ],
@@ -3245,6 +4255,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Rebel Oakes", value: 163, teams: ["CIN", "PBS", "STL"] },
       { name: "Terry Pendleton", value: 127, teams: ["ATL", "CIN", "KC", "MIA", "STL"] },
       { name: "Pat Listach", value: 116, teams: ["HOU", "MIL"] },
+      { name: "Ernie Banks", value: 50, teams: ["CHC"] },
     
     ],
   },
@@ -3753,6 +4764,8 @@ const CATEGORIES_BASEBALL = {
       { name: "Bullet Rogan", value: 115, teams: ["KC"] },
       { name: "Rollie Fingers", value: 114, teams: ["MIL", "OAK", "SDP"] },
       { name: "Nathan Eovaldi", value: 113, teams: ["BOS", "LAD", "MIA", "NYY", "TB", "TEX"] },
+      { name: "J. R. Richard", value: 107, teams: ["HOU"] },
+      { name: "Blake Snell", value: 85, teams: ["LAD", "SDP", "SFG", "TB"] },
     
     ],
   },
@@ -4307,7 +5320,7 @@ const CATEGORIES_BASEBALL = {
       { name: "Raisel Iglesias", value: 287, teams: ["CIN", "LAA"] },
       { name: "Rod Beck", value: 286, teams: ["BOS", "CHC", "SDP", "SFG"] },
       { name: "Bob Wickman", value: 267, teams: ["ARI", "ATL", "CLE", "MIL", "NYY"] },
-      { name: "Mark Melancon", value: 262, teams: ["ATL", "BOS", "HOU", "MON/WAS", "NYY", "PIT", "SDP", "SFG"] },
+      { name: "Mark Melancon", value: 262, teams: ["ARI", "ATL", "BOS", "HOU", "MON/WAS", "NYY", "PIT", "SDP", "SFG"] },
       { name: "Edwin Diaz", value: 260, teams: ["ARI", "NYM", "SEA"] },
       { name: "Todd Worrell", value: 256, teams: ["LAD", "STL"] },
       { name: "Josh Hader", value: 253, teams: ["MIL"] },
@@ -4750,7 +5763,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Brook Lopez", value: 18151, teams: ["BKN", "LAC", "LAL", "MIL"] },
       { name: "Devin Booker", value: 18120, teams: ["PHX"] },
       { name: "Nikola Joki\u0107", value: 18009, teams: ["DEN"] },
-      { name: "Nikola Jokic", value: 18009, teams: ["DEN"] },
       { name: "World B. Free", value: 17955, teams: ["CLE", "GSW", "HOU", "LAC", "PHI"] },
       { name: "Calvin Murphy", value: 17949, teams: ["HOU"] },
       { name: "Lou Hudson", value: 17940, teams: ["ATL", "LAL"] },
@@ -4834,7 +5846,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Al Horford", value: 15077, teams: ["ATL", "BOS", "GSW", "OKC", "PHI"] },
       { name: "Shareef Abdur-Rahim", value: 15028, teams: ["ATL", "MEM", "POR", "SAC"] },
       { name: "Luka Don\u010di\u0107", value: 15021, teams: ["DAL", "LAL"] },
-      { name: "Luka Doncic", value: 15021, teams: ["DAL", "LAL"] },
       { name: "Mike Mitchell", value: 15016, teams: ["CLE", "SAS"] },
       { name: "Richard Jefferson", value: 14904, teams: ["BKN", "CLE", "DAL", "DEN", "GSW", "MIL", "SAS", "UTA"] },
       { name: "James Edwards", value: 14862, teams: ["CHI", "CLE", "DET", "IND", "LAC", "LAL", "PHX", "POR"] },
@@ -4872,7 +5883,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Dave DeBusschere", value: 14053, teams: ["DET", "NYK"] },
       { name: "Jerry Lucas", value: 14053, teams: ["GSW", "NYK", "SAC"] },
       { name: "Manu Gin\u00f3bili", value: 14043, teams: ["SAS"] },
-      { name: "Manu Ginobili", value: 14043, teams: ["SAS"] },
       { name: "David West", value: 14034, teams: ["GSW", "IND", "NOP", "SAS"] },
       { name: "Fred Brown", value: 14018, teams: ["OKC"] },
       { name: "Carlos Boozer", value: 13976, teams: ["CHI", "CLE", "LAL", "UTA"] },
@@ -4887,7 +5897,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Bill Laimbeer", value: 13790, teams: ["CLE", "DET"] },
       { name: "Gerald Henderson", value: 13760, teams: ["BOS", "CHA", "DET", "HOU", "MIL", "NYK", "OKC", "PHI", "POR"] },
       { name: "Peja Stojakovi\u0107", value: 13647, teams: ["DAL", "IND", "NOP", "SAC", "TOR"] },
-      { name: "Peja Stojakovic", value: 13647, teams: ["DAL", "IND", "NOP", "SAC", "TOR"] },
       { name: "Billy Cunningham", value: 13626, teams: ["PHI"] },
       { name: "Orlando Woolridge", value: 13623, teams: ["BKN", "CHI", "DEN", "DET", "LAL", "MIL", "PHI"] },
       { name: "Xavier McDaniel", value: 13606, teams: ["BKN", "BOS", "NYK", "OKC", "PHX"] },
@@ -5238,7 +6247,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Elton Brand", value: 9040, teams: ["ATL", "CHI", "DAL", "LAC", "PHI"] },
       { name: "Russell Westbrook", value: 9025, teams: ["DEN", "HOU", "LAC", "LAL", "OKC", "SAC", "WAS"] },
       { name: "Nikola Joki\u0107", value: 8977, teams: ["DEN"] },
-      { name: "Nikola Jokic", value: 8977, teams: ["DEN"] },
       { name: "Larry Bird", value: 8974, teams: ["BOS"] },
       { name: "Giannis Antetokounmpo", value: 8882, teams: ["MIL"] },
       { name: "Shawn Kemp", value: 8834, teams: ["CLE", "OKC", "ORL", "POR"] },
@@ -5723,7 +6731,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Clyde Drexler", value: 6125, teams: ["HOU", "POR"] },
       { name: "John Havlicek", value: 6114, teams: ["BOS"] },
       { name: "Nikola Joki\u0107", value: 6080, teams: ["DEN"] },
-      { name: "Nikola Jokic", value: 6080, teams: ["DEN"] },
       { name: "Damian Lillard", value: 6069, teams: ["MIL", "POR"] },
       { name: "Baron Davis", value: 6025, teams: ["CHA", "CLE", "GSW", "LAC", "NOP", "NYK"] },
       { name: "Mookie Blaylock", value: 5972, teams: ["ATL", "BKN", "GSW"] },
@@ -5798,7 +6805,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Kirk Hinrich", value: 4245, teams: ["ATL", "CHI", "WAS"] },
       { name: "Eric Snow", value: 4245, teams: ["CLE", "OKC", "PHI"] },
       { name: "Luka Don\u010di\u0107", value: 4230, teams: ["DAL", "LAL"] },
-      { name: "Luka Doncic", value: 4230, teams: ["DAL", "LAL"] },
       { name: "Tim Duncan", value: 4225, teams: ["SAS"] },
       { name: "Charles Barkley", value: 4215, teams: ["HOU", "PHI", "PHX"] },
       { name: "Richie Guerin", value: 4211, teams: ["ATL", "NYK"] },
@@ -5816,7 +6822,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Rick Barry", value: 4017, teams: ["GSW", "HOU"] },
       { name: "Alvan Adams", value: 4012, teams: ["PHX"] },
       { name: "Manu Gin\u00f3bili", value: 4001, teams: ["SAS"] },
-      { name: "Manu Ginobili", value: 4001, teams: ["SAS"] },
       { name: "Mo Williams", value: 3990, teams: ["CHA", "CLE", "LAC", "MIL", "MIN", "POR", "UTA"] },
       { name: "John Bagley", value: 3980, teams: ["ATL", "BKN", "BOS", "CLE"] },
       { name: "Jimmy Butler", value: 3957, teams: ["CHI", "GSW", "MIA", "MIN", "PHI"] },
@@ -6256,7 +7261,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Randy Smith", value: 1403, teams: ["ATL", "CLE", "LAC", "NYK"] },
       { name: "Clifford Robinson", value: 1402, teams: ["BKN", "DET", "GSW", "PHX", "POR"] },
       { name: "Manu Gin\u00f3bili", value: 1392, teams: ["SAS"] },
-      { name: "Manu Ginobili", value: 1392, teams: ["SAS"] },
       { name: "David Robinson", value: 1388, teams: ["SAS"] },
       { name: "Dominique Wilkins", value: 1378, teams: ["ATL", "BOS", "LAC", "ORL", "SAS"] },
       { name: "Kawhi Leonard", value: 1377, teams: ["LAC", "SAS", "TOR"] },
@@ -6363,7 +7367,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Nen\u00ea", value: 1041, teams: ["DEN", "HOU", "WAS"] },
       { name: "James Worthy", value: 1041, teams: ["LAL"] },
       { name: "Nene", value: 1041, teams: ["DEN", "HOU", "PHI", "WAS"] },
-      { name: "Nikola Jokic", value: 1041, teams: ["DEN"] },
       { name: "A.C. Green", value: 1033, teams: ["DAL", "LAL", "MIA", "PHX"] },
       { name: "Michael Cooper", value: 1033, teams: ["LAL"] },
       { name: "Eric Bledsoe", value: 1028, teams: ["LAC", "MIL", "NOP", "PHX"] },
@@ -6815,7 +7818,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Kristaps Porzingis", value: 947, teams: ["ATL", "BOS", "DAL", "NYK", "WAS"] },
       { name: "Derrick Favors", value: 939, teams: ["BKN", "NOP", "OKC", "UTA"] },
       { name: "Rasho Nesterovi\u0107", value: 934, teams: ["IND", "MIN", "SAS", "TOR"] },
-      { name: "Rasho Nesterovic", value: 934, teams: ["IND", "MIN", "SAS", "TOR"] },
       { name: "Sam Perkins", value: 933, teams: ["DAL", "IND", "LAL", "OKC"] },
       { name: "Chris Bosh", value: 932, teams: ["MIA", "TOR"] },
       { name: "Chris Kaman", value: 931, teams: ["DAL", "LAC", "LAL", "NOP", "POR"] },
@@ -6936,7 +7938,6 @@ const CATEGORIES_BASKETBALL = {
       { name: "Ivica Zubac", value: 615, teams: ["IND", "LAC", "LAL"] },
       { name: "Alex Len", value: 615, teams: ["ATL", "LAL", "PHX", "SAC", "TOR", "WAS"] },
       { name: "Darko Mili\u010di\u0107", value: 613, teams: ["BOS", "DET", "MEM", "MIN", "NYK", "ORL"] },
-      { name: "Darko Milicic", value: 613, teams: ["BOS", "DET", "MEM", "MIN", "NYK", "ORL"] },
       { name: "Nic Claxton", value: 611, teams: ["BKN"] },
       { name: "Derrick McKey", value: 611, teams: ["IND", "OKC", "PHI"] },
       { name: "Armen Gilliam", value: 607, teams: ["BKN", "CHA", "MIL", "PHI", "PHX", "UTA"] },
@@ -6949,12 +7950,10 @@ const CATEGORIES_BASKETBALL = {
       { name: "Tom Burleson", value: 591, teams: ["ATL", "OKC", "SAC"] },
       { name: "Greg Anderson", value: 590, teams: ["ATL", "BKN", "DEN", "DET", "MIL", "SAS"] },
       { name: "Nikola Joki\u0107", value: 589, teams: ["DEN"] },
-      { name: "Nikola Jokic", value: 589, teams: ["DEN"] },
       { name: "Andrew Wiggins", value: 587, teams: ["GSW", "MIA", "MIN"] },
       { name: "Kent Benson", value: 586, teams: ["CLE", "DET", "MIL", "UTA"] },
       { name: "Andris Biedri\u0146\u0161", value: 580, teams: ["GSW", "UTA"] },
       { name: "Eddie Jones", value: 580, teams: ["CHA", "DAL", "LAL", "MEM", "MIA"] },
-      { name: "Andris Biedrins", value: 580, teams: ["GSW", "UTA"] },
       { name: "Robert Covington", value: 578, teams: ["HOU", "LAC", "MIN", "PHI", "POR"] },
       { name: "Marvin Williams", value: 577, teams: ["ATL", "CHA", "MIL", "UTA"] },
       { name: "Grant Hill", value: 576, teams: ["DET", "LAC", "ORL", "PHX"] },
@@ -7413,7 +8412,7 @@ const CATEGORIES_FOOTBALL = {
       { name: "Tony Banks", value: 15315, teams: ["LAR", "BAL", "HOU", "WAS"] },
       { name: "Teddy Bridgewater", value: 15182, teams: ["CAR", "DEN", "DET", "MIA", "MIN", "NO"] },
       { name: "Case Keenum", value: 15175, teams: ["BUF", "CLE", "DEN", "HOU", "LAR", "MIN", "WAS"] },
-      { name: "Jacoby Brissett", value: 15138, teams: ["CLE", "IND", "MIA", "NE", "WAS", "ARI"] },
+      { name: "Jacoby Brissett", value: 15138, teams: ["ARI", "BAL", "CLE", "IND", "MIA", "NE", "WAS"] },
       { name: "Kordell Stewart", value: 14746, teams: ["BAL", "CHI", "PIT"] },
       { name: "Doug Flutie", value: 14715, teams: ["BUF", "LAC", "NE", "CHI"] },
       { name: "Joey Harrington", value: 14693, teams: ["ATL", "DET", "MIA"] },
@@ -7688,7 +8687,7 @@ const CATEGORIES_FOOTBALL = {
       { name: "Case Keenum", value: 79, teams: ["BUF", "CLE", "DEN", "HOU", "LAR", "MIN", "WAS"] },
       { name: "Joey Harrington", value: 79, teams: ["ATL", "DET", "MIA"] },
       { name: "Mitchell Trubisky", value: 78, teams: ["BUF", "CHI", "PIT"] },
-      { name: "Jacoby Brissett", value: 78, teams: ["CLE", "IND", "MIA", "NE", "WAS", "ARI"] },
+      { name: "Jacoby Brissett", value: 78, teams: ["ARI", "BAL", "CLE", "IND", "MIA", "NE", "WAS"] },
       { name: "Tony Banks", value: 77, teams: ["BAL", "HOU", "WAS", "LAR"] },
       { name: "Kordell Stewart", value: 77, teams: ["BAL", "CHI", "PIT"] },
       { name: "Vince Ferragamo", value: 76, teams: ["BUF", "GB", "LAR"] },
@@ -7768,7 +8767,7 @@ const CATEGORIES_FOOTBALL = {
       { name: "Adrian Peterson", value: 14918, teams: ["ARI", "CHI", "DET", "MIN", "NO", "SEA", "TEN", "WAS"] },
       { name: "Curtis Martin", value: 14101, teams: ["NYJ", "NE"] },
       { name: "LaDainian Tomlinson", value: 13684, teams: ["LAC", "NYJ"] },
-      { name: "Jerome Bettis", value: 13662, teams: ["PIT"] },
+      { name: "Jerome Bettis", value: 13662, teams: ["LAR", "PIT"] },
       { name: "Eric Dickerson", value: 13259, teams: ["ATL", "IND", "LAR", "LV"] },
       { name: "Derrick Henry", value: 13230, teams: ["BAL", "TEN"] },
       { name: "Tony Dorsett", value: 12739, teams: ["DAL", "DEN"] },
@@ -7886,7 +8885,6 @@ const CATEGORIES_FOOTBALL = {
       { name: "Greg Pruitt", value: 5672, teams: ["CLE", "LV"] },
       { name: "Cam Newton", value: 5628, teams: ["CAR", "NE"] },
       { name: "Michael Pittman Sr.", value: 5627, teams: ["ARI", "TB", "DEN"] },
-      { name: "Michael Pittman", value: 5627, teams: ["ARI", "TB", "DEN"] },
       { name: "Pete Johnson", value: 5626, teams: ["CIN", "LAC", "MIA"] },
       { name: "Delvin Williams", value: 5598, teams: ["SF", "MIA", "GB"] },
       { name: "Joe Morris", value: 5585, teams: ["NYG", "CLE"] },
@@ -8248,7 +9246,6 @@ const CATEGORIES_FOOTBALL = {
       { name: "Ben Watson", value: 6058, teams: ["NE", "CLE", "NO", "BAL"] },
       { name: "Mark Andrews", value: 6050, teams: ["BAL"] },
       { name: "Jim Phillips", value: 6044, teams: ["LAR", "MIN"] },
-      { name: "Red Phillips", value: 6044, teams: ["LAR", "MIN"] },
       { name: "Lenny Moore", value: 6039, teams: ["IND"] },
       { name: "Santonio Holmes", value: 6030, teams: ["CHI", "NYJ", "PIT"] },
       { name: "Louis Lipps", value: 6019, teams: ["NO", "PIT"] },
@@ -8339,7 +9336,7 @@ const CATEGORIES_FOOTBALL = {
       { name: "Marshall Faulk", value: 100, teams: ["LAR", "IND"] },
       { name: "Barry Sanders", value: 99, teams: ["DET"] },
       { name: "Franco Harris", value: 91, teams: ["PIT", "SEA"] },
-      { name: "Jerome Bettis", value: 91, teams: ["PIT"] },
+      { name: "Jerome Bettis", value: 91, teams: ["LAR", "PIT"] },
       { name: "Eric Dickerson", value: 90, teams: ["ATL", "IND", "LAR", "LV"] },
       { name: "Curtis Martin", value: 90, teams: ["NYJ", "NE"] },
       { name: "Priest Holmes", value: 86, teams: ["BAL", "KC"] },
@@ -8915,6 +9912,73 @@ function normalize(str) {
     .trim();
 }
 
+// Player-name search for the answer boxes. Normal typing works as before; only when
+// nothing matches that way do we ignore spaces, so "JR Richard", "J.R. Richard" and
+// "J. R. Richard" all find the same player (and "AJ Burnett" finds "A. J. Burnett").
+function searchPlayers(players, text) {
+  const q = normalize(text);
+  if (q.length < 2) return [];
+  const plain = players.filter((p) => normalize(p.name).includes(q));
+  if (plain.length) return plain;
+  const flat = q.replace(/\s+/g, "");
+  if (flat.length < 3) return [];
+  const spaceless = players.filter((p) => normalize(p.name).replace(/\s+/g, "").includes(flat));
+  if (spaceless.length) return spaceless;
+  return typoSearch(players, q);
+}
+
+// Edit distance between two words, giving up early once it passes `max`.
+function editDistance(a, b, max) {
+  if (Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = [];
+  for (let j = 0; j <= b.length; j++) prev.push(j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    let rowMin = i;
+    for (let j = 1; j <= b.length; j++) {
+      cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      if (cur[j] < rowMin) rowMin = cur[j];
+    }
+    if (rowMin > max) return max + 1;
+    prev = cur;
+  }
+  return prev[b.length];
+}
+
+// Last resort when nothing else matches: forgive a typo in each word
+// ("Jazz Chisolm" finds Jazz Chisholm Jr., "Daryl Strawberry" finds Darryl Strawberry).
+// Short words must be exact, so this stays quiet for random typing.
+function typoSearch(players, q) {
+  const words = q.split(/\s+/).filter(Boolean);
+  if (words.join("").length < 4) return [];
+  const scored = [];
+  for (const p of players) {
+    const nameWords = normalize(p.name).split(/\s+/).filter(Boolean);
+    let total = 0;
+    let ok = true;
+    for (let i = 0; i < words.length && ok; i++) {
+      const w = words[i];
+      const max = w.length >= 7 ? 2 : w.length >= 4 ? 1 : 0;
+      let best = max + 1;
+      for (const n of nameWords) {
+        let d = editDistance(w, n, max);
+        // the word being typed right now only needs to match the start of a name
+        if (i === words.length - 1) {
+          for (const L of [w.length, w.length + 1]) {
+            if (n.length > L) d = Math.min(d, editDistance(w, n.slice(0, L), max));
+          }
+        }
+        if (d < best) best = d;
+      }
+      if (best > max) ok = false;
+      else total += best;
+    }
+    if (ok) scored.push([total, p]);
+  }
+  scored.sort((x, y) => x[0] - y[0]);
+  return scored.map((x) => x[1]);
+}
+
 function findPlayer(list, guess) {
   const g = normalize(guess);
   if (!g) return null;
@@ -9213,6 +10277,8 @@ const DAILY_SPIN_START = "2026-10-12"; // puzzle #1
 const DAILY_SPIN_STORE = "statBlitzDailySpin";
 const DAILY_SPIN_STATS = "statBlitzDailySpinStats";
 const DAILY_SPIN_SEEN = "statBlitzDailySpinSeen";
+// Replays of past puzzles live here, apart from the streak history.
+const DAILY_SPIN_ARCHIVE = "statBlitzDailySpinArchive";
 const REPORT_EMAIL = "jpgsportsbiz@gmail.com";
 // Opens an email to you with the details already filled in — used by every
 // "Tell us" link so players can flag a missing player or a missing team.
@@ -9261,6 +10327,31 @@ function dailyRng(seed) {
   };
 }
 
+// The teams a daily puzzle may pick from, fixed in place for each stat. They used to be
+// worked out from the player lists (teams with 4+ players), so adding players could quietly
+// change an old puzzle. Fixed, a date always gives the same puzzle on every version of the
+// app, which is also what lets people replay past days.
+const DAILY_SPIN_TEAM_POOLS = {
+  "baseball|Career Home Runs": ["NYY", "BOS", "TOR", "TB", "BAL", "CLE", "MIN", "CHW", "KC", "DET", "HOU", "SEA", "TEX", "LAA", "OAK", "ATL", "NYM", "PHI", "MON/WAS", "MIA", "CHC", "STL", "MIL", "PIT", "CIN", "LAD", "SFG", "SDP", "ARI", "COL"],
+  "baseball|Career Hits": ["NYY", "BOS", "TOR", "TB", "BAL", "CLE", "MIN", "CHW", "KC", "DET", "HOU", "SEA", "TEX", "LAA", "OAK", "ATL", "NYM", "PHI", "MON/WAS", "MIA", "CHC", "STL", "MIL", "PIT", "CIN", "LAD", "SFG", "SDP", "ARI", "COL"],
+  "baseball|Career RBI": ["NYY", "BOS", "TOR", "TB", "BAL", "CLE", "MIN", "CHW", "KC", "DET", "HOU", "SEA", "TEX", "LAA", "OAK", "ATL", "NYM", "PHI", "MON/WAS", "MIA", "CHC", "STL", "MIL", "PIT", "CIN", "LAD", "SFG", "SDP", "ARI", "COL"],
+  "baseball|Career Stolen Bases": ["NYY", "BOS", "TOR", "TB", "BAL", "CLE", "MIN", "CHW", "KC", "DET", "HOU", "SEA", "TEX", "LAA", "OAK", "ATL", "NYM", "PHI", "MON/WAS", "MIA", "CHC", "STL", "MIL", "PIT", "CIN", "LAD", "SFG", "SDP", "ARI", "COL"],
+  "baseball|Career Pitching Wins": ["NYY", "BOS", "TOR", "TB", "BAL", "CLE", "MIN", "CHW", "KC", "DET", "HOU", "SEA", "TEX", "LAA", "OAK", "ATL", "NYM", "PHI", "MON/WAS", "MIA", "CHC", "STL", "MIL", "PIT", "CIN", "LAD", "SFG", "SDP", "ARI", "COL"],
+  "baseball|Career Strikeouts (P)": ["NYY", "BOS", "TOR", "TB", "BAL", "CLE", "MIN", "CHW", "KC", "DET", "HOU", "SEA", "TEX", "LAA", "OAK", "ATL", "NYM", "PHI", "MON/WAS", "MIA", "CHC", "STL", "MIL", "PIT", "CIN", "LAD", "SFG", "SDP", "ARI", "COL"],
+  "baseball|Career Saves": ["NYY", "BOS", "TOR", "TB", "BAL", "CLE", "MIN", "CHW", "KC", "DET", "HOU", "SEA", "TEX", "LAA", "OAK", "ATL", "NYM", "PHI", "MON/WAS", "MIA", "CHC", "STL", "MIL", "PIT", "CIN", "LAD", "SFG", "SDP", "ARI", "COL"],
+  "basketball|Career Points": ["ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GSW", "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NOP", "NYK", "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SAS", "TOR", "UTA", "WAS"],
+  "basketball|Career Rebounds": ["ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GSW", "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NOP", "NYK", "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SAS", "TOR", "UTA", "WAS"],
+  "basketball|Career Assists": ["ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GSW", "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NOP", "NYK", "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SAS", "TOR", "UTA", "WAS"],
+  "basketball|Career Steals": ["ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GSW", "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NOP", "NYK", "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SAS", "TOR", "UTA", "WAS"],
+  "basketball|Career Blocks": ["ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DAL", "DEN", "DET", "GSW", "HOU", "IND", "LAC", "LAL", "MEM", "MIA", "MIL", "MIN", "NOP", "NYK", "OKC", "ORL", "PHI", "PHX", "POR", "SAC", "SAS", "TOR", "UTA", "WAS"],
+  "football|Career Passing Yards": ["BUF", "MIA", "NE", "NYJ", "BAL", "CIN", "CLE", "PIT", "HOU", "IND", "JAX", "TEN", "DEN", "KC", "LV", "LAC", "DAL", "NYG", "PHI", "WAS", "CHI", "DET", "GB", "MIN", "ATL", "CAR", "NO", "TB", "ARI", "LAR", "SF", "SEA"],
+  "football|Career Passing Touchdowns": ["BUF", "MIA", "NE", "NYJ", "BAL", "CIN", "CLE", "PIT", "HOU", "IND", "JAX", "TEN", "DEN", "KC", "LV", "LAC", "DAL", "NYG", "PHI", "WAS", "CHI", "DET", "GB", "MIN", "ATL", "CAR", "NO", "TB", "ARI", "LAR", "SF", "SEA"],
+  "football|Career Rushing Yards": ["BUF", "MIA", "NE", "NYJ", "BAL", "CIN", "CLE", "PIT", "HOU", "IND", "JAX", "TEN", "DEN", "KC", "LV", "LAC", "DAL", "NYG", "PHI", "WAS", "CHI", "DET", "GB", "MIN", "ATL", "CAR", "NO", "TB", "ARI", "LAR", "SF", "SEA"],
+  "football|Career Receiving Yards": ["BUF", "MIA", "NE", "NYJ", "BAL", "CIN", "CLE", "PIT", "HOU", "IND", "JAX", "TEN", "DEN", "KC", "LV", "LAC", "DAL", "NYG", "PHI", "WAS", "CHI", "DET", "GB", "MIN", "ATL", "CAR", "NO", "TB", "ARI", "LAR", "SF", "SEA"],
+  "football|Career Rushing Touchdowns": ["BUF", "MIA", "NE", "NYJ", "BAL", "CIN", "CLE", "PIT", "HOU", "IND", "JAX", "TEN", "DEN", "KC", "LV", "LAC", "DAL", "NYG", "PHI", "WAS", "CHI", "DET", "GB", "MIN", "ATL", "CAR", "NO", "TB", "ARI", "LAR", "SF", "SEA"],
+  "football|Career Receiving Touchdowns": ["BUF", "MIA", "NE", "NYJ", "BAL", "CIN", "CLE", "PIT", "HOU", "IND", "JAX", "TEN", "DEN", "KC", "LV", "LAC", "DAL", "NYG", "PHI", "WAS", "CHI", "DET", "GB", "MIN", "ATL", "CAR", "NO", "TB", "ARI", "LAR", "SF", "SEA"],
+};
+
 function buildDailyPuzzle(dateStr) {
   const n = dailyDayNumber(dateStr);
   const rng = dailyRng(dailyHash("statblitz-daily-" + dateStr));
@@ -9273,7 +10364,10 @@ function buildDailyPuzzle(dateStr) {
   const cat = sport.categories[categoryName];
   const count = 5 + Math.floor(rng() * 16); // 5 to 20 spots
   // Only teams with a few players in this list, so no spot is a dead end.
-  const roomy = sport.teams.filter((t) => cat.players.filter((p) => p.teams.includes(t.abbr)).length >= 4);
+  const fixedPool = DAILY_SPIN_TEAM_POOLS[sportKey + "|" + categoryName];
+  const roomy = fixedPool
+    ? sport.teams.filter((t) => fixedPool.includes(t.abbr))
+    : sport.teams.filter((t) => cat.players.filter((p) => p.teams.includes(t.abbr)).length >= 4);
   const pool = (roomy.length >= count ? roomy : sport.teams).map((t) => t.abbr);
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
@@ -9315,15 +10409,15 @@ function dailyScore(puzzle, picks) {
   return { best, total, pct, squares, bestBySlot };
 }
 
-function dailyShareText(puzzle, result, streak) {
+function dailyShareText(puzzle, result, streak, replay) {
   const rows = [];
   for (let i = 0; i < result.squares.length; i += 10) rows.push(result.squares.slice(i, i + 10).join(""));
   return [
-    `Stat Blitz daily spin #${puzzle.number}`,
+    `Stat Blitz daily spin #${puzzle.number}${replay ? " (replay)" : ""}`,
     `${SPORTS[puzzle.sportKey].label} · ${puzzle.categoryName}`,
     `${result.pct}% of the best possible · ${puzzle.count} spots`,
     rows.join("\n"),
-    streak > 1 ? `${streak}-day streak` : "",
+    !replay && streak > 1 ? `${streak}-day streak` : "",
     DAILY_SPIN_URL,
   ]
     .filter(Boolean)
@@ -9701,15 +10795,18 @@ function WhoHasMore({ onClose, initialSport, initialCategory }) {
   );
 }
 
-function DailySpin({ onClose }) {
+function DailySpin({ onClose, onArchive, playDate }) {
   const today = dailyDateString();
-  const puzzle = useMemo(() => buildDailyPuzzle(today), [today]);
+  // playDate is set when replaying an old puzzle from the archive. Replays are kept apart
+  // from today's puzzle, so they never touch the streak.
+  const isReplay = !!playDate;
+  const puzzle = useMemo(() => buildDailyPuzzle(playDate || today), [playDate, today]);
   const sport = SPORTS[puzzle.sportKey];
   const cat = sport.categories[puzzle.categoryName];
 
   const [picks, setPicks] = useState(() => {
-    const saved = dailyRead(DAILY_SPIN_STORE, null);
-    if (saved && saved.date === puzzle.date && Array.isArray(saved.picks) && saved.picks.length === puzzle.count) {
+    const saved = isReplay ? dailyRead(DAILY_SPIN_ARCHIVE, {})[puzzle.date] : dailyRead(DAILY_SPIN_STORE, null);
+    if (saved && (isReplay || saved.date === puzzle.date) && Array.isArray(saved.picks) && saved.picks.length === puzzle.count) {
       return saved.picks;
     }
     return Array(puzzle.count).fill(null);
@@ -9737,21 +10834,42 @@ function DailySpin({ onClose }) {
   const liveStreak = stats.last === today || stats.last === dailyYesterday(today) ? stats.streak : 0;
 
   useEffect(() => {
-    dailyWrite(DAILY_SPIN_STORE, { date: puzzle.date, picks });
-  }, [picks, puzzle.date]);
+    if (isReplay) {
+      const all = dailyRead(DAILY_SPIN_ARCHIVE, {});
+      dailyWrite(DAILY_SPIN_ARCHIVE, { ...all, [puzzle.date]: { ...(all[puzzle.date] || {}), picks } });
+    } else {
+      dailyWrite(DAILY_SPIN_STORE, { date: puzzle.date, picks });
+    }
+  }, [picks, puzzle.date, isReplay]);
 
   useEffect(() => {
     if (!done || !result) return;
+    if (isReplay) {
+      // Keep your best score on this old puzzle. Replays never touch the streak.
+      const all = dailyRead(DAILY_SPIN_ARCHIVE, {});
+      const prev = all[puzzle.date] || {};
+      dailyWrite(DAILY_SPIN_ARCHIVE, { ...all, [puzzle.date]: { ...prev, picks, pct: Math.max(prev.pct || 0, result.pct) } });
+      return;
+    }
     if (stats.history && stats.history[puzzle.date] != null) return;
     const next = dailyRecordFinish(stats, puzzle.date, result.pct);
     dailyWrite(DAILY_SPIN_STATS, next);
     setStats(next);
-  }, [done, result, stats, puzzle.date]);
+  }, [done, result, stats, puzzle.date, isReplay, picks]);
+
+  function replayAgain() {
+    setPicks(Array(puzzle.count).fill(null));
+    setSel(0);
+    setQuery("");
+    setMsg("");
+    setReport(null);
+    setConfirmSkip(false);
+    setShowBest(false);
+    setShareNote("");
+  }
 
   const suggestions = useMemo(() => {
-    const q = normalize(query);
-    if (q.length < 2) return [];
-    return cat.players.filter((p) => normalize(p.name).includes(q)).slice(0, 8);
+    return searchPlayers(cat.players, query).slice(0, 8);
   }, [query, cat]);
 
   const teamName = (abbr) => {
@@ -9801,7 +10919,7 @@ function DailySpin({ onClose }) {
   const now = new Date();
   const msLeft = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
   const nextIn = `${Math.floor(msLeft / 3600000)}h ${Math.floor((msLeft % 3600000) / 60000)}m`;
-  const shareText = result ? dailyShareText(puzzle, result, stats.streak) : "";
+  const shareText = result ? dailyShareText(puzzle, result, stats.streak, isReplay) : "";
 
   return (
     <div data-daily-spin className="w-full max-w-md font-body text-slate-200">
@@ -9815,7 +10933,7 @@ function DailySpin({ onClose }) {
             ← Back
           </button>
           <span className="text-xs text-slate-400">
-            {liveStreak > 0 ? `🔥 ${liveStreak}-day streak` : "Start a streak today"}
+            {isReplay ? "Replay · no streak" : liveStreak > 0 ? `🔥 ${liveStreak}-day streak` : "Start a streak today"}
           </span>
         </div>
 
@@ -9823,7 +10941,19 @@ function DailySpin({ onClose }) {
         <p className="mt-1 text-sm text-amber-400 font-semibold">
           {sport.label} · {puzzle.categoryName} · {puzzle.count} spots
         </p>
-        <p className="mt-1 text-xs text-slate-400">Same teams for everyone today. Name a player who played for each one.</p>
+        <p className="mt-1 text-xs text-slate-400">
+          {isReplay
+            ? `Same teams everyone had on ${dailyShortDate(puzzle.date)}. Replays don't count toward your streak.`
+            : "Same teams for everyone today. Name a player who played for each one."}
+        </p>
+        {!isReplay && onArchive && (
+          <button
+            onClick={onArchive}
+            className="mt-3 rounded-full border border-amber-400/40 bg-amber-400/10 px-3.5 py-1.5 text-xs font-semibold text-amber-300 hover:bg-amber-400/20"
+          >
+            Past puzzles →
+          </button>
+        )}
         <button
           onClick={() => setShowHow((v) => !v)}
           className="mt-2 text-xs text-amber-400 underline decoration-dotted underline-offset-2"
@@ -10002,7 +11132,9 @@ function DailySpin({ onClose }) {
               {result.squares.slice(10).join("")}
             </p>
             <p className="mt-2 text-xs text-slate-400">
-              🔥 {stats.streak}-day streak · best {stats.best} · played {stats.played}
+              {isReplay
+                ? "Replay · doesn't count toward your streak"
+                : `🔥 ${stats.streak}-day streak · best ${stats.best} · played ${stats.played}`}
             </p>
             <button
               onClick={() => dailyShare(shareText, setShareNote)}
@@ -10011,7 +11143,17 @@ function DailySpin({ onClose }) {
               Share result
             </button>
             {shareNote && <p className="mt-2 text-xs text-emerald-300">{shareNote}</p>}
-            <p className="mt-3 text-xs text-slate-500">Next daily spin in {nextIn}</p>
+            {isReplay ? (
+              <button
+                data-replay-again
+                onClick={replayAgain}
+                className="mt-3 w-full rounded-xl border border-white/15 py-3 text-sm font-semibold text-slate-200 hover:bg-white/10"
+              >
+                Play it again
+              </button>
+            ) : (
+              <p className="mt-3 text-xs text-slate-500">Next daily spin in {nextIn}</p>
+            )}
             <button
               onClick={() => setShowBest((v) => !v)}
               className="mt-3 text-xs text-amber-400 underline decoration-dotted underline-offset-2"
@@ -10048,6 +11190,7 @@ function DailySpin({ onClose }) {
           </div>
         )}
 
+        {!isReplay && (
         <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
           <p className="text-xs uppercase tracking-wide text-slate-400">Your longest streaks</p>
           {runs.length === 0 ? (
@@ -10073,16 +11216,144 @@ function DailySpin({ onClose }) {
             {stats.played} played · average score {avgScore}%
           </p>
         </div>
+        )}
 
         <button
           onClick={onClose}
           className="mt-6 w-full rounded-xl border border-white/15 py-3 text-sm text-slate-300 hover:bg-white/10"
         >
-          ← Back to the game
+          {isReplay ? "← Back to past puzzles" : "← Back to the game"}
         </button>
       </div>
     </div>
   );
+}
+
+
+function dailyScoreTone(pct) {
+  return pct >= 85 ? "text-emerald-400" : pct >= 60 ? "text-amber-300" : "text-rose-400";
+}
+
+// Every puzzle from yesterday back to #1, newest first, so any past day can be played.
+function DailyArchive({ onBack, onPlay }) {
+  const today = dailyDateString();
+  const stats = dailyRead(DAILY_SPIN_STATS, DAILY_SPIN_EMPTY_STATS);
+  const archive = dailyRead(DAILY_SPIN_ARCHIVE, {});
+  const [showAll, setShowAll] = useState(false);
+  const rows = useMemo(() => {
+    const out = [];
+    let d = dailyYesterday(today);
+    while (dailyDayNumber(d) >= dailyDayNumber(DAILY_SPIN_START)) {
+      out.push(buildDailyPuzzle(d));
+      d = dailyYesterday(d);
+    }
+    return out;
+  }, [today]);
+  const shown = showAll ? rows : rows.slice(0, 30);
+  const playedCount = rows.filter((r) => (stats.history && stats.history[r.date] != null) || (archive[r.date] && archive[r.date].pct != null)).length;
+
+  return (
+    <div data-daily-archive className="w-full max-w-md font-body text-slate-200">
+      <div className="px-2 pb-10">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={onBack}
+            aria-label="Back"
+            className="px-4 py-3.5 -ml-4 text-sm text-slate-300 hover:text-white"
+          >
+            ← Back
+          </button>
+          <span className="text-xs text-slate-400">
+            {playedCount} of {rows.length} played
+          </span>
+        </div>
+        <h1 className="font-scoreboard text-4xl text-white leading-none mt-2">PAST PUZZLES</h1>
+        <p className="mt-1 text-xs text-slate-400">
+          Play any day you missed. Replays save your best score and never touch your streak.
+        </p>
+
+        {rows.length === 0 ? (
+          <p className="mt-6 text-sm text-slate-400">No past puzzles yet. Come back tomorrow.</p>
+        ) : (
+          <div className="mt-4 space-y-2">
+            {shown.map((p) => {
+              const orig = stats.history ? stats.history[p.date] : null;
+              const rep = archive[p.date];
+              const progress = rep && Array.isArray(rep.picks) ? rep.picks.filter(Boolean).length : 0;
+              let main = "Play";
+              let sub = "not played";
+              let tone = "text-slate-300";
+              if (orig != null && rep && rep.pct != null) {
+                main = orig + "%";
+                sub = "replay " + rep.pct + "%";
+                tone = dailyScoreTone(orig);
+              } else if (orig != null) {
+                main = orig + "%";
+                sub = "played that day";
+                tone = dailyScoreTone(orig);
+              } else if (rep && rep.pct != null) {
+                main = rep.pct + "%";
+                sub = "replayed";
+                tone = dailyScoreTone(rep.pct);
+              } else if (progress > 0) {
+                main = "In progress";
+                sub = progress + " of " + p.count;
+                tone = "text-amber-300";
+              }
+              return (
+                <button
+                  key={p.date}
+                  data-archive-row={p.number}
+                  onClick={() => onPlay(p.date)}
+                  className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-left hover:bg-white/10"
+                >
+                  <span className="w-10 shrink-0 font-scoreboard text-2xl leading-none text-white">#{p.number}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm text-white">
+                      {SPORTS[p.sportKey].label} · {p.categoryName}
+                    </span>
+                    <span className="block text-[11px] text-slate-400">
+                      {dailyShortDate(p.date)} · {p.count} spots
+                    </span>
+                  </span>
+                  <span className="shrink-0 text-right">
+                    <span className={"block text-sm font-semibold " + tone}>{main}</span>
+                    <span className="block text-[10px] text-slate-500">{sub}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {!showAll && rows.length > 30 && (
+          <button
+            onClick={() => setShowAll(true)}
+            className="mt-3 w-full rounded-xl border border-white/10 py-3 text-sm text-slate-300 hover:bg-white/10"
+          >
+            Show older puzzles ({rows.length - 30} more)
+          </button>
+        )}
+
+        <button
+          onClick={onBack}
+          className="mt-6 w-full rounded-xl border border-white/15 py-3 text-sm text-slate-300 hover:bg-white/10"
+        >
+          ← Back to today's puzzle
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Switches between today's puzzle, the list of past puzzles, and a replay.
+function DailySpinHub({ onClose }) {
+  const [view, setView] = useState(null); // null = today, "archive" = the list, or a date to replay
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [view]);
+  if (view === "archive") return <DailyArchive onBack={() => setView(null)} onPlay={(d) => setView(d)} />;
+  if (view) return <DailySpin key={view} playDate={view} onClose={() => setView("archive")} />;
+  return <DailySpin onClose={onClose} onArchive={() => setView("archive")} />;
 }
 
 function StatBlitz() {
@@ -11331,10 +12602,7 @@ function StatBlitz() {
                       showSuggestions &&
                       slot.name.trim().length > 0 &&
                       (() => {
-                        const query = normalize(slot.name);
-                        const suggestions = cat.players
-                          .filter((p) => normalize(p.name).includes(query))
-                          .slice(0, 8);
+                        const suggestions = searchPlayers(cat.players, slot.name).slice(0, 8);
                         if (suggestions.length === 0) return null;
                         return (
                           <div className="absolute left-0 right-0 z-10 mt-1 max-h-48 overflow-y-auto rounded-lg border border-white/10 bg-slate-900 shadow-xl">
@@ -11524,7 +12792,7 @@ function StatBlitz() {
           </p>
         </div>
       </div>
-      {DAILY_SPIN_ENABLED && dailyOpen && <DailySpin onClose={closeDaily} />}
+      {DAILY_SPIN_ENABLED && dailyOpen && <DailySpinHub onClose={closeDaily} />}
       {WHO_HAS_MORE_ENABLED && moreOpen && (
         <WhoHasMore onClose={closeMore} initialSport={sport} initialCategory={category} />
       )}
